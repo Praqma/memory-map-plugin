@@ -21,22 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 package net.praqma.jenkins.memorymap.parser;
 
 import hudson.Extension;
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
+import net.sf.json.JSONObject;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.StaplerRequest;
 
 /**
  *
  * @author Praqma
  */
-@Extension
-public class TexasIntrumentsMemoryMapParser extends AbstractMemoryMapParser {
+public class GccFakeParser extends AbstractMemoryMapParser implements Serializable {
     
    //private static final Pattern PATTERN_FLASH = Pattern.compile("(FLASH\\s+\\S+\\s+)(\\S)\\s");
     //private static final Pattern PATTERN_FLASH = Pattern.compile("FLASH\\s+\\S+\\s+(\\S+)");
@@ -46,11 +50,14 @@ public class TexasIntrumentsMemoryMapParser extends AbstractMemoryMapParser {
     private static final Pattern CINIT_DOT = Pattern.compile("^\\.cinit\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
     private static final Pattern STACK_DOT = Pattern.compile("^\\.stack\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
     private static final Pattern BSS_DOT = Pattern.compile("^\\.ebss\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
- 
-    public TexasIntrumentsMemoryMapParser() {}
     
-    public TexasIntrumentsMemoryMapParser(String includePattern) {
-        super(includePattern, TEXT_DOT, CONST_DOT, CINIT_DOT, STACK_DOT, BSS_DOT);
+    @DataBoundConstructor
+    public GccFakeParser(String mapFile) {
+        super(mapFile, TEXT_DOT, CONST_DOT, CINIT_DOT, STACK_DOT, BSS_DOT);
+    }
+    
+    public GccFakeParser() { 
+        super();
     }
 
     @Override
@@ -62,28 +69,40 @@ public class TexasIntrumentsMemoryMapParser extends AbstractMemoryMapParser {
                 String parsedValue = m.group(1);
                 MemoryMapParsingResult pres = new MemoryMapParsingResult();                
                 if(p == TEXT_DOT) {
-                    pres.name = ".text";
+                    pres.setName(".text");
                 } else if (p == CONST_DOT) {
-                    pres.name = ".econst";
+                    pres.setName(".econst");
                 } else if (p == CINIT_DOT) {
-                    pres.name = ".cinit";
+                    pres.setName(".cinit");
                 } else if (p == STACK_DOT) {
-                    pres.name = ".stack";
+                    pres.setName(".stack");
                 } else if (p == BSS_DOT) {
-                    pres.name = ".ebss";
+                    pres.setName(".ebss");
                 } else {
                     throw new IOException("Illegal pattern passed to method", new IllegalArgumentException(p.toString()));
                 }
-                pres.rawvalue = parsedValue;
-                pres.value = Integer.parseInt(parsedValue, 16);
+                pres.setRawvalue(parsedValue);
+                pres.setValue(Integer.parseInt(parsedValue, 16));
                 res.add(pres);
             }
         }        
         return res;
     }
 
-    @Override
-    public String getParserName() {
-        return "Texas Instruments Parser";
-    }
+    @Extension
+    public static final class DescriptorImpl extends MemoryMapParserDescriptor<TexasInstrumentsMemoryMapParser> {
+
+        @Override
+        public String getDisplayName() {
+            return "Gcc Fake Parser";
+        }
+
+        @Override
+        public AbstractMemoryMapParser newInstance(StaplerRequest req, JSONObject formData, AbstractMemoryMapParser instance) throws FormException {
+            GccFakeParser parser = (GccFakeParser)instance;
+            save();
+            return parser;
+        } 
+    }    
 }
+

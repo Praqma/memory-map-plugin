@@ -24,6 +24,8 @@
 package net.praqma.jenkins.memorymap;
 
 import hudson.model.Action;
+import java.util.List;
+import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
 
 /**
  *
@@ -31,6 +33,12 @@ import hudson.model.Action;
  */
 public class MemoryMapBuildAction implements Action {
 
+    public List<MemoryMapParsingResult> results;
+    
+    public MemoryMapBuildAction(List<MemoryMapParsingResult> results) {
+        this.results = results;
+    }
+    
     @Override
     public String getIconFileName() {
         return null;
@@ -45,5 +53,25 @@ public class MemoryMapBuildAction implements Action {
     public String getUrlName() {
         return null;
     }
+    
+    /**
+     * Returns an indication wheather as to the requirements are met. You do one check per set of values you wish to compare. 
+     * 
+     * @param threshold
+     * @param valuenames
+     * @return 
+     */
+    public boolean validateThreshold(int threshold, String... valuenames) {
+        int sum = 0;
+        
+        for(MemoryMapParsingResult res : results) {
+            for(String s : valuenames) {
+                if(res.getName().equals(s)) {
+                    sum+=res.getValue();
+                }
+            }
+        }
+        return threshold <= sum;
+    } 
     
 }

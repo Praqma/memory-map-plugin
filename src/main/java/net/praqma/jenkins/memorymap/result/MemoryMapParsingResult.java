@@ -30,13 +30,58 @@ import java.io.Serializable;
  * @author Praqma 
 */
 public class MemoryMapParsingResult implements Serializable {
-    public String name;
-    public String rawvalue;
-    public int value;
+    private String name;
+    private String rawvalue;
+    private int value;
+    
+    //Empty constructor for serialization
+    public MemoryMapParsingResult() {}
 
     @Override
     public String toString() {
-        return String.format("[name = %s, value = %s, raw value = %s]", name, value, rawvalue);
+        return String.format("[name = %s, value = %s, raw value = %s]", getName(), getValue(), getRawvalue());
+    }
+
+    /**
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @param name the name to set
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * @return the rawvalue
+     */
+    public String getRawvalue() {
+        return rawvalue;
+    }
+
+    /**
+     * @param rawvalue the rawvalue to set
+     */
+    public void setRawvalue(String rawvalue) {
+        this.rawvalue = rawvalue;
+    }
+
+    /**
+     * @return the value
+     */
+    public int getValue() {
+        return value;
+    }
+
+    /**
+     * @param value the value to set
+     */
+    public void setValue(int value) {
+        this.value = value;
     }
 
 }

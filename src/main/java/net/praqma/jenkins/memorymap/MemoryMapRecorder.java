@@ -23,19 +23,23 @@
  */
 package net.praqma.jenkins.memorymap;
 
-import net.praqma.jenkins.memorymap.parser.TexasIntrumentsMemoryMapParser;
 import hudson.Extension;
+import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.BuildListener;
+import hudson.remoting.VirtualChannel;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
 import hudson.tasks.Recorder;
+import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import net.praqma.jenkins.memorymap.parser.AbstractMemoryMapParser;
+import net.praqma.jenkins.memorymap.parser.MemoryMapParserDescriptor;
 import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
 import org.kohsuke.stapler.DataBoundConstructor;
 
@@ -47,6 +51,7 @@ public class MemoryMapRecorder extends Recorder {
 
     private String mapFile;
     private int memoryCapacity;
+    private AbstractMemoryMapParser chosenParser;
     
     @Override
     public BuildStepMonitor getRequiredMonitorService() {
@@ -54,22 +59,31 @@ public class MemoryMapRecorder extends Recorder {
     }
     
     @DataBoundConstructor
-    public MemoryMapRecorder(String mapFile, String memoryCapacity ) {
-        this.mapFile = mapFile;
-        this.memoryCapacity = Integer.parseInt(memoryCapacity);
+    public MemoryMapRecorder(AbstractMemoryMapParser chosenParser) {
+        this.chosenParser = chosenParser;
     }
 
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
         
-        //Example parser
-        TexasIntrumentsMemoryMapParser parser = new TexasIntrumentsMemoryMapParser(mapFile);
-      
-        List<MemoryMapParsingResult> res = build.getWorkspace().act(parser);
+        
+        List<MemoryMapParsingResult> res = build.getWorkspace().act(new MemoryMapParserDelegator(chosenParser));
+        
         
         for(MemoryMapParsingResult result : res) {
             listener.getLogger().println(result);
         }
+        
+        
+        
+        
+        
+        /*
+         * Create a build action and store the result.
+         */
+        MemoryMapBuildAction mmba = new MemoryMapBuildAction(res);
+        build.getActions().add(mmba);
+        
         return true;        
     } 
 
@@ -100,6 +114,20 @@ public class MemoryMapRecorder extends Recorder {
     public void setMemoryCapacity(int memoryCapacity) {
         this.memoryCapacity = memoryCapacity;
     }
+
+    /**
+     * @return the chosenParser
+     */
+    public AbstractMemoryMapParser getChosenParser() {
+        return chosenParser;
+    }
+
+    /**
+     * @param chosenParser the chosenParser to set
+     */
+    public void setChosenParser(AbstractMemoryMapParser chosenParser) {
+        this.chosenParser = chosenParser;
+    }
     
     @Extension
     public static final class DescriptorImpl extends BuildStepDescriptor<Publisher> {
@@ -113,7 +141,45 @@ public class MemoryMapRecorder extends Recorder {
         public String getDisplayName() {
             return "Memory Map Parser";
         }
+        
+        public List<MemoryMapParserDescriptor<?>> getParsers() {
+			return AbstractMemoryMapParser.getDescriptors();
+		}
     }
-            
+    
+    /**
+     * Small class to abstract the task of using the file callable away from the parser 
+     */
+    public class MemoryMapParserDelegator implements FilePath.FileCallable<List<MemoryMapParsingResult>> 
+    {
+        private AbstractMemoryMapParser parser;
+        
+        //Empty constructor. For serialization purposes.
+        public MemoryMapParserDelegator() { }
+        
+        public MemoryMapParserDelegator(AbstractMemoryMapParser parser) {
+            this.parser = parser;
+        }
+        
+        @Override
+        public List<MemoryMapParsingResult> invoke(File file, VirtualChannel vc) throws IOException, InterruptedException {
+            return getParser().parse(file);
+        }
+
+        /**
+         * @return the parser
+         */
+        public AbstractMemoryMapParser getParser() {
+            return parser;
+        }
+
+        /**
+         * @param parser the parser to set
+         */
+        public void setParser(AbstractMemoryMapParser parser) {
+            this.parser = parser;
+        }
+        
+    }
     
 }

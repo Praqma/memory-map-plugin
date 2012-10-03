@@ -23,10 +23,10 @@
  */
 package net.praqma.jenkins.memorymap.parser;
 
+import hudson.DescriptorExtensionList;
 import hudson.ExtensionPoint;
-import hudson.FilePath;
-import hudson.remoting.VirtualChannel;
-import java.io.File;
+import hudson.model.Describable;
+import hudson.model.Descriptor;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Serializable;
@@ -34,37 +34,33 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
-import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
+import jenkins.model.Jenkins;
+import org.apache.commons.collections.ListUtils;
 
 /**
  *
  * @author Praqma
  */
-public abstract class AbstractMemoryMapParser implements FilePath.FileCallable<List<MemoryMapParsingResult>> {
+public abstract class AbstractMemoryMapParser implements Describable<AbstractMemoryMapParser>, ExtensionPoint, MemoryMapParsable, Serializable {
     
     protected List<Pattern> patterns;
-    protected String includeFilePattern;
+    protected String mapFile;
     
-    public AbstractMemoryMapParser() {}
-    
-    public AbstractMemoryMapParser(String includeFilePattern, Pattern... pattern) {
-        this.patterns = Arrays.asList(pattern);
-        this.includeFilePattern = includeFilePattern;
+    public AbstractMemoryMapParser () {  
+        this.patterns = ListUtils.EMPTY_LIST;
     }
     
-    public abstract List<MemoryMapParsingResult> parse(File f) throws IOException;
-    public abstract String getParserName();
-
-    @Override
-    public List<MemoryMapParsingResult> invoke(File file, VirtualChannel vc) throws IOException, InterruptedException {
-        return parse(file);
+    public AbstractMemoryMapParser(String mapFile, Pattern... pattern) {
+        this.patterns = Arrays.asList(pattern);
+        this.mapFile = mapFile;
     }
     
     protected CharSequence createCharSequenceFromFile() throws IOException {
-        FileInputStream fis = new FileInputStream(includeFilePattern);
+        FileInputStream fis = new FileInputStream(mapFile);
         FileChannel fc = fis.getChannel();
 
         ByteBuffer bbuf = fc.map(FileChannel.MapMode.READ_ONLY, 0, (int)fc.size());
@@ -75,14 +71,34 @@ public abstract class AbstractMemoryMapParser implements FilePath.FileCallable<L
     /**
      * @return the includeFilePattern
      */
-    public String getIncludeFilePattern() {
-        return includeFilePattern;
+    public String getMapFile() {
+        return mapFile;
     }
 
     /**
      * @param includeFilePattern the includeFilePattern to set
      */
-    public void setIncludeFilePattern(String includeFilePattern) {
-        this.includeFilePattern = includeFilePattern;
+    public void setMapFile(String mapFile) {
+        this.mapFile = mapFile;
     }
+    
+    @Override
+	public Descriptor<AbstractMemoryMapParser> getDescriptor() {
+		return (Descriptor<AbstractMemoryMapParser>) Jenkins.getInstance().getDescriptorOrDie( getClass() );
+	}
+    
+    	/**
+	 * All registered {@link AbstractConfigurationRotatorSCM}s.
+	 */
+	public static DescriptorExtensionList<AbstractMemoryMapParser, MemoryMapParserDescriptor<AbstractMemoryMapParser>> all() {
+		return Jenkins.getInstance().<AbstractMemoryMapParser, MemoryMapParserDescriptor<AbstractMemoryMapParser>> getDescriptorList( AbstractMemoryMapParser.class );
+	}
+    
+    public static List<MemoryMapParserDescriptor<?>> getDescriptors() {
+		List<MemoryMapParserDescriptor<?>> list = new ArrayList<MemoryMapParserDescriptor<?>>();
+		for( MemoryMapParserDescriptor<?> d : all() ) {
+			list.add( d );
+		}
+		return list;
+	}
 }

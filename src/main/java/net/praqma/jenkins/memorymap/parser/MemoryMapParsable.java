@@ -23,16 +23,15 @@
  */
 package net.praqma.jenkins.memorymap.parser;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
+import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
 
 /**
  *
  * @author Praqma
  */
-public class ParserLocator {
-    public static List<AbstractMemoryMapParser> getParsers() {
-        return null;        
-    }
-    
-    
+public interface MemoryMapParsable {
+    public List<MemoryMapParsingResult> parse(File f) throws IOException;
 }
