@@ -23,12 +23,19 @@
  */
 package net.praqma.jenkins.memorymap.parser;
 
+import hudson.Extension;
+import java.io.File;
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
 
 /**
  *
  * @author Praqma
  */
+@Extension
 public class TexasIntrumentsMemoryMapParser extends AbstractMemoryMapParser {
     
    //private static final Pattern PATTERN_FLASH = Pattern.compile("(FLASH\\s+\\S+\\s+)(\\S)\\s");
@@ -40,7 +47,43 @@ public class TexasIntrumentsMemoryMapParser extends AbstractMemoryMapParser {
     private static final Pattern STACK_DOT = Pattern.compile("^\\.stack\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
     private static final Pattern BSS_DOT = Pattern.compile("^\\.ebss\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
  
+    public TexasIntrumentsMemoryMapParser() {}
+    
     public TexasIntrumentsMemoryMapParser(String includePattern) {
         super(includePattern, TEXT_DOT, CONST_DOT, CINIT_DOT, STACK_DOT, BSS_DOT);
+    }
+
+    @Override
+    public LinkedList<MemoryMapParsingResult> parse(File f) throws IOException {
+        LinkedList<MemoryMapParsingResult> res = new LinkedList<MemoryMapParsingResult>();
+        for(Pattern p : patterns) {
+            Matcher m = p.matcher(createCharSequenceFromFile());
+            while(m.find()) {
+                String parsedValue = m.group(1);
+                MemoryMapParsingResult pres = new MemoryMapParsingResult();                
+                if(p == TEXT_DOT) {
+                    pres.name = ".text";
+                } else if (p == CONST_DOT) {
+                    pres.name = ".econst";
+                } else if (p == CINIT_DOT) {
+                    pres.name = ".cinit";
+                } else if (p == STACK_DOT) {
+                    pres.name = ".stack";
+                } else if (p == BSS_DOT) {
+                    pres.name = ".ebss";
+                } else {
+                    throw new IOException("Illegal pattern passed to method", new IllegalArgumentException(p.toString()));
+                }
+                pres.rawvalue = parsedValue;
+                pres.value = Integer.parseInt(parsedValue, 16);
+                res.add(pres);
+            }
+        }        
+        return res;
+    }
+
+    @Override
+    public String getParserName() {
+        return "Texas Instruments Parser";
     }
 }

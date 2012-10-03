@@ -34,6 +34,9 @@ import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
 import hudson.tasks.Recorder;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 /**
@@ -62,10 +65,11 @@ public class MemoryMapRecorder extends Recorder {
         //Example parser
         TexasIntrumentsMemoryMapParser parser = new TexasIntrumentsMemoryMapParser(mapFile);
       
-        String res = build.getWorkspace().act(parser);
+        List<MemoryMapParsingResult> res = build.getWorkspace().act(parser);
         
-        listener.getLogger().println(res);
-        
+        for(MemoryMapParsingResult result : res) {
+            listener.getLogger().println(result);
+        }
         return true;        
     } 
 

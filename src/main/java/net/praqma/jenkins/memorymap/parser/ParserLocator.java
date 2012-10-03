@@ -21,22 +21,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package net.praqma.jenkins.memorymap.result;
+package net.praqma.jenkins.memorymap.parser;
 
-import java.io.Serializable;
+import java.util.List;
 
 /**
  *
- * @author Praqma 
-*/
-public class MemoryMapParsingResult implements Serializable {
-    public String name;
-    public String rawvalue;
-    public int value;
-
-    @Override
-    public String toString() {
-        return String.format("[name = %s, value = %s, raw value = %s]", name, value, rawvalue);
+ * @author Praqma
+ */
+public class ParserLocator {
+    public static List<AbstractMemoryMapParser> getParsers() {
+        return null;        
     }
-
+    
+    
 }

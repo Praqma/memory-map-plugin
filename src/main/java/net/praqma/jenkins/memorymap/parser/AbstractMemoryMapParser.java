@@ -23,18 +23,19 @@
  */
 package net.praqma.jenkins.memorymap.parser;
 
+import hudson.ExtensionPoint;
 import hudson.FilePath;
 import hudson.remoting.VirtualChannel;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
 
@@ -42,31 +43,27 @@ import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
  *
  * @author Praqma
  */
-public class AbstractMemoryMapParser implements FilePath.FileCallable<MemoryMapParsingResult> {
+public abstract class AbstractMemoryMapParser implements FilePath.FileCallable<List<MemoryMapParsingResult>> {
     
-    private List<Pattern> patterns;
-    private String includeFilePattern;
+    protected List<Pattern> patterns;
+    protected String includeFilePattern;
+    
+    public AbstractMemoryMapParser() {}
     
     public AbstractMemoryMapParser(String includeFilePattern, Pattern... pattern) {
         this.patterns = Arrays.asList(pattern);
-        
         this.includeFilePattern = includeFilePattern;
     }
+    
+    public abstract List<MemoryMapParsingResult> parse(File f) throws IOException;
+    public abstract String getParserName();
 
     @Override
-    public MemoryMapParsingResult invoke(File file, VirtualChannel vc) throws IOException, InterruptedException {
-        MemoryMapParsingResult res = new MemoryMapParsingResult("Test", 0);
-      
-        for(Pattern pattern : patterns) {
-            Matcher match = pattern.matcher(createCharSequenceFromFile());
-            while(match.find()) {
-                //res += match.group(1) + "\n"; //Works. Next up Structure
-            }
-        }
-        return res;
+    public List<MemoryMapParsingResult> invoke(File file, VirtualChannel vc) throws IOException, InterruptedException {
+        return parse(file);
     }
     
-    private CharSequence createCharSequenceFromFile() throws IOException {
+    protected CharSequence createCharSequenceFromFile() throws IOException {
         FileInputStream fis = new FileInputStream(includeFilePattern);
         FileChannel fc = fis.getChannel();
 
