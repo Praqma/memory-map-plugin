@@ -23,9 +23,12 @@
  */
 package net.praqma.jenkins.memorymap;
 
+import hudson.model.AbstractBuild;
 import hudson.model.Action;
 import java.util.List;
 import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
 
 /**
  *
@@ -34,10 +37,14 @@ import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
 public class MemoryMapBuildAction implements Action {
 
     public List<MemoryMapParsingResult> results;
+    private AbstractBuild<?,?> build;
     
-    public MemoryMapBuildAction(List<MemoryMapParsingResult> results) {
+    public MemoryMapBuildAction(AbstractBuild<?,?> build,List<MemoryMapParsingResult> results) {
         this.results = results;
+        this.build = build;
     }
+    
+    
     
     @Override
     public String getIconFileName() {
@@ -62,8 +69,11 @@ public class MemoryMapBuildAction implements Action {
      * @return 
      */
     public boolean validateThreshold(int threshold, String... valuenames) {
+        return sumOfValues(valuenames) <= threshold;
+    }
+    
+    public int sumOfValues(String... valuenames) { 
         int sum = 0;
-        
         for(MemoryMapParsingResult res : results) {
             for(String s : valuenames) {
                 if(res.getName().equals(s)) {
@@ -71,7 +81,47 @@ public class MemoryMapBuildAction implements Action {
                 }
             }
         }
-        return threshold <= sum;
-    } 
+        return sum;
+    }
+    
+        /**
+     * Fetches the previous MemoryMap build. Takes all succesful, but failed builds. 
+     * 
+     * Goes to the end of list.
+     */ 
+    public MemoryMapBuildAction getPreviousAction(AbstractBuild<?,?> base) {
+        MemoryMapBuildAction action = null;
+        AbstractBuild<?,?> start = base;
+        while(true) {
+            start = start.getPreviousCompletedBuild();
+            if(start == null) {
+                return null;
+            }
+            action = start.getAction(MemoryMapBuildAction.class);            
+            if(action != null) {
+                return action;
+            }
+        }
+    }
+    
+    public MemoryMapBuildAction getPreviousAction() {
+        MemoryMapBuildAction action = null;
+        AbstractBuild<?,?> start = build;
+        while(true) {
+            start = start.getPreviousCompletedBuild();
+            if(start == null) {
+                return null;
+            }
+            action = start.getAction(MemoryMapBuildAction.class);            
+            if(action != null) {
+                return action;
+            }
+        }
+    }
+    
+    
+    public void doDrawMemoryMapUsageGraph(StaplerRequest req, StaplerResponse rsp) {
+        
+    }
     
 }

@@ -1,6 +1,15 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
          xmlns:t="/lib/hudson" xmlns:f="/lib/form">
 	<f:block>
+        <f:entry>
+            ${%Maximum Ram Capacity}
+            <f:textbox name="ramCapacity" field="ramCapacity"/>
+        </f:entry>
+        <f:entry>
+            ${%Maximum Flash Capacity}
+            <f:textbox name="flashCapacity" field="flashCapacity"/>
+        </f:entry>
+        
 		<f:dropdownDescriptorSelector descriptors="${descriptor.getParsers()}" field="chosenParser" />
 	</f:block>   
 </j:jelly>

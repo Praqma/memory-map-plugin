@@ -23,6 +23,8 @@
  */
 package net.praqma.jenkins.memorymap;
 
+import hudson.model.AbstractProject;
+import hudson.model.Action;
 import hudson.model.Actionable;
 import hudson.model.ProminentProjectAction;
 
@@ -32,7 +34,12 @@ import hudson.model.ProminentProjectAction;
  */
 public class MemoryMapProjectAction extends Actionable implements ProminentProjectAction {
     public static final String ICON_NAME="/plugin/memory-map/images/64x64/memory.png";
-
+    private AbstractProject<?,?> project;
+    
+    public MemoryMapProjectAction(AbstractProject<?,?> project) {
+        this.project = project;
+    }
+    
     @Override
     public String getDisplayName() {
         return "Memory map";
@@ -53,4 +60,10 @@ public class MemoryMapProjectAction extends Actionable implements ProminentProje
         return "memory-map";
     }
     
+    public MemoryMapBuildAction getLatestActionInProject() {       
+        if(project.getLastCompletedBuild() != null) {
+            return project.getLastCompletedBuild().getAction(MemoryMapBuildAction.class);     
+        }
+        return null;
+    }  
 }

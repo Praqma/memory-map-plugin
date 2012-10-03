@@ -24,19 +24,17 @@
 package net.praqma.jenkins.memorymap;
 
 import hudson.Extension;
-import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
+import hudson.model.Action;
 import hudson.model.BuildListener;
-import hudson.remoting.VirtualChannel;
+import hudson.model.Result;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
 import hudson.tasks.Recorder;
-import java.io.File;
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.List;
 import net.praqma.jenkins.memorymap.parser.AbstractMemoryMapParser;
 import net.praqma.jenkins.memorymap.parser.MemoryMapParserDelegate;
@@ -51,7 +49,8 @@ import org.kohsuke.stapler.DataBoundConstructor;
 public class MemoryMapRecorder extends Recorder {
 
     private String mapFile;
-    private int memoryCapacity;
+    private int ramCapacity;
+    private int flashCapacity;
     private AbstractMemoryMapParser chosenParser;
     
     @Override
@@ -60,29 +59,41 @@ public class MemoryMapRecorder extends Recorder {
     }
     
     @DataBoundConstructor
-    public MemoryMapRecorder(AbstractMemoryMapParser chosenParser) {
+    public MemoryMapRecorder(AbstractMemoryMapParser chosenParser, int ramCapacity, int flashCapacity) {
         this.chosenParser = chosenParser;
+        this.ramCapacity = ramCapacity;
+        this.flashCapacity = flashCapacity;
     }
 
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
-        
-        
+
         List<MemoryMapParsingResult> res = build.getWorkspace().act(new MemoryMapParserDelegate(chosenParser));
-        
-        
+
         for(MemoryMapParsingResult result : res) {
             listener.getLogger().println(result);
         }
-        
-        
-        
-        
-        
         /*
          * Create a build action and store the result.
          */
-        MemoryMapBuildAction mmba = new MemoryMapBuildAction(res);
+        MemoryMapBuildAction mmba = new MemoryMapBuildAction(build, res);
+        
+        boolean validFlashCapacity = mmba.validateThreshold(getFlashCapacity(), ".text",".econst");
+        int flashCount = mmba.sumOfValues(".text",".econst");
+        boolean validRamCapacity = mmba.validateThreshold(getRamCapacity(), ".stack",".cinit",".ebss");
+        int ramCount = mmba.sumOfValues( ".stack",".cinit",".ebss");
+
+        listener.getLogger().println("flashCount: "+flashCount);        
+        listener.getLogger().println("ramCount: "+ramCount);        
+        
+        
+        if(!validFlashCapacity && !validRamCapacity) {
+            listener.getLogger().println("Ram capacity exceeded!");
+            build.setResult(Result.FAILURE);            
+        } else {
+            listener.getLogger().println("Ram capacity is adequate");
+        }
+        
         build.getActions().add(mmba);
         
         return true;        
@@ -105,15 +116,15 @@ public class MemoryMapRecorder extends Recorder {
     /**
      * @return the memoryCapacity
      */
-    public int getMemoryCapacity() {
-        return memoryCapacity;
+    public int getRamCapacity() {
+        return ramCapacity;
     }
 
     /**
      * @param memoryCapacity the memoryCapacity to set
      */
-    public void setMemoryCapacity(int memoryCapacity) {
-        this.memoryCapacity = memoryCapacity;
+    public void setRamCapacity(int ramCapacity) {
+        this.ramCapacity = ramCapacity;
     }
 
     /**
@@ -128,6 +139,20 @@ public class MemoryMapRecorder extends Recorder {
      */
     public void setChosenParser(AbstractMemoryMapParser chosenParser) {
         this.chosenParser = chosenParser;
+    }
+
+    /**
+     * @return the flashCapacity
+     */
+    public int getFlashCapacity() {
+        return flashCapacity;
+    }
+
+    /**
+     * @param flashCapacity the flashCapacity to set
+     */
+    public void setFlashCapacity(int flashCapacity) {
+        this.flashCapacity = flashCapacity;
     }
     
     @Extension
@@ -148,9 +173,10 @@ public class MemoryMapRecorder extends Recorder {
 		}
     }
     
-    /**
-     * Small class to abstract the task of using the file callable away from the parser 
-     */
+    @Override
+    public Action getProjectAction(AbstractProject<?, ?> project) {
+        return new MemoryMapProjectAction(project);
+    }
 
     
 }

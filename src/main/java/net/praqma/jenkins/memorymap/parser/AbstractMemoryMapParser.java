@@ -60,13 +60,17 @@ public abstract class AbstractMemoryMapParser implements Describable<AbstractMem
     }
     
     protected CharSequence createCharSequenceFromFile() throws IOException {
+        return createCharSequenceFromFile("8859_1");
+    }
+    
+    protected CharSequence createCharSequenceFromFile(String charset) throws IOException {
         FileInputStream fis = new FileInputStream(mapFile);
         FileChannel fc = fis.getChannel();
 
         ByteBuffer bbuf = fc.map(FileChannel.MapMode.READ_ONLY, 0, (int)fc.size());
-        CharBuffer cbuf = Charset.forName("8859_1").newDecoder().decode(bbuf);
+        CharBuffer cbuf = Charset.forName(charset).newDecoder().decode(bbuf);
         return cbuf;
-    }    
+    } 
 
     /**
      * @return the includeFilePattern

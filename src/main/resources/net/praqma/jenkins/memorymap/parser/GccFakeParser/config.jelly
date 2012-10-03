@@ -3,9 +3,5 @@
     <f:entry>
         Path to map file
         <f:textbox field="mapFile" name="mapFile" description="Descritpion goes here"/>
-    </f:entry>
-    <f:entry>
-        Memory capacity (Flash) (in words)
-        <f:textbox field="memoryCapacity" name="memoryCapacity" description="Descritpion goes here"/>
-    </f:entry>        
+    </f:entry>      
 </j:jelly>
