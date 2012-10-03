@@ -68,15 +68,15 @@ public class GccFakeParser extends AbstractMemoryMapParser implements Serializab
             while(m.find()) {
                 String parsedValue = m.group(1);
                 MemoryMapParsingResult pres = new MemoryMapParsingResult();                
-                if(p == TEXT_DOT) {
+                if(p.toString().equals(TEXT_DOT.toString())) {
                     pres.setName(".text");
-                } else if (p == CONST_DOT) {
+                } else if (p.toString().equals(CONST_DOT.toString())) {
                     pres.setName(".econst");
-                } else if (p == CINIT_DOT) {
+                } else if (p.toString().equals(CINIT_DOT.toString())) {
                     pres.setName(".cinit");
-                } else if (p == STACK_DOT) {
+                } else if (p.toString().equals(STACK_DOT.toString())) {
                     pres.setName(".stack");
-                } else if (p == BSS_DOT) {
+                } else if (p.toString().equals(BSS_DOT.toString())) {
                     pres.setName(".ebss");
                 } else {
                     throw new IOException("Illegal pattern passed to method", new IllegalArgumentException(p.toString()));

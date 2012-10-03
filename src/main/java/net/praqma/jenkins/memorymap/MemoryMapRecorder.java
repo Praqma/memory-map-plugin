@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import net.praqma.jenkins.memorymap.parser.AbstractMemoryMapParser;
+import net.praqma.jenkins.memorymap.parser.MemoryMapParserDelegate;
 import net.praqma.jenkins.memorymap.parser.MemoryMapParserDescriptor;
 import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -67,7 +68,7 @@ public class MemoryMapRecorder extends Recorder {
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
         
         
-        List<MemoryMapParsingResult> res = build.getWorkspace().act(new MemoryMapParserDelegator(chosenParser));
+        List<MemoryMapParsingResult> res = build.getWorkspace().act(new MemoryMapParserDelegate(chosenParser));
         
         
         for(MemoryMapParsingResult result : res) {
@@ -150,36 +151,6 @@ public class MemoryMapRecorder extends Recorder {
     /**
      * Small class to abstract the task of using the file callable away from the parser 
      */
-    public class MemoryMapParserDelegator implements FilePath.FileCallable<List<MemoryMapParsingResult>> 
-    {
-        private AbstractMemoryMapParser parser;
-        
-        //Empty constructor. For serialization purposes.
-        public MemoryMapParserDelegator() { }
-        
-        public MemoryMapParserDelegator(AbstractMemoryMapParser parser) {
-            this.parser = parser;
-        }
-        
-        @Override
-        public List<MemoryMapParsingResult> invoke(File file, VirtualChannel vc) throws IOException, InterruptedException {
-            return getParser().parse(file);
-        }
 
-        /**
-         * @return the parser
-         */
-        public AbstractMemoryMapParser getParser() {
-            return parser;
-        }
-
-        /**
-         * @param parser the parser to set
-         */
-        public void setParser(AbstractMemoryMapParser parser) {
-            this.parser = parser;
-        }
-        
-    }
     
 }
