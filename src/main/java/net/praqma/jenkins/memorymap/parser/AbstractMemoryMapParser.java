@@ -27,6 +27,7 @@ import hudson.DescriptorExtensionList;
 import hudson.ExtensionPoint;
 import hudson.model.Describable;
 import hudson.model.Descriptor;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.Serializable;
@@ -58,17 +59,28 @@ public abstract class AbstractMemoryMapParser implements Describable<AbstractMem
         this.patterns = Arrays.asList(pattern);
         this.mapFile = mapFile;
     }
-    
-    protected CharSequence createCharSequenceFromFile() throws IOException {
-        return createCharSequenceFromFile("8859_1");
+     
+    protected CharSequence createCharSequenceFromFile(File f) throws IOException {
+        return createCharSequenceFromFile("8859_1", f);
     }
-    
-    protected CharSequence createCharSequenceFromFile(String charset) throws IOException {
-        FileInputStream fis = new FileInputStream(mapFile);
-        FileChannel fc = fis.getChannel();
+     
+    protected CharSequence createCharSequenceFromFile(String charset, File f) throws IOException {
+        CharBuffer cbuf = null;
+        FileInputStream fis = null;
+        try 
+        {
+            fis = new FileInputStream(f.getAbsolutePath());
+            FileChannel fc = fis.getChannel();
 
-        ByteBuffer bbuf = fc.map(FileChannel.MapMode.READ_ONLY, 0, (int)fc.size());
-        CharBuffer cbuf = Charset.forName(charset).newDecoder().decode(bbuf);
+            ByteBuffer bbuf = fc.map(FileChannel.MapMode.READ_ONLY, 0, (int)fc.size());
+            cbuf = Charset.forName(charset).newDecoder().decode(bbuf);
+        } catch (IOException ex) {
+            throw ex;
+        } finally {
+            if(fis != null) {
+                fis.close();
+            }
+        }
         return cbuf;
     } 
 

@@ -31,6 +31,7 @@ import hudson.util.DataSetBuilder;
 import hudson.util.ShiftedCategoryAxis;
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Paint;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,6 +53,7 @@ import org.jfree.ui.RectangleEdge;
 import org.jfree.ui.RectangleInsets;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
+import org.w3c.dom.css.RGBColor;
 
 /**
  *
@@ -112,6 +114,18 @@ public class MemoryMapBuildAction implements Action {
         return sum;
     }
     
+    public int sumOfValues(List<String> values) { 
+        int sum = 0;
+        for(MemoryMapParsingResult res : getResults()) {
+            for(String s : values) {
+                if(res.getName().equals(s)) {
+                    sum+=res.getValue();
+                }
+            }
+        }
+        return sum;
+    }
+    
         /**
      * Fetches the previous MemoryMap build. Takes all succesful, but failed builds. 
      * 
@@ -141,7 +155,7 @@ public class MemoryMapBuildAction implements Action {
                 return null;
             }
             action = start.getAction(MemoryMapBuildAction.class);            
-            if(action != null) {
+            if(action != null && (action.getResults() != null && action.getResults().size() > 0)) {
                 return action;
             }
         }
@@ -151,18 +165,34 @@ public class MemoryMapBuildAction implements Action {
         DataSetBuilder<String, ChartUtil.NumberOnlyBuildLabel> dataset = new DataSetBuilder<String, ChartUtil.NumberOnlyBuildLabel>();
         MemoryMapProjectAction.GraphCategories category = MemoryMapProjectAction.GraphCategories.valueOf(req.getParameter("category"));
         List<String> valuesInCategory = categoryMap.get(category);
+        int max = Integer.MIN_VALUE;
         
         for(MemoryMapBuildAction membuild = this; membuild != null; membuild = membuild.getPreviousAction()) {
             ChartUtil.NumberOnlyBuildLabel label = new ChartUtil.NumberOnlyBuildLabel(membuild.build);
             List<MemoryMapParsingResult> result = membuild.getResults();
             for(MemoryMapParsingResult res : result) {
+                int sum = membuild.sumOfValues(valuesInCategory);
+                if(sum >= max) {
+                    max = sum; 
+                }
+                
                 if(valuesInCategory.contains(res.getName())) {
                     dataset.add(res.getValue(), res.getName(), label);
                 }
             }
         }
+
         
-        ChartUtil.generateGraph( req, rsp, createChart(dataset.build(), category.toString(), "Words", 50000, 0), 400, 300 );     
+        JFreeChart chart = createChart(dataset.build(), category.toString(), "Words", (int)((double)max*1.1), 0);
+        /*
+        Color currentColor = Color.GREEN;
+        for (int i = 0; i< valuesInCategory.size(); i++) {
+            ((CategoryPlot)chart.getPlot()).getRenderer().setSeriesPaint(i, currentColor);
+            currentColor = currentColor.brighter();
+        }
+        */
+
+        ChartUtil.generateGraph( req, rsp, chart, 400, 300 );     
     }    
 
     /**

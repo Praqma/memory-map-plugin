@@ -23,6 +23,7 @@
  */
 package net.praqma.jenkins.memorymap;
 
+import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.Actionable;
 import hudson.model.ProminentProjectAction;
@@ -43,7 +44,6 @@ public class MemoryMapProjectAction extends Actionable implements ProminentProje
         Ram 
     }
     
-    
     public MemoryMapProjectAction(AbstractProject<?,?> project) {
         this.project = project;
     }
@@ -55,7 +55,7 @@ public class MemoryMapProjectAction extends Actionable implements ProminentProje
 
     @Override
     public String getSearchUrl() {
-        return  "Memory map";
+        return "Memory map";
     }
 
     @Override
@@ -70,13 +70,13 @@ public class MemoryMapProjectAction extends Actionable implements ProminentProje
     
     public MemoryMapBuildAction getLatestActionInProject() {       
         if(project.getLastCompletedBuild() != null) {
-            return project.getLastCompletedBuild().getAction(MemoryMapBuildAction.class);     
+            return project.getLastCompletedBuild().getAction(MemoryMapBuildAction.class);
         }
         return null;
     }
     
     public void doDrawMemoryMapUsageGraph(StaplerRequest req, StaplerResponse rsp) throws IOException {
-        if(getLatestActionInProject() != null) {
+        if(getLatestActionInProject() != null && (getLatestActionInProject().getResults() != null && getLatestActionInProject().getResults().size() > 0)) {
             getLatestActionInProject().doDrawMemoryMapUsageGraph(req, rsp);
         }
     }

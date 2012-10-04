@@ -40,6 +40,7 @@ import net.praqma.jenkins.memorymap.parser.AbstractMemoryMapParser;
 import net.praqma.jenkins.memorymap.parser.MemoryMapParserDelegate;
 import net.praqma.jenkins.memorymap.parser.MemoryMapParserDescriptor;
 import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
+import org.apache.tools.ant.types.FileSet;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 /**
@@ -68,7 +69,7 @@ public class MemoryMapRecorder extends Recorder {
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
 
-        List<MemoryMapParsingResult> res = build.getWorkspace().act(new MemoryMapParserDelegate(chosenParser));
+        List<MemoryMapParsingResult> res = build.getWorkspace().act(new MemoryMapParserDelegate(chosenParser, mapFile));
 
         for(MemoryMapParsingResult result : res) {
             listener.getLogger().println(result);
@@ -177,6 +178,5 @@ public class MemoryMapRecorder extends Recorder {
     public Action getProjectAction(AbstractProject<?, ?> project) {
         return new MemoryMapProjectAction(project);
     }
-
     
 }

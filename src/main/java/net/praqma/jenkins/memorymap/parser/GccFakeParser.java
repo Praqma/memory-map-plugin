@@ -64,7 +64,7 @@ public class GccFakeParser extends AbstractMemoryMapParser implements Serializab
     public LinkedList<MemoryMapParsingResult> parse(File f) throws IOException {
         LinkedList<MemoryMapParsingResult> res = new LinkedList<MemoryMapParsingResult>();
         for(Pattern p : patterns) {
-            Matcher m = p.matcher(createCharSequenceFromFile());
+            Matcher m = p.matcher(createCharSequenceFromFile(f));
             while(m.find()) {
                 String parsedValue = m.group(1);
                 MemoryMapParsingResult pres = new MemoryMapParsingResult();                

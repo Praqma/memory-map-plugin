@@ -41,8 +41,6 @@ import org.kohsuke.stapler.StaplerRequest;
  */
 public class TexasInstrumentsMemoryMapParser extends AbstractMemoryMapParser {
     
-   //private static final Pattern PATTERN_FLASH = Pattern.compile("(FLASH\\s+\\S+\\s+)(\\S)\\s");
-    //private static final Pattern PATTERN_FLASH = Pattern.compile("FLASH\\s+\\S+\\s+(\\S+)");
     private static final Pattern TEXT_DOT = Pattern.compile("^\\.text\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
     private static final Pattern CONST_DOT = Pattern.compile("^\\.econst\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
     
@@ -65,7 +63,7 @@ public class TexasInstrumentsMemoryMapParser extends AbstractMemoryMapParser {
     public LinkedList<MemoryMapParsingResult> parse(File f) throws IOException {
         LinkedList<MemoryMapParsingResult> res = new LinkedList<MemoryMapParsingResult>();
         for(Pattern p : patterns) {
-            Matcher m = p.matcher(createCharSequenceFromFile());
+            Matcher m = p.matcher(createCharSequenceFromFile(f));
             while(m.find()) {
                 String parsedValue = m.group(1);
                 MemoryMapParsingResult pres = new MemoryMapParsingResult();                

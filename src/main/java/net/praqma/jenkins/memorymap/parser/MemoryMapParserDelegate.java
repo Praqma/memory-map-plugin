@@ -26,9 +26,13 @@ package net.praqma.jenkins.memorymap.parser;
 import hudson.FilePath;
 import hudson.remoting.VirtualChannel;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
+import org.apache.commons.lang.StringUtils;
+import org.apache.tools.ant.types.FileSet;
+import org.apache.tools.ant.types.Path;
 
 /**
  * Class to wrap the FileCallable method. Serves as a proxy to the parser method. 
@@ -37,17 +41,28 @@ import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
 public class MemoryMapParserDelegate implements FilePath.FileCallable<List<MemoryMapParsingResult>> 
 {
     private AbstractMemoryMapParser parser;
-
     //Empty constructor. For serialization purposes.
     public MemoryMapParserDelegate() { }
 
-    public MemoryMapParserDelegate(AbstractMemoryMapParser parser) {
+    public MemoryMapParserDelegate(AbstractMemoryMapParser parser, String includePath) {
         this.parser = parser;
     }
 
     @Override
-    public List<MemoryMapParsingResult> invoke(File file, VirtualChannel vc) throws IOException, InterruptedException {
-        return getParser().parse(file);
+    public List<MemoryMapParsingResult> invoke(File file, VirtualChannel vc) throws IOException, InterruptedException {        
+        FileSet fileSet = new FileSet();
+        org.apache.tools.ant.Project project = new org.apache.tools.ant.Project();
+        fileSet.setProject(project);
+        fileSet.setDir(file);
+        fileSet.setIncludes(parser.getMapFile());
+        
+        File f = new File(file.getAbsoluteFile() + System.getProperty("file.separator") + fileSet.getDirectoryScanner(project).getIncludedFiles()[0]);
+        int lenghth = fileSet.getDirectoryScanner(project).getIncludedFiles().length;
+        
+        if(!f.exists()) {
+            throw new FileNotFoundException(String.format("File %s not found workspace was %s scanner found %s files", f.getAbsolutePath(),file.getAbsolutePath(),lenghth));
+        } 
+        return getParser().parse(f);
     }
 
     /**
