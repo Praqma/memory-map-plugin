@@ -173,8 +173,8 @@ public class MemoryMapRecorder extends Recorder {
         }
         
         public List<MemoryMapParserDescriptor<?>> getParsers() {
-			return AbstractMemoryMapParser.getDescriptors();
-		}
+            return AbstractMemoryMapParser.getDescriptors();
+        }
     }
     
     @Override
