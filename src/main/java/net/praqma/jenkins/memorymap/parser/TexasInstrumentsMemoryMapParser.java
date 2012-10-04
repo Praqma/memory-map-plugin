@@ -26,7 +26,6 @@ package net.praqma.jenkins.memorymap.parser;
 import hudson.Extension;
 import java.io.File;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

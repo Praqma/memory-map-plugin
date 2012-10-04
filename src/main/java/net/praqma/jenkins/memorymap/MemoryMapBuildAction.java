@@ -26,14 +26,11 @@ package net.praqma.jenkins.memorymap;
 import hudson.model.AbstractBuild;
 import hudson.model.Action;
 import hudson.util.ChartUtil;
-import hudson.util.ColorPalette;
 import hudson.util.DataSetBuilder;
 import hudson.util.ShiftedCategoryAxis;
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Paint;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -45,7 +42,6 @@ import org.jfree.chart.axis.CategoryLabelPositions;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.renderer.category.LineAndShapeRenderer;
 import org.jfree.chart.renderer.category.StackedAreaRenderer;
 import org.jfree.chart.title.LegendTitle;
 import org.jfree.data.category.CategoryDataset;
@@ -53,7 +49,6 @@ import org.jfree.ui.RectangleEdge;
 import org.jfree.ui.RectangleInsets;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
-import org.w3c.dom.css.RGBColor;
 
 /**
  *
@@ -126,7 +121,7 @@ public class MemoryMapBuildAction implements Action {
         return sum;
     }
     
-        /**
+    /**
      * Fetches the previous MemoryMap build. Takes all succesful, but failed builds. 
      * 
      * Goes to the end of list.
@@ -184,14 +179,6 @@ public class MemoryMapBuildAction implements Action {
 
         
         JFreeChart chart = createChart(dataset.build(), category.toString(), "Words", (int)((double)max*1.1), 0);
-        /*
-        Color currentColor = Color.GREEN;
-        for (int i = 0; i< valuesInCategory.size(); i++) {
-            ((CategoryPlot)chart.getPlot()).getRenderer().setSeriesPaint(i, currentColor);
-            currentColor = currentColor.brighter();
-        }
-        */
-
         ChartUtil.generateGraph( req, rsp, chart, 400, 300 );     
     }    
 

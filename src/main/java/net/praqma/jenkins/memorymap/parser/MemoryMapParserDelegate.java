@@ -30,9 +30,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
-import org.apache.commons.lang.StringUtils;
 import org.apache.tools.ant.types.FileSet;
-import org.apache.tools.ant.types.Path;
 
 /**
  * Class to wrap the FileCallable method. Serves as a proxy to the parser method. 
@@ -44,7 +42,7 @@ public class MemoryMapParserDelegate implements FilePath.FileCallable<List<Memor
     //Empty constructor. For serialization purposes.
     public MemoryMapParserDelegate() { }
 
-    public MemoryMapParserDelegate(AbstractMemoryMapParser parser, String includePath) {
+    public MemoryMapParserDelegate(AbstractMemoryMapParser parser) {
         this.parser = parser;
     }
 

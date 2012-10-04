@@ -23,7 +23,6 @@
  */
 package net.praqma.jenkins.memorymap;
 
-import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.Actionable;
 import hudson.model.ProminentProjectAction;
