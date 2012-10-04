@@ -42,7 +42,6 @@ public class TexasInstrumentsMemoryMapParser extends AbstractMemoryMapParser {
     
     /*
      * Flash
-     * 
      */
     private static final Pattern TEXT_DOT = Pattern.compile("^\\.text\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
     private static final Pattern CONST_DOT = Pattern.compile("^\\.const\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);

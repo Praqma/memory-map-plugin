@@ -33,6 +33,6 @@ import org.kohsuke.stapler.StaplerRequest;
  */
 public abstract class MemoryMapParserDescriptor<T extends AbstractMemoryMapParser> extends Descriptor<AbstractMemoryMapParser> {
     public AbstractMemoryMapParser newInstance( StaplerRequest req, JSONObject formData, AbstractMemoryMapParser instance ) throws FormException { 
-		return super.newInstance( req, formData );
-	}
+        return super.newInstance( req, formData );
+    }
 }

@@ -84,15 +84,18 @@ public class MemoryMapRecorder extends Recorder {
         boolean validRamCapacity = mmba.validateThreshold(getRamCapacity(), ".stack",".cinit",".ebss");
         int ramCount = mmba.sumOfValues( ".stack",".cinit",".ebss");
 
-        listener.getLogger().println("flashCount: "+flashCount);        
-        listener.getLogger().println("ramCount: "+ramCount);        
+        listener.getLogger().println("Recorded flash memory usage: "+flashCount);        
+        listener.getLogger().println("Recode ram usage: "+ramCount);        
         
         
-        if(!validFlashCapacity && !validRamCapacity) {
-            listener.getLogger().println("Ram capacity exceeded!");
+        if(!validFlashCapacity) {
+            listener.getLogger().println("Flash capacity exceeded.");
+            build.setResult(Result.FAILURE);            
+        } else if(!validRamCapacity) {
+            listener.getLogger().println("Ram capacity exceeded.");
             build.setResult(Result.FAILURE);            
         } else {
-            listener.getLogger().println("Ram capacity is adequate");
+            listener.getLogger().println("Both ram and flash capacity are adequate");
         }
         
         build.getActions().add(mmba);
