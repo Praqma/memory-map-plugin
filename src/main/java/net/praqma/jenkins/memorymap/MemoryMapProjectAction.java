@@ -24,9 +24,11 @@
 package net.praqma.jenkins.memorymap;
 
 import hudson.model.AbstractProject;
-import hudson.model.Action;
 import hudson.model.Actionable;
 import hudson.model.ProminentProjectAction;
+import java.io.IOException;
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
 
 /**
  *
@@ -35,6 +37,12 @@ import hudson.model.ProminentProjectAction;
 public class MemoryMapProjectAction extends Actionable implements ProminentProjectAction {
     public static final String ICON_NAME="/plugin/memory-map/images/64x64/memory.png";
     private AbstractProject<?,?> project;
+        
+    public enum GraphCategories {
+        Flash,
+        Ram 
+    }
+    
     
     public MemoryMapProjectAction(AbstractProject<?,?> project) {
         this.project = project;
@@ -65,5 +73,15 @@ public class MemoryMapProjectAction extends Actionable implements ProminentProje
             return project.getLastCompletedBuild().getAction(MemoryMapBuildAction.class);     
         }
         return null;
-    }  
+    }
+    
+    public void doDrawMemoryMapUsageGraph(StaplerRequest req, StaplerResponse rsp) throws IOException {
+        if(getLatestActionInProject() != null) {
+            getLatestActionInProject().doDrawMemoryMapUsageGraph(req, rsp);
+        }
+    }
+    
+    public GraphCategories[] getCategories() {
+        return GraphCategories.values();
+    }
 }

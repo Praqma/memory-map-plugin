@@ -25,8 +25,31 @@ package net.praqma.jenkins.memorymap;
 
 import hudson.model.AbstractBuild;
 import hudson.model.Action;
+import hudson.util.ChartUtil;
+import hudson.util.ColorPalette;
+import hudson.util.DataSetBuilder;
+import hudson.util.ShiftedCategoryAxis;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.CategoryAxis;
+import org.jfree.chart.axis.CategoryLabelPositions;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.renderer.category.LineAndShapeRenderer;
+import org.jfree.chart.renderer.category.StackedAreaRenderer;
+import org.jfree.chart.title.LegendTitle;
+import org.jfree.data.category.CategoryDataset;
+import org.jfree.ui.RectangleEdge;
+import org.jfree.ui.RectangleInsets;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
@@ -36,16 +59,21 @@ import org.kohsuke.stapler.StaplerResponse;
  */
 public class MemoryMapBuildAction implements Action {
 
-    public List<MemoryMapParsingResult> results;
+    private List<MemoryMapParsingResult> results;
     private AbstractBuild<?,?> build;
+
+    private static final HashMap<MemoryMapProjectAction.GraphCategories,List<String>> categoryMap = new HashMap<MemoryMapProjectAction.GraphCategories, List<String>>();
     
-    public MemoryMapBuildAction(AbstractBuild<?,?> build,List<MemoryMapParsingResult> results) {
+    static {
+        categoryMap.put(MemoryMapProjectAction.GraphCategories.Flash, Arrays.asList(".econst",".text"));
+        categoryMap.put(MemoryMapProjectAction.GraphCategories.Ram, Arrays.asList(".stack",".cinit",".ebss"));
+    }
+    
+    public MemoryMapBuildAction(AbstractBuild<?,?> build, List<MemoryMapParsingResult> results) {
         this.results = results;
         this.build = build;
     }
-    
-    
-    
+
     @Override
     public String getIconFileName() {
         return null;
@@ -74,7 +102,7 @@ public class MemoryMapBuildAction implements Action {
     
     public int sumOfValues(String... valuenames) { 
         int sum = 0;
-        for(MemoryMapParsingResult res : results) {
+        for(MemoryMapParsingResult res : getResults()) {
             for(String s : valuenames) {
                 if(res.getName().equals(s)) {
                     sum+=res.getValue();
@@ -118,10 +146,79 @@ public class MemoryMapBuildAction implements Action {
             }
         }
     }
-    
-    
-    public void doDrawMemoryMapUsageGraph(StaplerRequest req, StaplerResponse rsp) {
+
+    public void doDrawMemoryMapUsageGraph(StaplerRequest req, StaplerResponse rsp) throws IOException {
+        DataSetBuilder<String, ChartUtil.NumberOnlyBuildLabel> dataset = new DataSetBuilder<String, ChartUtil.NumberOnlyBuildLabel>();
+        MemoryMapProjectAction.GraphCategories category = MemoryMapProjectAction.GraphCategories.valueOf(req.getParameter("category"));
+        List<String> valuesInCategory = categoryMap.get(category);
         
+        for(MemoryMapBuildAction membuild = this; membuild != null; membuild = membuild.getPreviousAction()) {
+            ChartUtil.NumberOnlyBuildLabel label = new ChartUtil.NumberOnlyBuildLabel(membuild.build);
+            List<MemoryMapParsingResult> result = membuild.getResults();
+            for(MemoryMapParsingResult res : result) {
+                if(valuesInCategory.contains(res.getName())) {
+                    dataset.add(res.getValue(), res.getName(), label);
+                }
+            }
+        }
+        
+        ChartUtil.generateGraph( req, rsp, createChart(dataset.build(), category.toString(), "Words", 50000, 0), 400, 300 );     
+    }    
+
+    /**
+     * @return the results
+     */
+    public List<MemoryMapParsingResult> getResults() {
+        return results;
+    }
+
+    /**
+     * @param results the results to set
+     */
+    public void setResults(List<MemoryMapParsingResult> results) {
+        this.results = results;
     }
     
+    protected JFreeChart createChart( CategoryDataset dataset, String title, String yaxis, int max, int min ) {
+        final JFreeChart chart = ChartFactory.createStackedAreaChart( title, // chart                                                                                                                                       // title
+                        null, // unused
+                        yaxis, // range axis label
+                        dataset, // data
+                        PlotOrientation.VERTICAL, // orientation
+                        true, // include legend
+                        true, // tooltips
+                        false // urls
+        );
+
+        final LegendTitle legend = chart.getLegend();
+
+        legend.setPosition( RectangleEdge.BOTTOM );
+
+        chart.setBackgroundPaint( Color.white );
+
+        final CategoryPlot plot = chart.getCategoryPlot();
+
+        plot.setBackgroundPaint( Color.WHITE );
+        plot.setOutlinePaint( null );
+        plot.setRangeGridlinesVisible( true );
+        plot.setRangeGridlinePaint( Color.black );
+
+        CategoryAxis domainAxis = new ShiftedCategoryAxis( null );
+        plot.setDomainAxis( domainAxis );
+        domainAxis.setCategoryLabelPositions( CategoryLabelPositions.UP_90 );
+        domainAxis.setLowerMargin( 0.0 );
+        domainAxis.setUpperMargin( 0.0 );
+        domainAxis.setCategoryMargin( 0.0 );
+
+        final NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+        rangeAxis.setStandardTickUnits( NumberAxis.createIntegerTickUnits() );
+        rangeAxis.setUpperBound( max );
+        rangeAxis.setLowerBound( min );
+        
+        final StackedAreaRenderer renderer = (StackedAreaRenderer) plot.getRenderer();
+        renderer.setBaseStroke( new BasicStroke( 2.0f ) );
+        //ColorPalette.apply( renderer );
+        plot.setInsets( new RectangleInsets( 5.0, 0, 0, 5.0 ) );
+        return chart;
+    }
 }
