@@ -59,10 +59,14 @@ public class TexasInstrumentsMemoryMapParser extends AbstractMemoryMapParser {
     private static final Pattern CIO = Pattern.compile("^\\.cio\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
     private static final Pattern DATA = Pattern.compile("^\\.data\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
     
+    private boolean initDataIsInRom;
+    private boolean mtOptionEnabled;
     
     @DataBoundConstructor
-    public TexasInstrumentsMemoryMapParser(String mapFile) {
+    public TexasInstrumentsMemoryMapParser(String mapFile, boolean initDataIsInRom, boolean mtOptionEnabled) {
         super(mapFile, TEXT_DOT, CONST_DOT, ECONST_DOT, PINIT, SWITCH, CINIT_DOT, STACK_DOT, BSS_DOT, EBSS_DOT, SYSMEM, ESYSMEM, CIO, DATA);
+        this.initDataIsInRom = initDataIsInRom;
+        this.mtOptionEnabled = mtOptionEnabled;
     }
     
     public TexasInstrumentsMemoryMapParser() {
@@ -113,6 +117,34 @@ public class TexasInstrumentsMemoryMapParser extends AbstractMemoryMapParser {
             }
         }        
         return res;
+    }
+
+    /**
+     * @return the initDataIsInRom
+     */
+    public boolean isInitDataIsInRom() {
+        return initDataIsInRom;
+    }
+
+    /**
+     * @param initDataIsInRom the initDataIsInRom to set
+     */
+    public void setInitDataIsInRom(boolean initDataIsInRom) {
+        this.initDataIsInRom = initDataIsInRom;
+    }
+
+    /**
+     * @return the mtOptionEnabled
+     */
+    public boolean isMtOptionEnabled() {
+        return mtOptionEnabled;
+    }
+
+    /**
+     * @param mtOptionEnabled the mtOptionEnabled to set
+     */
+    public void setMtOptionEnabled(boolean mtOptionEnabled) {
+        this.mtOptionEnabled = mtOptionEnabled;
     }
     
     @Extension

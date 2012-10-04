@@ -3,5 +3,13 @@
     <f:entry>
         Path to map file
         <f:textbox field="mapFile" name="mapFile" description="Descritpion goes here"/>
+    </f:entry>
+    <f:entry>
+        Init data is in rom
+        <f:checkbox field="initDataIsInRom" name="initDataIsInRom" checked="${instance.initDataIsInRom == true}"/>
+    </f:entry> 
+    <f:entry>
+        Init data is in rom
+        <f:checkbox field="mtOptionEnabled" name="mtOptionEnabled" checked="${instance.mtOptionEnabled == true}"/>
     </f:entry>       
 </j:jelly>
