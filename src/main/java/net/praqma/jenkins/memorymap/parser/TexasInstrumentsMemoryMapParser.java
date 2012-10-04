@@ -40,17 +40,29 @@ import org.kohsuke.stapler.StaplerRequest;
  */
 public class TexasInstrumentsMemoryMapParser extends AbstractMemoryMapParser {
     
+    /*
+     * Flash
+     * 
+     */
     private static final Pattern TEXT_DOT = Pattern.compile("^\\.text\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
-    private static final Pattern CONST_DOT = Pattern.compile("^\\.econst\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
+    private static final Pattern CONST_DOT = Pattern.compile("^\\.const\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
+    private static final Pattern ECONST_DOT = Pattern.compile("^\\.econst\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
+    private static final Pattern PINIT = Pattern.compile("^\\.pinit\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
+    private static final Pattern SWITCH = Pattern.compile("^\\.pinit\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
     
     private static final Pattern CINIT_DOT = Pattern.compile("^\\.cinit\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
     private static final Pattern STACK_DOT = Pattern.compile("^\\.stack\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
-    private static final Pattern BSS_DOT = Pattern.compile("^\\.ebss\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
+    private static final Pattern BSS_DOT = Pattern.compile("^\\.bss\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
+    private static final Pattern EBSS_DOT = Pattern.compile("^\\.ebss\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
+    private static final Pattern SYSMEM = Pattern.compile("^\\.sysmem\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
+    private static final Pattern ESYSMEM = Pattern.compile("^\\.esysmem\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
+    private static final Pattern CIO = Pattern.compile("^\\.cio\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
+    private static final Pattern DATA = Pattern.compile("^\\.data\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
     
     
     @DataBoundConstructor
     public TexasInstrumentsMemoryMapParser(String mapFile) {
-        super(mapFile, TEXT_DOT, CONST_DOT, CINIT_DOT, STACK_DOT, BSS_DOT);
+        super(mapFile, TEXT_DOT, CONST_DOT, ECONST_DOT, PINIT, SWITCH, CINIT_DOT, STACK_DOT, BSS_DOT, EBSS_DOT, SYSMEM, ESYSMEM, CIO, DATA);
     }
     
     public TexasInstrumentsMemoryMapParser() {
@@ -68,15 +80,31 @@ public class TexasInstrumentsMemoryMapParser extends AbstractMemoryMapParser {
                 MemoryMapParsingResult pres = new MemoryMapParsingResult();                
                 if(p.toString().equals(TEXT_DOT.toString())) {
                     pres.setName(".text");
-                } else if (p.toString().equals(CONST_DOT.toString())) {
+                } else if (p.toString().equals(ECONST_DOT.toString())) {
                     pres.setName(".econst");
                 } else if (p.toString().equals(CINIT_DOT.toString())) {
                     pres.setName(".cinit");
                 } else if (p.toString().equals(STACK_DOT.toString())) {
                     pres.setName(".stack");
-                } else if (p.toString().equals(BSS_DOT.toString())) {
+                } else if (p.toString().equals(EBSS_DOT.toString())) {
                     pres.setName(".ebss");
-                } else {
+                } else if (p.toString().equals(BSS_DOT.toString())) {
+                    pres.setName(".bss");
+                } else if (p.toString().equals(CONST_DOT.toString())) {
+                    pres.setName(".const");
+                } else if (p.toString().equals(PINIT.toString())) {
+                    pres.setName(".pinit");
+                } else if (p.toString().equals(SWITCH.toString())) {
+                    pres.setName(".switch");
+                } else if (p.toString().equals(SYSMEM.toString())) {
+                    pres.setName(".sysmem");
+                } else if (p.toString().equals(ESYSMEM.toString())) {
+                    pres.setName(".esysmem");
+                } else if(p.toString().equals(CIO.toString())) {
+                    pres.setName(".cio");
+                } else if(p.toString().equals(DATA.toString())) {
+                    pres.setName(".data");
+                } else  {
                     throw new IOException("Illegal pattern passed to method", new IllegalArgumentException(p.toString()));
                 }
                 pres.setRawvalue(parsedValue);
