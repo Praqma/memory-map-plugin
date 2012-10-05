@@ -32,25 +32,22 @@ import java.util.LinkedList;
  */
 public class MemoryMapGroup extends LinkedList<String> {
     private String groupName;
-    private int threshold = Integer.MAX_VALUE;
-    
-    public MemoryMapGroup() { }
-    
-    public MemoryMapGroup(String groupName) {
-        this.groupName = groupName;
-    }
+    private int threshold;
     
     public MemoryMapGroup(String groupName, int threshold) {
         this.groupName = groupName;
         this.threshold = threshold;
     }
     
+    public MemoryMapGroup() { }
+
+    
     /**
      * Factory default flash group
      * @return 
      */
     public static MemoryMapGroup defaultFlashGroup() {
-        MemoryMapGroup group = new MemoryMapGroup("Flash");
+        MemoryMapGroup group = new MemoryMapGroup("Flash", Integer.MAX_VALUE);
         group.addAll(Arrays.asList(".econst",".const",".text",".cinit",".switch",".pinit"));
         return group;
     }
@@ -60,7 +57,7 @@ public class MemoryMapGroup extends LinkedList<String> {
      * @return 
      */
     public static MemoryMapGroup defaultRamGroup() {
-        MemoryMapGroup group = new MemoryMapGroup("Ram");
+        MemoryMapGroup group = new MemoryMapGroup("Ram", Integer.MAX_VALUE);
         group.addAll(Arrays.asList(".stack",".ebss",".bss",".sysmem",".esysmem",".cio",".data"));
         return group;  
     }

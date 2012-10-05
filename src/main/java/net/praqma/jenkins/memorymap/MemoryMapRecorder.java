@@ -35,13 +35,16 @@ import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
 import hudson.tasks.Recorder;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import net.praqma.jenkins.memorymap.parser.AbstractMemoryMapParser;
 import net.praqma.jenkins.memorymap.parser.MemoryMapParserDelegate;
 import net.praqma.jenkins.memorymap.parser.MemoryMapParserDescriptor;
 import net.praqma.jenkins.memorymap.result.MemoryMapGroup;
 import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
+import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.StaplerRequest;
 
 /**
  *
@@ -53,6 +56,7 @@ public class MemoryMapRecorder extends Recorder {
     private int ramCapacity;
     private int flashCapacity;
     private AbstractMemoryMapParser chosenParser;
+    private List<MemoryMapGroup> groups;
     
     @Override
     public BuildStepMonitor getRequiredMonitorService() {
@@ -60,12 +64,13 @@ public class MemoryMapRecorder extends Recorder {
     }
     
     @DataBoundConstructor
-    public MemoryMapRecorder(AbstractMemoryMapParser chosenParser, int ramCapacity, int flashCapacity) {
+    public MemoryMapRecorder(AbstractMemoryMapParser chosenParser, List<MemoryMapGroup> groups, int ramCapacity, int flashCapacity) {
         this.chosenParser = chosenParser;
         this.ramCapacity = ramCapacity;
         this.flashCapacity = flashCapacity;
+        this.groups = groups;
     }
-
+    
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
 
@@ -168,6 +173,25 @@ public class MemoryMapRecorder extends Recorder {
     public void setFlashCapacity(int flashCapacity) {
         this.flashCapacity = flashCapacity;
     }
+
+    /**
+     * @return the groups
+     */
+    public List<MemoryMapGroup> getGroups() {
+        if(groups == null) {
+            groups = new ArrayList<MemoryMapGroup>();
+            groups.add(MemoryMapGroup.defaultFlashGroup());
+            groups.add(MemoryMapGroup.defaultRamGroup());
+        }
+        return groups;
+    }
+
+    /**
+     * @param groups the groups to set
+     */
+    public void setGroups(List<MemoryMapGroup> groups) {
+        this.groups = groups;
+    }
     
     @Extension
     public static final class DescriptorImpl extends BuildStepDescriptor<Publisher> {
@@ -185,6 +209,17 @@ public class MemoryMapRecorder extends Recorder {
         public List<MemoryMapParserDescriptor<?>> getParsers() {
             return AbstractMemoryMapParser.getDescriptors();
         }
+
+        @Override
+        public Publisher newInstance(StaplerRequest req, JSONObject formData) throws FormException {
+            MemoryMapRecorder instance = req.bindJSON(MemoryMapRecorder.class, formData);
+            List<MemoryMapGroup> groups = req.bindParametersToList(MemoryMapGroup.class, "group.");
+            instance.setGroups(groups);
+            save();
+            return instance;
+        }
+        
+        
     }
     
     @Override

@@ -1,6 +1,37 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
          xmlns:t="/lib/hudson" xmlns:f="/lib/form">
 	<f:block>
+        <!--
+        <f:entry>
+            <f:repeatable var="group" varStatus="instStatus" items="${instance.groups}">
+                
+                <table>
+                    <tr>
+                        <td>${group.getGroupName()}</td>
+                        <td>${group.getThreshold()}</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <f:label for="group.groupName">${%Group name}</f:label>
+                        </td>
+                        <td>
+                            <f:textbox name="group.groupName" field="groupName" value="${group.groupName}"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <f:label for="group.threshold">${%Threshold}</f:label>
+                        </td>
+                        <td>
+                            <f:textbox name="group.threshold" field="threshold" value="${group.threshold}"/>
+                        </td>
+                    </tr>
+                </table>
+                
+                <f:repeatableDeleteButton/>
+            </f:repeatable>
+        </f:entry>
+         -->
         <f:entry>
             ${%Maximum Ram Capacity}
             <f:textbox  name="ramCapacity" field="ramCapacity"/>
