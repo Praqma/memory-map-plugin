@@ -62,8 +62,8 @@ public class MemoryMapBuildAction implements Action {
     private static final HashMap<MemoryMapProjectAction.GraphCategories,List<String>> categoryMap = new HashMap<MemoryMapProjectAction.GraphCategories, List<String>>();
     
     static {
-        categoryMap.put(MemoryMapProjectAction.GraphCategories.Flash, Arrays.asList(".econst",".text"));
-        categoryMap.put(MemoryMapProjectAction.GraphCategories.Ram, Arrays.asList(".stack",".cinit",".ebss"));
+        categoryMap.put(MemoryMapProjectAction.GraphCategories.Flash, Arrays.asList(".econst",".const",".text",".cinit",".switch",".pinit"));
+        categoryMap.put(MemoryMapProjectAction.GraphCategories.Ram, Arrays.asList(".stack",".ebss",".bss",".sysmem",".esysmem",".cio",".data"));
     }
     
     public MemoryMapBuildAction(AbstractBuild<?,?> build, List<MemoryMapParsingResult> results) {
@@ -94,6 +94,10 @@ public class MemoryMapBuildAction implements Action {
      * @return 
      */
     public boolean validateThreshold(int threshold, String... valuenames) {
+        return sumOfValues(valuenames) <= threshold;
+    }
+    
+    public boolean validateThreshold(int threshold, List<String> valuenames) {
         return sumOfValues(valuenames) <= threshold;
     }
     

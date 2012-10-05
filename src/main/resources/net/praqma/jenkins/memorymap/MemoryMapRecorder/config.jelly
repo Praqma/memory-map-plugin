@@ -3,13 +3,16 @@
 	<f:block>
         <f:entry>
             ${%Maximum Ram Capacity}
-            <f:textbox name="ramCapacity" field="ramCapacity"/>
+            <f:textbox  name="ramCapacity" field="ramCapacity"/>
         </f:entry>
         <f:entry>
             ${%Maximum Flash Capacity}
             <f:textbox name="flashCapacity" field="flashCapacity"/>
         </f:entry>
-        
-		<f:dropdownDescriptorSelector descriptors="${descriptor.getParsers()}" field="chosenParser" />
+        <f:entry>
+            <strong>${%Compiler}</strong>
+        </f:entry>
+        <f:dropdownDescriptorSelector descriptors="${descriptor.getParsers()}" field="chosenParser" />
+
 	</f:block>   
 </j:jelly>

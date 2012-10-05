@@ -60,8 +60,7 @@ public class MemoryMapParserDelegate implements FilePath.FileCallable<List<Memor
         }
         
         File f = new File(file.getAbsoluteFile() + System.getProperty("file.separator") + fileSet.getDirectoryScanner(project).getIncludedFiles()[0]);
-        
-        
+
         if(!f.exists()) {
             throw new FileNotFoundException(String.format("File %s not found workspace was %s scanner found %s files", f.getAbsolutePath(),file.getAbsolutePath(),lenghth));
         } 

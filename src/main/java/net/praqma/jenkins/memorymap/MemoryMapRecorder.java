@@ -39,6 +39,7 @@ import java.util.List;
 import net.praqma.jenkins.memorymap.parser.AbstractMemoryMapParser;
 import net.praqma.jenkins.memorymap.parser.MemoryMapParserDelegate;
 import net.praqma.jenkins.memorymap.parser.MemoryMapParserDescriptor;
+import net.praqma.jenkins.memorymap.result.MemoryMapGroup;
 import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
 import org.kohsuke.stapler.DataBoundConstructor;
 
@@ -79,23 +80,32 @@ public class MemoryMapRecorder extends Recorder {
          */
         MemoryMapBuildAction mmba = new MemoryMapBuildAction(build, res);
         
-        boolean validFlashCapacity = mmba.validateThreshold(getFlashCapacity(), ".text",".econst");
-        int flashCount = mmba.sumOfValues(".text",".econst");
-        boolean validRamCapacity = mmba.validateThreshold(getRamCapacity(), ".stack",".cinit",".ebss");
-        int ramCount = mmba.sumOfValues( ".stack",".cinit",".ebss");
+        //boolean validFlashCapacity = mmba.validateThreshold(getFlashCapacity(), ".econst",".const",".text",".cinit",".switch",".pinit");
+        boolean validFlashCapacity = mmba.validateThreshold(getFlashCapacity(), MemoryMapGroup.defaultFlashGroup());
+        //int flashCount = mmba.sumOfValues(".econst",".const",".text",".cinit",".switch",".pinit");
+        int flashCount = mmba.sumOfValues(MemoryMapGroup.defaultFlashGroup());
+        
+        //boolean validRamCapacity = mmba.validateThreshold(getRamCapacity(), ".stack",".ebss",".bss",".sysmem",".esysmem",".cio",".data");
+        boolean validRamCapacity = mmba.validateThreshold(getRamCapacity(), MemoryMapGroup.defaultRamGroup());
+        //int ramCount = mmba.sumOfValues(".stack",".ebss",".bss",".sysmem",".esysmem",".cio",".data");
+        int ramCount = mmba.sumOfValues(MemoryMapGroup.defaultRamGroup());
 
         listener.getLogger().println("Recorded flash memory usage: "+flashCount);        
-        listener.getLogger().println("Recode ram usage: "+ramCount);        
+        listener.getLogger().println("Recorded ram usage: "+ramCount);        
         
         
         if(!validFlashCapacity) {
             listener.getLogger().println("Flash capacity exceeded.");
             build.setResult(Result.FAILURE);            
-        } else if(!validRamCapacity) {
+        }
+        
+        if(!validRamCapacity) {
             listener.getLogger().println("Ram capacity exceeded.");
             build.setResult(Result.FAILURE);            
-        } else {
-            listener.getLogger().println("Both ram and flash capacity are adequate");
+        }
+        
+        if(validRamCapacity && validFlashCapacity) {
+            listener.getLogger().println("Ram and flash usage within capacity");
         }
         
         build.getActions().add(mmba);
@@ -169,7 +179,7 @@ public class MemoryMapRecorder extends Recorder {
 
         @Override
         public String getDisplayName() {
-            return "Memory Map Parser";
+            return "Memory Map";
         }
         
         public List<MemoryMapParserDescriptor<?>> getParsers() {
