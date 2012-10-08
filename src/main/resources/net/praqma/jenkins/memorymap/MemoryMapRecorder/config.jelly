@@ -32,13 +32,15 @@
             </f:repeatable>
         </f:entry>
          -->
-        <f:entry>
+        <f:entry field="ramCapacity" name="ramCapacity">
             ${%Maximum Ram Capacity}
-            <f:textbox  name="ramCapacity" field="ramCapacity"/>
+            <f:textbox/>
         </f:entry>
-        <f:entry>
+        
+        
+        <f:entry field="flashCapacity" name="flashCapacity">
             ${%Maximum Flash Capacity}
-            <f:textbox name="flashCapacity" field="flashCapacity"/>
+            <f:textbox/>
         </f:entry>
         <f:entry>
             <strong>${%Compiler}</strong>

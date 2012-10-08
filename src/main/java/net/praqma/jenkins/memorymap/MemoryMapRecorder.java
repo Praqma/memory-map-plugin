@@ -34,6 +34,7 @@ import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
 import hudson.tasks.Recorder;
+import hudson.util.FormValidation;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +44,9 @@ import net.praqma.jenkins.memorymap.parser.MemoryMapParserDescriptor;
 import net.praqma.jenkins.memorymap.result.MemoryMapGroup;
 import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
 /**
@@ -85,19 +88,17 @@ public class MemoryMapRecorder extends Recorder {
          */
         MemoryMapBuildAction mmba = new MemoryMapBuildAction(build, res);
         
-        //boolean validFlashCapacity = mmba.validateThreshold(getFlashCapacity(), ".econst",".const",".text",".cinit",".switch",".pinit");
         boolean validFlashCapacity = mmba.validateThreshold(getFlashCapacity(), MemoryMapGroup.defaultFlashGroup());
-        //int flashCount = mmba.sumOfValues(".econst",".const",".text",".cinit",".switch",".pinit");
         int flashCount = mmba.sumOfValues(MemoryMapGroup.defaultFlashGroup());
         
-        //boolean validRamCapacity = mmba.validateThreshold(getRamCapacity(), ".stack",".ebss",".bss",".sysmem",".esysmem",".cio",".data");
         boolean validRamCapacity = mmba.validateThreshold(getRamCapacity(), MemoryMapGroup.defaultRamGroup());
-        //int ramCount = mmba.sumOfValues(".stack",".ebss",".bss",".sysmem",".esysmem",".cio",".data");
         int ramCount = mmba.sumOfValues(MemoryMapGroup.defaultRamGroup());
 
         listener.getLogger().println("Recorded flash memory usage: "+flashCount);        
         listener.getLogger().println("Recorded ram usage: "+ramCount);        
         
+        listener.getLogger().println(String.format("Maximum flash setting: %s", getFlashCapacity()));
+        listener.getLogger().println(String.format("Maximum ram setting: %s", getRamCapacity()));
         
         if(!validFlashCapacity) {
             listener.getLogger().println("Flash capacity exceeded.");
@@ -195,6 +196,32 @@ public class MemoryMapRecorder extends Recorder {
     
     @Extension
     public static final class DescriptorImpl extends BuildStepDescriptor<Publisher> {
+        
+        public FormValidation doCheckFlashCapacity(@QueryParameter String value) {
+            try 
+            {
+                int val = Integer.parseInt(value);        
+                if(val < 0) {
+                    return FormValidation.error("Number must be 0 or greater");
+                }
+            } catch (NumberFormatException nfe) {
+                return FormValidation.error("Not a valid integer value");
+            }
+            return FormValidation.ok();          
+        }
+
+        public FormValidation doCheckRamCapacity(@QueryParameter String value) {
+            try 
+            {
+                int val = Integer.parseInt(value);
+                if(val < 0) {
+                    return FormValidation.error("Number must be 0 or greater");
+                }
+            } catch (NumberFormatException nfe) {
+                return FormValidation.error("Not a valid integer value");
+            }
+            return FormValidation.ok();           
+        }
 
         @Override
         public boolean isApplicable(Class<? extends AbstractProject> type) {
@@ -209,7 +236,7 @@ public class MemoryMapRecorder extends Recorder {
         public List<MemoryMapParserDescriptor<?>> getParsers() {
             return AbstractMemoryMapParser.getDescriptors();
         }
-
+        
         @Override
         public Publisher newInstance(StaplerRequest req, JSONObject formData) throws FormException {
             MemoryMapRecorder instance = req.bindJSON(MemoryMapRecorder.class, formData);
@@ -219,12 +246,14 @@ public class MemoryMapRecorder extends Recorder {
             return instance;
         }
         
-        
+        public DescriptorImpl() {
+            super(MemoryMapRecorder.class);
+            load();
+        }
     }
     
     @Override
     public Action getProjectAction(AbstractProject<?, ?> project) {
         return new MemoryMapProjectAction(project);
-    }
-    
+    }    
 }
