@@ -46,8 +46,7 @@ public class MemoryMapParserDelegateTest {
     public void findFilePatternWorks() throws IOException {
 
         File f = File.createTempFile("testfile", ".test");
-        
-        
+                
         System.out.println(f.getAbsolutePath());
         
         MemoryMapParserDelegate delegate = new MemoryMapParserDelegate();
