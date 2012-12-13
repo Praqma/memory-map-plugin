@@ -42,6 +42,11 @@
             <f:textbox/>
         </f:entry>
         
+        <f:entry field="configurationFile" name="configurationFile">
+            ${%Compiler configuration file}
+            <f:textbox/>
+        </f:entry>
+        
         <f:entry>
             <strong>${%Compiler}</strong>
         </f:entry>

@@ -60,6 +60,8 @@ public class MemoryMapRecorder extends Recorder {
     private String mapFile;
     private int ramCapacity;
     private int flashCapacity;
+    private String configurationFile;
+    
     private AbstractMemoryMapParser chosenParser;
     private List<MemoryMapGroup> groups;
     
@@ -69,11 +71,12 @@ public class MemoryMapRecorder extends Recorder {
     }
     
     @DataBoundConstructor
-    public MemoryMapRecorder(AbstractMemoryMapParser chosenParser, List<MemoryMapGroup> groups, int ramCapacity, int flashCapacity) {
+    public MemoryMapRecorder(AbstractMemoryMapParser chosenParser, List<MemoryMapGroup> groups, int ramCapacity, int flashCapacity, String configurationFile) {
         this.chosenParser = chosenParser;
         this.ramCapacity = ramCapacity;
         this.flashCapacity = flashCapacity;
         this.groups = groups;
+        this.configurationFile = configurationFile;              
     }
     
     @Override
@@ -213,6 +216,20 @@ public class MemoryMapRecorder extends Recorder {
      */
     public void setGroups(List<MemoryMapGroup> groups) {
         this.groups = groups;
+    }
+
+    /**
+     * @return the configurationFile
+     */
+    public String getConfigurationFile() {
+        return configurationFile;
+    }
+
+    /**
+     * @param configurationFile the configurationFile to set
+     */
+    public void setConfigurationFile(String configurationFile) {
+        this.configurationFile = configurationFile;
     }
     
     @Extension
