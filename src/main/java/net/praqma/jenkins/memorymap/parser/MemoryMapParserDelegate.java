@@ -48,23 +48,12 @@ public class MemoryMapParserDelegate implements FilePath.FileCallable<List<Memor
 
     @Override
     public List<MemoryMapParsingResult> invoke(File file, VirtualChannel vc) throws IOException, InterruptedException {        
-        FileSet fileSet = new FileSet();
-        org.apache.tools.ant.Project project = new org.apache.tools.ant.Project();
-        fileSet.setProject(project);
-        fileSet.setDir(file);
-        fileSet.setIncludes(parser.getMapFile());
-        
-        int lenghth = fileSet.getDirectoryScanner(project).getIncludedFiles().length;
-        if(lenghth == 0) {
-            throw new FileNotFoundException(String.format("Filematcher found no files using pattern %s in folder %s",parser.getMapFile(),file.getAbsolutePath()));
-        }
-        
-        File f = new File(file.getAbsoluteFile() + System.getProperty("file.separator") + fileSet.getDirectoryScanner(project).getIncludedFiles()[0]);
 
-        if(!f.exists()) {
-            throw new FileNotFoundException(String.format("File %s not found workspace was %s scanner found %s files", f.getAbsolutePath(),file.getAbsolutePath(),lenghth));
-        } 
-        return getParser().parse(f);
+        try {
+            return getParser().parse(findFile(file));
+        } catch (FileNotFoundException fnfex) {
+            throw new IOException(String.format("File %s not found", parser.getMapFile()), fnfex);
+        }
     }
 
     /**
@@ -79,6 +68,26 @@ public class MemoryMapParserDelegate implements FilePath.FileCallable<List<Memor
      */
     public void setParser(AbstractMemoryMapParser parser) {
         this.parser = parser;
+    }
+    
+    public File findFile(File file) throws IOException {
+        FileSet fileSet = new FileSet();
+        org.apache.tools.ant.Project project = new org.apache.tools.ant.Project();
+        fileSet.setProject(project);
+        fileSet.setDir(file);
+        fileSet.setIncludes(parser.getMapFile());
+        
+        int numberOfFoundFiles = fileSet.getDirectoryScanner(project).getIncludedFiles().length;
+        if(numberOfFoundFiles == 0) {
+            throw new FileNotFoundException(String.format("Filematcher found no files using pattern %s in folder %s",parser.getMapFile(),file.getAbsolutePath()));
+        } 
+        
+        File f = new File(file.getAbsoluteFile() + System.getProperty("file.separator") + fileSet.getDirectoryScanner(project).getIncludedFiles()[0]);
+
+        if(!f.exists()) {
+            throw new FileNotFoundException(String.format("File %s not found workspace was %s scanner found %s files.", f.getAbsolutePath(),file.getAbsolutePath(),numberOfFoundFiles));
+        }
+        return f;
     }
 
 }

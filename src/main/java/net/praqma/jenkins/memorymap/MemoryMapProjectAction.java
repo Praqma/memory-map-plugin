@@ -80,7 +80,8 @@ public class MemoryMapProjectAction extends Actionable implements ProminentProje
         }
     }
     
-    public GraphCategories[] getCategories() {
+    public GraphCategories[] getCategories() {        
         return GraphCategories.values();
     }
 }
+

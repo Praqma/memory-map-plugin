@@ -29,6 +29,7 @@ import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.Action;
 import hudson.model.BuildListener;
+import hudson.model.Hudson;
 import hudson.model.Result;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
@@ -36,7 +37,9 @@ import hudson.tasks.Publisher;
 import hudson.tasks.Recorder;
 import hudson.util.FormValidation;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import net.praqma.jenkins.memorymap.parser.AbstractMemoryMapParser;
 import net.praqma.jenkins.memorymap.parser.MemoryMapParserDelegate;
@@ -44,7 +47,6 @@ import net.praqma.jenkins.memorymap.parser.MemoryMapParserDescriptor;
 import net.praqma.jenkins.memorymap.result.MemoryMapGroup;
 import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
 import net.sf.json.JSONObject;
-import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
@@ -76,17 +78,36 @@ public class MemoryMapRecorder extends Recorder {
     
     @Override
     public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
-
-        List<MemoryMapParsingResult> res = build.getWorkspace().act(new MemoryMapParserDelegate(chosenParser));
+        
+        boolean failed = false;
+        PrintStream out = listener.getLogger();
+                
+        List<MemoryMapParsingResult> res = new LinkedList<MemoryMapParsingResult>();
+        String version = Hudson.getInstance().getPlugin( "memory-map" ).getWrapper().getVersion();
+		out.println( "Memory Map Plugin version " + version );
+        
+        try { 
+            res = build.getWorkspace().act(new MemoryMapParserDelegate(chosenParser));
+        } catch(IOException ex) {
+            out.println(String.format("Failed to parse memory map file, the reason given: %s", ex.getMessage()));
+            failed = true;
+        }
 
         for(MemoryMapParsingResult result : res) {
-            listener.getLogger().println(result);
-        }
-        
+            out.println(result);
+        }        
         /*
          * Create a build action and store the result.
          */
         MemoryMapBuildAction mmba = new MemoryMapBuildAction(build, res);
+        mmba.setRecorder(this);
+        
+        if(failed) {
+            build.setResult(Result.FAILURE);
+            return false;
+        }
+        
+        
         
         boolean validFlashCapacity = mmba.validateThreshold(getFlashCapacity(), MemoryMapGroup.defaultFlashGroup());
         int flashCount = mmba.sumOfValues(MemoryMapGroup.defaultFlashGroup());
@@ -94,24 +115,24 @@ public class MemoryMapRecorder extends Recorder {
         boolean validRamCapacity = mmba.validateThreshold(getRamCapacity(), MemoryMapGroup.defaultRamGroup());
         int ramCount = mmba.sumOfValues(MemoryMapGroup.defaultRamGroup());
 
-        listener.getLogger().println("Recorded flash memory usage: "+flashCount);        
-        listener.getLogger().println("Recorded ram usage: "+ramCount);        
+        out.println("Recorded flash memory usage: "+flashCount);        
+        out.println("Recorded ram usage: "+ramCount);        
         
-        listener.getLogger().println(String.format("Maximum flash setting: %s", getFlashCapacity()));
-        listener.getLogger().println(String.format("Maximum ram setting: %s", getRamCapacity()));
+        out.println(String.format("Maximum flash setting: %s", getFlashCapacity()));
+        out.println(String.format("Maximum ram setting: %s", getRamCapacity()));
         
         if(!validFlashCapacity) {
-            listener.getLogger().println("Flash capacity exceeded.");
+            out.println("Flash capacity exceeded.");
             build.setResult(Result.FAILURE);            
         }
         
         if(!validRamCapacity) {
-            listener.getLogger().println("Ram capacity exceeded.");
+            out.println("Ram capacity exceeded.");
             build.setResult(Result.FAILURE);            
         }
         
         if(validRamCapacity && validFlashCapacity) {
-            listener.getLogger().println("Ram and flash usage within capacity");
+            out.println("Ram and flash usage within capacity");
         }
         
         build.getActions().add(mmba);
@@ -230,7 +251,7 @@ public class MemoryMapRecorder extends Recorder {
 
         @Override
         public String getDisplayName() {
-            return "Memory Map";
+            return "Memory Map Publisher";
         }
         
         public List<MemoryMapParserDescriptor<?>> getParsers() {

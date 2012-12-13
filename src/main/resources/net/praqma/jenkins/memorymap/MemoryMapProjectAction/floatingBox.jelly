@@ -1,6 +1,6 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
          xmlns:t="/lib/hudson" xmlns:f="/lib/form">    
-    <j:forEach var="category" items="${from.getCategories()}">
+    <j:forEach var="category" items="${from.getCategories()}">        
         <img src="${from.urlName}/drawMemoryMapUsageGraph?category=${category}"/>
     </j:forEach>
 </j:jelly>

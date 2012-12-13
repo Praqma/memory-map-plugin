@@ -68,7 +68,7 @@ public class TexasInstrumentsMemoryMapParser extends AbstractMemoryMapParser {
         super();
     }
 
-    //TODO:Why come i cannot use patter.equals(other.patter)? I have to use the string representation in order to get it working...
+    //TODO:Why come i cannot use pattern.equals(other.patter)? I have to use the string representation in order to get it working...
     @Override
     public LinkedList<MemoryMapParsingResult> parse(File f) throws IOException {
         LinkedList<MemoryMapParsingResult> res = new LinkedList<MemoryMapParsingResult>();
