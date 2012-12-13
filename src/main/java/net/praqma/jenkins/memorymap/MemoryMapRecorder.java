@@ -89,7 +89,7 @@ public class MemoryMapRecorder extends Recorder {
         try { 
             res = build.getWorkspace().act(new MemoryMapParserDelegate(chosenParser));
         } catch(IOException ex) {
-            out.println(String.format("Failed to parse memory map file, the reason given: %s", ex.getMessage()));
+            out.println(ex.getCause().getMessage());
             failed = true;
         }
 

@@ -52,7 +52,7 @@ public class MemoryMapParserDelegate implements FilePath.FileCallable<List<Memor
         try {
             return getParser().parse(findFile(file));
         } catch (FileNotFoundException fnfex) {
-            throw new IOException(String.format("File %s not found", parser.getMapFile()), fnfex);
+            throw new IOException(fnfex.getMessage());
         }
     }
 

@@ -23,6 +23,7 @@
  */
 package net.praqma.jenkins.memorymap;
 
+import hudson.model.AbstractBuild;
 import hudson.model.AbstractProject;
 import hudson.model.Actionable;
 import hudson.model.ProminentProjectAction;
@@ -74,10 +75,27 @@ public class MemoryMapProjectAction extends Actionable implements ProminentProje
         return null;
     }
     
+    public MemoryMapBuildAction getLastApplicableMemmoryMapResult() {
+        AbstractBuild<?,?> build = project.getLastCompletedBuild();
+        while(build != null) {
+            MemoryMapBuildAction mmba = build.getAction(MemoryMapBuildAction.class);
+            if(mmba != null && mmba.getResults().size() > 0) {
+                return mmba;
+            }
+            build = build.getPreviousBuild();
+        }
+        
+        return null;
+    }
+        
+    
     public void doDrawMemoryMapUsageGraph(StaplerRequest req, StaplerResponse rsp) throws IOException {
+        /*
         if(getLatestActionInProject() != null && (getLatestActionInProject().getResults() != null && getLatestActionInProject().getResults().size() > 0)) {
             getLatestActionInProject().doDrawMemoryMapUsageGraph(req, rsp);
-        }
+        } 
+        */
+        getLastApplicableMemmoryMapResult().doDrawMemoryMapUsageGraph(req, rsp);
     }
     
     public GraphCategories[] getCategories() {        
