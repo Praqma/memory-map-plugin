@@ -50,7 +50,7 @@ public class MemoryMapProjectAction extends Actionable implements ProminentProje
     
     @Override
     public String getDisplayName() {
-        return "Memory map";
+        return "Memory Map Publisher";
     }
 
     @Override
@@ -75,6 +75,7 @@ public class MemoryMapProjectAction extends Actionable implements ProminentProje
         return null;
     }
     
+    //Gets the last 'applicable' build action from project. That is a bui
     public MemoryMapBuildAction getLastApplicableMemmoryMapResult() {
         AbstractBuild<?,?> build = project.getLastCompletedBuild();
         while(build != null) {
@@ -90,11 +91,6 @@ public class MemoryMapProjectAction extends Actionable implements ProminentProje
         
     
     public void doDrawMemoryMapUsageGraph(StaplerRequest req, StaplerResponse rsp) throws IOException {
-        /*
-        if(getLatestActionInProject() != null && (getLatestActionInProject().getResults() != null && getLatestActionInProject().getResults().size() > 0)) {
-            getLatestActionInProject().doDrawMemoryMapUsageGraph(req, rsp);
-        } 
-        */
         getLastApplicableMemmoryMapResult().doDrawMemoryMapUsageGraph(req, rsp);
     }
     
