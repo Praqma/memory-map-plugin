@@ -23,6 +23,7 @@
  */
 package net.praqma.jenkins.memorymap.parser;
 
+import com.sun.istack.internal.logging.Logger;
 import hudson.DescriptorExtensionList;
 import hudson.ExtensionPoint;
 import hudson.model.Describable;
@@ -48,6 +49,10 @@ import org.apache.commons.collections.ListUtils;
  */
 public abstract class AbstractMemoryMapParser implements Describable<AbstractMemoryMapParser>, ExtensionPoint, MemoryMapParsable, Serializable {
     
+    private static final String UTF_8_CHARSET = "UTF8";
+    private static final String ISO_8859_1 = "8859_1";
+    protected static final Logger logger = Logger.getLogger(AbstractMemoryMapParser.class);
+    
     protected List<Pattern> patterns;
     protected String mapFile;
     
@@ -61,19 +66,27 @@ public abstract class AbstractMemoryMapParser implements Describable<AbstractMem
     }
      
     protected CharSequence createCharSequenceFromFile(File f) throws IOException {
-        return createCharSequenceFromFile("8859_1", f);
+        return createCharSequenceFromFile(UTF_8_CHARSET, f);
     }
      
     protected CharSequence createCharSequenceFromFile(String charset, File f) throws IOException {
+        String chosenCharset = charset;
+        
         CharBuffer cbuf = null;
         FileInputStream fis = null;
         try 
         {
             fis = new FileInputStream(f.getAbsolutePath());
             FileChannel fc = fis.getChannel();
-
             ByteBuffer bbuf = fc.map(FileChannel.MapMode.READ_ONLY, 0, (int)fc.size());
-            cbuf = Charset.forName(charset).newDecoder().decode(bbuf);
+            
+            if(!Charset.isSupported(chosenCharset)) {
+                logger.warning(String.format("The charset %s is not supported", charset));
+                cbuf = Charset.defaultCharset().newDecoder().decode(bbuf);
+            } else {
+                cbuf = Charset.forName(charset).newDecoder().decode(bbuf);
+            }
+            
         } catch (IOException ex) {
             throw ex;
         } finally {
