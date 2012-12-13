@@ -21,12 +21,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package net.praqma.jenkins;
+package net.praqma.jenkins.unit;
+
+import java.util.LinkedList;
+import java.util.List;
+import net.praqma.jenkins.memorymap.MemoryMapBuildAction;
+import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  *
  * @author Praqma
  */
-public class DefaultTest {
+
+
+public class MemoryMapBuildActionTestSimple {
     
+    @Test
+    public void memoryMapBuildAction_intialization_compare() {
+        MemoryMapBuildAction mmba = new MemoryMapBuildAction(null, null);
+        mmba.setResults(new LinkedList<MemoryMapParsingResult>());        
+        
+        int sum = 0;
+        
+        assertEquals(sum, mmba.sumOfValues("dummy","non-existant"));
+        assertEquals(0, mmba.getResults().size());
+        
+        MemoryMapParsingResult mmpa = new MemoryMapParsingResult();
+        mmpa.setName(".ebss");
+        mmpa.setValue(1000);
+        
+        //Add a result with .ebss
+        mmba.getResults().add(mmpa);
+        
+        assertEquals(1000, mmba.sumOfValues(".ebss"));
+        
+    }
+            
 }

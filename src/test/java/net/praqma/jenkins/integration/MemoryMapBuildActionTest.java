@@ -21,12 +21,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package net.praqma.jenkins.unit;
+package net.praqma.jenkins.integration;
+
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  *
  * @author Praqma
  */
-public class DefaultUnitTest {
+public class MemoryMapBuildActionTest {
     
+    //TODO: implement me
+    @Test
+    public void test_buildActionAdded() {
+        assertTrue(true);
+    }
 }
