@@ -28,8 +28,8 @@ import java.io.IOException;
 import net.praqma.jenkins.memorymap.parser.MemoryMapParserDelegate;
 import net.praqma.jenkins.memorymap.parser.TexasInstrumentsMemoryMapParser;
 import org.apache.commons.lang.SerializationUtils;
-import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  *
