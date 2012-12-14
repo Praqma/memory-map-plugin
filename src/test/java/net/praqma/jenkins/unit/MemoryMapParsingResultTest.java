@@ -43,7 +43,7 @@ public class MemoryMapParsingResultTest {
     }
     
     @Test
-    public void data_MemoryMapParsingResult() throws Exception {
+    public void data_MemoryMapParsingResult_test() throws Exception {
         MemoryMapParsingResult mmpr = new MemoryMapParsingResult();
         String name = "dataName";
         String rawvalue = "00010100111";
@@ -59,7 +59,7 @@ public class MemoryMapParsingResultTest {
     }
     
     @Test
-    public void data_MemoryMapParsingResult_serialization() throws Exception {
+    public void data_MemoryMapParsingResult_serialization_test() throws Exception {
         File f = File.createTempFile("testSerialization", ".test");
         FileOutputStream fos = new FileOutputStream(f);
         ObjectOutputStream ous = new ObjectOutputStream(fos);

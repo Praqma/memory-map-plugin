@@ -38,12 +38,12 @@ import static org.junit.Assert.*;
 public class MemoryMapParserDelegateTest {
     
     @Test
-    public void isMemoryMapParserDelegateSerializable() {
+    public void isMemoryMapParserDelegateSerializable_test() {
         SerializationUtils.serialize(new MemoryMapParserDelegate());
     }
     
     @Test
-    public void findFilePatternWorks() throws IOException {
+    public void findFilePatternWorks_test() throws IOException {
 
         File f = File.createTempFile("testfile", ".test");
                 

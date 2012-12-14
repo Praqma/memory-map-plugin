@@ -41,7 +41,7 @@ import static org.junit.Assert.*;
 public class MemoryMapBuildActionTestSimple {
     
     @Test
-    public void memoryMapBuildAction_trivial_accessor_mutator_tests() {
+    public void test_memoryMapBuildAction_trivial_accessor_mutator() {
         MemoryMapBuildAction memoryMapBuildAction = new MemoryMapBuildAction(null, null);
         assertNull(memoryMapBuildAction.getIconFileName());
         assertNull(memoryMapBuildAction.getUrlName());
@@ -49,7 +49,7 @@ public class MemoryMapBuildActionTestSimple {
     }
     
     @Test
-    public void memoryMapBuildAction_intialization_compare() {
+    public void test_memoryMapBuildAction_intialization_compare() {
         
         String ebss = ".ebss";
         String bss = ".bss";

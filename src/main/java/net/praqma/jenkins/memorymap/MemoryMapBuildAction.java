@@ -162,13 +162,6 @@ public class MemoryMapBuildAction implements Action {
             }
         }
     }
-    
-    public int getLimitForCategory(MemoryMapProjectAction.GraphCategories category) {
-        if(category.equals(MemoryMapProjectAction.GraphCategories.Flash)) {
-            return 50000;
-        }
-        return 10000;
-    }
 
     public void doDrawMemoryMapUsageGraph(StaplerRequest req, StaplerResponse rsp) throws IOException {
         DataSetBuilder<String, ChartUtil.NumberOnlyBuildLabel> dataset = new DataSetBuilder<String, ChartUtil.NumberOnlyBuildLabel>();
