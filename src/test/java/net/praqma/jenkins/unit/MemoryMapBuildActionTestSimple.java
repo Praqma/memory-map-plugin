@@ -41,6 +41,14 @@ import static org.junit.Assert.*;
 public class MemoryMapBuildActionTestSimple {
     
     @Test
+    public void memoryMapBuildAction_trivial_accessor_mutator_tests() {
+        MemoryMapBuildAction memoryMapBuildAction = new MemoryMapBuildAction(null, null);
+        assertNull(memoryMapBuildAction.getIconFileName());
+        assertNull(memoryMapBuildAction.getUrlName());
+        assertEquals("Memory map", memoryMapBuildAction.getDisplayName());
+    }
+    
+    @Test
     public void memoryMapBuildAction_intialization_compare() {
         
         String ebss = ".ebss";
