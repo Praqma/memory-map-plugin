@@ -27,9 +27,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
-import org.junit.Test;
 import static org.junit.Assert.*;
-import org.junit.BeforeClass;
+import org.junit.Test;
 
 /**
  *
@@ -37,13 +36,8 @@ import org.junit.BeforeClass;
  */
 public class MemoryMapParsingResultTest {
     
-    @BeforeClass
-    public static void setUp() {
-        
-    }
-    
     @Test
-    public void data_MemoryMapParsingResult_test() throws Exception {
+    public void data_MemoryMapParsingResult_test()  {
         MemoryMapParsingResult mmpr = new MemoryMapParsingResult();
         String name = "dataName";
         String rawvalue = "00010100111";
