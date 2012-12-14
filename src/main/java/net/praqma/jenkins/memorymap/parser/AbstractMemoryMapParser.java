@@ -23,7 +23,6 @@
  */
 package net.praqma.jenkins.memorymap.parser;
 
-import com.sun.istack.internal.logging.Logger;
 import hudson.DescriptorExtensionList;
 import hudson.ExtensionPoint;
 import hudson.model.Describable;
@@ -39,6 +38,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import jenkins.model.Jenkins;
 import org.apache.commons.collections.ListUtils;
@@ -51,7 +51,7 @@ public abstract class AbstractMemoryMapParser implements Describable<AbstractMem
     
     private static final String UTF_8_CHARSET = "UTF8";
     private static final String ISO_8859_1 = "8859_1";
-    protected static final Logger logger = Logger.getLogger(AbstractMemoryMapParser.class);
+    protected static final Logger logger = Logger.getLogger(AbstractMemoryMapParser.class.toString());
     
     protected List<Pattern> patterns;
     protected String mapFile;
