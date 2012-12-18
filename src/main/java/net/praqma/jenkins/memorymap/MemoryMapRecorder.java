@@ -95,8 +95,8 @@ public class MemoryMapRecorder extends Recorder {
         
         try { 
             chosenParser.setConfigurationFile(configurationFile);
-            res = build.getWorkspace().act(new MemoryMapMapParserDelegate(chosenParser));
             config = build.getWorkspace().act(new MemoryMapConfigFileParserDelegate(chosenParser));
+            res = build.getWorkspace().act(new MemoryMapMapParserDelegate(chosenParser));
         } catch(IOException ex) {
             out.println(ex.getCause().getMessage());
             failed = true;
@@ -115,7 +115,7 @@ public class MemoryMapRecorder extends Recorder {
         /*
          * Create a build action and store the result.
          */
-        MemoryMapBuildAction mmba = new MemoryMapBuildAction(build, res);
+        MemoryMapBuildAction mmba = new MemoryMapBuildAction(build, config, res);
         mmba.setRecorder(this);
         
         if(failed) {

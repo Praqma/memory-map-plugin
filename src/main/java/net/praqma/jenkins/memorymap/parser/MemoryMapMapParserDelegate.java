@@ -27,9 +27,11 @@ import hudson.remoting.VirtualChannel;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
 import net.praqma.jenkins.memorymap.util.FileFoundable;
 
@@ -41,6 +43,8 @@ public class MemoryMapMapParserDelegate extends FileFoundable<List<MemoryMapPars
 {
     private static final Logger log = Logger.getLogger(MemoryMapMapParserDelegate.class.getName());
     private AbstractMemoryMapParser parser;
+    private static HashMap<String,Pattern> patternRegistry;
+    
     //Empty constructor. For serialization purposes.
     public MemoryMapMapParserDelegate() { }
 
@@ -71,5 +75,17 @@ public class MemoryMapMapParserDelegate extends FileFoundable<List<MemoryMapPars
      */
     public void setParser(AbstractMemoryMapParser parser) {
         this.parser = parser;
+    }
+    
+    public static Pattern getPatternForMemorySection(String sectionName) {
+        if(patternRegistry.containsKey(sectionName)) {
+            return patternRegistry.get(sectionName);
+        } else {
+            String regex = String.format("^(\\s+%s\\s+)(\\S+)(\\s+)(\\S+)(\\s+)(\\S+)(\\s+)(\\S+)(\\s+)(\\S+)", sectionName);
+            Pattern memsection = Pattern.compile(regex,Pattern.MULTILINE);
+            patternRegistry.put(sectionName, memsection);
+            return memsection;
+        }
+      
     }
 }

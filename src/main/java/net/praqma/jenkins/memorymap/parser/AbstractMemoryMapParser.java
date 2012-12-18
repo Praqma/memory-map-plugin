@@ -52,8 +52,7 @@ import org.apache.commons.collections.ListUtils;
  * @author Praqma
  */
 public abstract class AbstractMemoryMapParser implements Describable<AbstractMemoryMapParser>, ExtensionPoint, MemoryMapParsable, Serializable {
-    
-    
+
     private static final Pattern CONFIG_FILE_PATTERN =  Pattern.compile("^(\\s+)(\\S+)(.*origin\\s=\\s)(0x\\S+)(,.*)(0x\\S+)(.*)$",Pattern.MULTILINE);   
     private static final String UTF_8_CHARSET = "UTF8";
     private static final String ISO_8859_1 = "8859_1";
@@ -117,12 +116,26 @@ public abstract class AbstractMemoryMapParser implements Describable<AbstractMem
         Matcher m = CONFIG_FILE_PATTERN.matcher(sequence);
         while(m.find()) {
             MemoryMapConfigMemoryItem item = new MemoryMapConfigMemoryItem(m.group(2), m.group(4), m.group(6));
-            config.put(m.group(2), item);
+            config.add(item);
         }
         
         //TODO:Remove before release
-        System.out.println("Number of items found; "+config.values().size());
+        System.out.println("Number of items found; "+config.size());
         return config;
+    }
+    
+    @Override
+    public MemoryMapConfigMemory parseMapFile(File f, MemoryMapConfigMemory configuration) throws IOException {
+        CharSequence sequence = createCharSequenceFromFile(f);
+        for(MemoryMapConfigMemoryItem item : configuration) {
+            Matcher matcher = MemoryMapMapParserDelegate.getPatternForMemorySection(item.getName()).matcher(sequence);
+            while(matcher.find()) {
+                item.setUsed(matcher.group(6));
+                item.setUnused(matcher.group(8));
+            }      
+                    
+        }
+        return configuration;
     }
 
     /**

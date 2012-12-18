@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
 import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
@@ -58,6 +59,7 @@ import org.kohsuke.stapler.StaplerResponse;
  */
 public class MemoryMapBuildAction implements Action {
 
+    private MemoryMapConfigMemory memoryMapConfig;
     private List<MemoryMapParsingResult> results;
     private AbstractBuild<?,?> build;
     private MemoryMapRecorder recorder;
@@ -69,9 +71,11 @@ public class MemoryMapBuildAction implements Action {
         categoryMap.put(MemoryMapProjectAction.GraphCategories.Ram, Arrays.asList(".stack",".ebss",".bss",".sysmem",".esysmem",".cio",".data"));
     }
     
-    public MemoryMapBuildAction(AbstractBuild<?,?> build, List<MemoryMapParsingResult> results) {
+    public MemoryMapBuildAction(AbstractBuild<?,?> build, MemoryMapConfigMemory memoryMapConfig, List<MemoryMapParsingResult> results) {
         this.results = results;
         this.build = build;
+        this.memoryMapConfig = memoryMapConfig;
+        
     }
     
     @Override
@@ -315,5 +319,19 @@ public class MemoryMapBuildAction implements Action {
      */
     public void setRecorder(MemoryMapRecorder recorder) {
         this.recorder = recorder;
+    }
+
+    /**
+     * @return the memoryMapConfig
+     */
+    public MemoryMapConfigMemory getMemoryMapConfig() {
+        return memoryMapConfig;
+    }
+
+    /**
+     * @param memoryMapConfig the memoryMapConfig to set
+     */
+    public void setMemoryMapConfig(MemoryMapConfigMemory memoryMapConfig) {
+        this.memoryMapConfig = memoryMapConfig;
     }
 }

@@ -42,7 +42,7 @@ public class MemoryMapBuildActionSimpleTest {
     
     @Test
     public void memoryMapBuildAction_trivial_accessor_mutator_test() throws Exception {
-        MemoryMapBuildAction memoryMapBuildAction = new MemoryMapBuildAction(null, null);
+        MemoryMapBuildAction memoryMapBuildAction = new MemoryMapBuildAction(null, null, null);
         assertNull(memoryMapBuildAction.getIconFileName());
         assertNull(memoryMapBuildAction.getUrlName());
         assertEquals("Memory map", memoryMapBuildAction.getDisplayName());
@@ -53,7 +53,7 @@ public class MemoryMapBuildActionSimpleTest {
         
         String ebss = ".ebss";
         String bss = ".bss";
-        MemoryMapBuildAction mmba = new MemoryMapBuildAction(null, null);
+        MemoryMapBuildAction mmba = new MemoryMapBuildAction(null, null, null);
         mmba.setResults(new LinkedList<MemoryMapParsingResult>());        
         
         int sum = 0;

@@ -34,7 +34,13 @@ import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
  * @author Praqma
  */
 public interface MemoryMapParsable {
+    @Deprecated
     public List<MemoryMapParsingResult> parseMapFile(File f) throws IOException;
+    @Deprecated
     public MemoryMapConfigMemory parseConfigFile(File f) throws IOException;
+    
+    
+    public MemoryMapConfigMemory parseMapFile2(File f) throws IOException;
+    public MemoryMapConfigMemory parseMapFile(File f, MemoryMapConfigMemory configuration) throws IOException;
     
 }

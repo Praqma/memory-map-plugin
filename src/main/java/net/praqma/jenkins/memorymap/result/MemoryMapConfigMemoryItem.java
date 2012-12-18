@@ -30,11 +30,13 @@ import java.util.List;
  *
  * @author Praqma
  */
-public class MemoryMapConfigMemoryItem implements Serializable{
+public class MemoryMapConfigMemoryItem implements Serializable {
     private String name;
     private String origin;
     private String length;
-    private List<String> associatedSections;
+    private String used = "";
+    private String unused = "";    
+    private List<MemoryMapConfigMemoryItem> associatedSections;
     
     public MemoryMapConfigMemoryItem() {} 
     
@@ -43,7 +45,15 @@ public class MemoryMapConfigMemoryItem implements Serializable{
         this.origin = origin;
         this.length = length;
     }
-
+    
+    public MemoryMapConfigMemoryItem(String name, String origin, String length, String used, String unused) {
+        this.name = name;
+        this.origin = origin;
+        this.length = length;
+        this.unused = unused;
+        this.used = used;
+    }
+    
     /**
      * @return the name
      */
@@ -89,22 +99,47 @@ public class MemoryMapConfigMemoryItem implements Serializable{
     /**
      * @return the associatedSections
      */
-    public List<String> getAssociatedSections() {
+    public List<MemoryMapConfigMemoryItem> getAssociatedSections() {
         return associatedSections;
     }
 
     /**
      * @param associatedSections the associatedSections to set
      */
-    public void setAssociatedSections(List<String> associatedSections) {
-        this.associatedSections = associatedSections;
+    public void setAssociatedSections(List<MemoryMapConfigMemoryItem> associatedSections) {
+        this.setAssociatedSections(associatedSections);
     }
 
     @Override
     public String toString() {
-        return String.format("%s [origin = 0x%s, length = 0x%s]",name, origin, length);
+        return String.format("%s [origin = 0x%s, length = 0x%s, used = 0x%s, unused = 0x%s]", getName(), getOrigin(), getLength(), getUsed(), getUnused());
+    }      
+
+    /**
+     * @return the used
+     */
+    public String getUsed() {
+        return used;
     }
-    
-    
-        
+
+    /**
+     * @param used the used to set
+     */
+    public void setUsed(String used) {
+        this.used = used;
+    }
+
+    /**
+     * @return the unused
+     */
+    public String getUnused() {
+        return unused;
+    }
+
+    /**
+     * @param unused the unused to set
+     */
+    public void setUnused(String unused) {
+        this.unused = unused;
+    }
 }

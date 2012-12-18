@@ -118,6 +118,16 @@ public class KeilMemoryMapParser extends AbstractMemoryMapParser {
     public MemoryMapConfigMemory parseConfigFile(File f) throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+
+    @Override
+    public MemoryMapConfigMemory parseMapFile2(File f) throws IOException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public MemoryMapConfigMemory parseMapFile(File f, MemoryMapConfigMemory configuration) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
     
     @Extension
     public static final class DescriptorImpl extends MemoryMapParserDescriptor<TexasInstrumentsMemoryMapParser> {

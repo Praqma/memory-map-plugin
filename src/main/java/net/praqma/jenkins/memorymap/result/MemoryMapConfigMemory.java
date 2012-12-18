@@ -24,31 +24,27 @@
 package net.praqma.jenkins.memorymap.result;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Set;
+import java.util.LinkedList;
 
 /**
  *
  * @author Praqma
+ * 
+ * This object is the big aggregation 
  */
-public class MemoryMapConfigMemory extends HashMap<String, MemoryMapConfigMemoryItem> implements Serializable{
-    private Integer page = null;
-    
+public class MemoryMapConfigMemory extends LinkedList<MemoryMapConfigMemoryItem> implements Serializable{
     public MemoryMapConfigMemory() {}
 
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
         
-        for (String name : keySet()) {
-            MemoryMapConfigMemoryItem item = get(name);
+        for (MemoryMapConfigMemoryItem item : this) {
             builder.append(item.toString());
             builder.append("\n");
         }
         
         return builder.toString();
     }
-    
-    
-    
+      
 }

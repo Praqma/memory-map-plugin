@@ -30,6 +30,7 @@ import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
+import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemoryItem;
 import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -40,6 +41,14 @@ import org.kohsuke.stapler.StaplerRequest;
  * @author Praqma
  */
 public class TexasInstrumentsMemoryMapParser extends AbstractMemoryMapParser {
+    
+    
+    /*
+     * Generic design
+     */
+    private static final Pattern MEMORY_OVERALL_SECTION = Pattern.compile("^\\.text\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
+
+    
     
     
     /*
@@ -124,6 +133,13 @@ public class TexasInstrumentsMemoryMapParser extends AbstractMemoryMapParser {
     public MemoryMapConfigMemory parseConfigFile(File f) throws IOException {
         return super.parseConfigFile(f);
     }
+
+    @Override
+    public MemoryMapConfigMemory parseMapFile2(File f) throws IOException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+
     
     @Extension
     public static final class DescriptorImpl extends MemoryMapParserDescriptor<TexasInstrumentsMemoryMapParser> {
