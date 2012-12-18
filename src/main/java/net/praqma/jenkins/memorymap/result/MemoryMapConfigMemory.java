@@ -32,7 +32,7 @@ import java.util.LinkedList;
  * 
  * This object is the big aggregation 
  */
-public class MemoryMapConfigMemory extends LinkedList<MemoryMapConfigMemoryItem> implements Serializable{
+public class MemoryMapConfigMemory extends LinkedList<MemoryMapConfigMemoryItem> implements Serializable {
     public MemoryMapConfigMemory() {}
 
     @Override

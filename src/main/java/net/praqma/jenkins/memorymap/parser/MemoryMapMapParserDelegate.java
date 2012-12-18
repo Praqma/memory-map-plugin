@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
 import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
 import net.praqma.jenkins.memorymap.util.FileFoundable;
 
@@ -43,6 +44,7 @@ public class MemoryMapMapParserDelegate extends FileFoundable<List<MemoryMapPars
 {
     private static final Logger log = Logger.getLogger(MemoryMapMapParserDelegate.class.getName());
     private AbstractMemoryMapParser parser;
+    private MemoryMapConfigMemory config;
     private static HashMap<String,Pattern> patternRegistry;
     
     //Empty constructor. For serialization purposes.
@@ -51,12 +53,22 @@ public class MemoryMapMapParserDelegate extends FileFoundable<List<MemoryMapPars
     public MemoryMapMapParserDelegate(AbstractMemoryMapParser parser) {
         this.parser = parser;
     }
+    
+    public MemoryMapMapParserDelegate(AbstractMemoryMapParser parser, MemoryMapConfigMemory config) {
+        this.parser = parser;
+        this.config = config;        
+    }
 
     @Override
     public List<MemoryMapParsingResult> invoke(File file, VirtualChannel vc) throws IOException, InterruptedException {        
 
         try {
-            return getParser().parseMapFile(findFile(file, parser.getMapFile()));
+              if(parser == null) {
+                return getParser().parseMapFile(findFile(file, parser.getMapFile()));
+              } else {
+                getParser().parseMapFile(findFile(file, parser.getMapFile()), config);
+                throw new IOException(config.toString());   
+              }
         } catch (FileNotFoundException fnfex) {
             log.logp(Level.WARNING, "invoke", MemoryMapConfigFileParserDelegate.class.getName(), "invoke caught file not found exception", fnfex);
             throw new IOException(fnfex.getMessage());
@@ -78,6 +90,10 @@ public class MemoryMapMapParserDelegate extends FileFoundable<List<MemoryMapPars
     }
     
     public static Pattern getPatternForMemorySection(String sectionName) {
+        if(patternRegistry == null) {
+            patternRegistry = new HashMap<String, Pattern>();
+        }
+        
         if(patternRegistry.containsKey(sectionName)) {
             return patternRegistry.get(sectionName);
         } else {

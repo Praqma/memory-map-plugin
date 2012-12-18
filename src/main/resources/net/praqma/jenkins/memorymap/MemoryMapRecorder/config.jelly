@@ -45,21 +45,23 @@
         <f:entry field="configurationFile" name="configurationFile">
             ${%Linker command file}
             <f:textbox/>
-        </f:entry>
-        
+        </f:entry>        
         <f:entry field="wordSize" name="wordSize">
             ${%Word size}
             <f:textbox/>
         </f:entry>
         <f:entry field="showBytesOnGraph" name="showBytesOnGraph">
-            
+            ${%Show bytes on graphs}
             <f:checkbox/>
         </f:entry>
-        
-        
         <f:entry>
             <strong>${%Compiler}</strong>
         </f:entry>
+        <f:repeatable>
+            
+        </f:repeatable>
+        
+        
         <f:dropdownDescriptorSelector descriptors="${descriptor.getParsers()}" field="chosenParser" />
 
 	</f:block>   

@@ -135,6 +135,11 @@ public class TexasInstrumentsMemoryMapParser extends AbstractMemoryMapParser {
     }
 
     @Override
+    public MemoryMapConfigMemory parseMapFile(File f, MemoryMapConfigMemory config) throws IOException {
+        return super.parseMapFile(f, config);
+    }
+
+    @Override
     public MemoryMapConfigMemory parseMapFile2(File f) throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
