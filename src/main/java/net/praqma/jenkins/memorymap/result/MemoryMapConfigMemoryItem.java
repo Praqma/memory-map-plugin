@@ -23,17 +23,88 @@
  */
 package net.praqma.jenkins.memorymap.result;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  *
  * @author Praqma
  */
-public class MemoryMapConfigMemoryItem {
+public class MemoryMapConfigMemoryItem implements Serializable{
     private String name;
     private String origin;
     private String length;
     private List<String> associatedSections;
     
+    public MemoryMapConfigMemoryItem() {} 
     
+    public MemoryMapConfigMemoryItem(String name, String origin, String length) {
+        this.name = name;
+        this.origin = origin;
+        this.length = length;
+    }
+
+    /**
+     * @return the name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @param name the name to set
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * @return the origin
+     */
+    public String getOrigin() {
+        return origin;
+    }
+
+    /**
+     * @param origin the origin to set
+     */
+    public void setOrigin(String origin) {
+        this.origin = origin;
+    }
+
+    /**
+     * @return the length
+     */
+    public String getLength() {
+        return length;
+    }
+
+    /**
+     * @param length the length to set
+     */
+    public void setLength(String length) {
+        this.length = length;
+    }
+
+    /**
+     * @return the associatedSections
+     */
+    public List<String> getAssociatedSections() {
+        return associatedSections;
+    }
+
+    /**
+     * @param associatedSections the associatedSections to set
+     */
+    public void setAssociatedSections(List<String> associatedSections) {
+        this.associatedSections = associatedSections;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s [origin = 0x%s, length = 0x%s]",name, origin, length);
+    }
+    
+    
+        
 }

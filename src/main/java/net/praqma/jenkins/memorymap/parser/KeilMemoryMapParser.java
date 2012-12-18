@@ -61,8 +61,8 @@ public class KeilMemoryMapParser extends AbstractMemoryMapParser {
     
     
     @DataBoundConstructor
-    public KeilMemoryMapParser(String mapFile, String configurationFile, Integer wordSize) {
-        super(mapFile, configurationFile, wordSize, TEXT_DOT, CONST_DOT, ECONST_DOT, PINIT, SWITCH, CINIT_DOT, STACK_DOT, BSS_DOT, EBSS_DOT, SYSMEM, ESYSMEM, CIO, DATA);
+    public KeilMemoryMapParser(String mapFile, String configurationFile, Integer wordSize, Boolean bytesOnGraph) {
+        super(mapFile, configurationFile, wordSize,bytesOnGraph, TEXT_DOT, CONST_DOT, ECONST_DOT, PINIT, SWITCH, CINIT_DOT, STACK_DOT, BSS_DOT, EBSS_DOT, SYSMEM, ESYSMEM, CIO, DATA);
     }
     
     public KeilMemoryMapParser() {

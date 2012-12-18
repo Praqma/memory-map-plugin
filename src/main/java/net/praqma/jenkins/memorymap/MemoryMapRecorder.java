@@ -94,12 +94,20 @@ public class MemoryMapRecorder extends Recorder {
 		out.println( "Memory Map Plugin version " + version );
         
         try { 
+            chosenParser.setConfigurationFile(configurationFile);
             res = build.getWorkspace().act(new MemoryMapMapParserDelegate(chosenParser));
             config = build.getWorkspace().act(new MemoryMapConfigFileParserDelegate(chosenParser));
         } catch(IOException ex) {
             out.println(ex.getCause().getMessage());
             failed = true;
         }
+        //TODO:Remove before release
+        out.println("Printing configuration");
+        out.println(chosenParser.getConfigurationFile());
+        if(config != null) {
+            out.println(config.toString());
+        }
+        //
 
         for(MemoryMapParsingResult result : res) {
             out.println(result);

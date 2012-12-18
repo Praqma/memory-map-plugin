@@ -23,6 +23,7 @@
  */
 package net.praqma.jenkins.memorymap.parser;
 
+import com.sun.org.apache.xerces.internal.impl.xpath.regex.Match;
 import hudson.DescriptorExtensionList;
 import hudson.ExtensionPoint;
 import hudson.model.Describable;
@@ -39,9 +40,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import jenkins.model.Jenkins;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
+import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemoryItem;
 import org.apache.commons.collections.ListUtils;
 
 /**
@@ -50,24 +53,28 @@ import org.apache.commons.collections.ListUtils;
  */
 public abstract class AbstractMemoryMapParser implements Describable<AbstractMemoryMapParser>, ExtensionPoint, MemoryMapParsable, Serializable {
     
+    
+    private static final Pattern CONFIG_FILE_PATTERN =  Pattern.compile("^(\\s+)(\\S+)(.*origin\\s=\\s)(0x\\S+)(,.*)(0x\\S+)(.*)$",Pattern.MULTILINE);   
     private static final String UTF_8_CHARSET = "UTF8";
     private static final String ISO_8859_1 = "8859_1";
     protected static final Logger logger = Logger.getLogger(AbstractMemoryMapParser.class.toString());
     
     protected List<Pattern> patterns;
     protected String mapFile;
-    protected String configurationFile;
+    private String configurationFile;
     private Integer wordSize;
+    private Boolean bytesOnGraph;
     
     public AbstractMemoryMapParser () {  
         this.patterns = ListUtils.EMPTY_LIST;
     }
     
-    public AbstractMemoryMapParser(String mapFile, String configurationFile, Integer wordSize, Pattern... pattern) {
+    public AbstractMemoryMapParser(String mapFile, String configurationFile, Integer wordSize, Boolean bytesOnGraph, Pattern... pattern) {
         this.patterns = Arrays.asList(pattern);
         this.mapFile = mapFile;
         this.configurationFile = configurationFile;
         this.wordSize = wordSize;
+        this.bytesOnGraph = bytesOnGraph;
     }
      
     protected CharSequence createCharSequenceFromFile(File f) throws IOException {
@@ -100,13 +107,22 @@ public abstract class AbstractMemoryMapParser implements Describable<AbstractMem
             }
         }
         return cbuf;
-    }
-    
-    
+    }    
     
     @Override
     public MemoryMapConfigMemory parseConfigFile(File f) throws IOException {
-        return null;
+        MemoryMapConfigMemory config =  new MemoryMapConfigMemory();
+        CharSequence sequence = createCharSequenceFromFile(f);
+
+        Matcher m = CONFIG_FILE_PATTERN.matcher(sequence);
+        while(m.find()) {
+            MemoryMapConfigMemoryItem item = new MemoryMapConfigMemoryItem(m.group(2), m.group(4), m.group(6));
+            config.put(m.group(2), item);
+        }
+        
+        //TODO:Remove before release
+        System.out.println("Number of items found; "+config.values().size());
+        return config;
     }
 
     /**
@@ -155,5 +171,33 @@ public abstract class AbstractMemoryMapParser implements Describable<AbstractMem
      */
     public void setWordSize(Integer wordSize) {
         this.wordSize = wordSize;
+    }
+
+    /**
+     * @return the bytesOnGraph
+     */
+    public Boolean getBytesOnGraph() {
+        return bytesOnGraph;
+    }
+
+    /**
+     * @param bytesOnGraph the bytesOnGraph to set
+     */
+    public void setBytesOnGraph(Boolean bytesOnGraph) {
+        this.bytesOnGraph = bytesOnGraph;
+    }
+
+    /**
+     * @return the configurationFile
+     */
+    public String getConfigurationFile() {
+        return configurationFile;
+    }
+
+    /**
+     * @param configurationFile the configurationFile to set
+     */
+    public void setConfigurationFile(String configurationFile) {
+        this.configurationFile = configurationFile;
     }
 }

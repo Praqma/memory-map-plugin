@@ -23,7 +23,6 @@
  */
 package net.praqma.jenkins.memorymap.parser;
 
-import hudson.FilePath;
 import hudson.remoting.VirtualChannel;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -32,13 +31,13 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
-import org.apache.tools.ant.types.FileSet;
+import net.praqma.jenkins.memorymap.util.FileFoundable;
 
 /**
  * Class to wrap the FileCallable method. Serves as a proxy to the parser method. 
  * @author Praqma
  */
-public class MemoryMapMapParserDelegate implements FilePath.FileCallable<List<MemoryMapParsingResult>> 
+public class MemoryMapMapParserDelegate extends FileFoundable<List<MemoryMapParsingResult>> 
 {
     private static final Logger log = Logger.getLogger(MemoryMapMapParserDelegate.class.getName());
     private AbstractMemoryMapParser parser;
@@ -53,9 +52,9 @@ public class MemoryMapMapParserDelegate implements FilePath.FileCallable<List<Me
     public List<MemoryMapParsingResult> invoke(File file, VirtualChannel vc) throws IOException, InterruptedException {        
 
         try {
-            return getParser().parseMapFile(findFile(file));
+            return getParser().parseMapFile(findFile(file, parser.getMapFile()));
         } catch (FileNotFoundException fnfex) {
-            log.logp(Level.WARNING, "invoke", MemoryMapConfigFileParserDelegate.class.getName(), "incvok caught file not found exception", fnfex);
+            log.logp(Level.WARNING, "invoke", MemoryMapConfigFileParserDelegate.class.getName(), "invoke caught file not found exception", fnfex);
             throw new IOException(fnfex.getMessage());
         }
     }
@@ -73,25 +72,4 @@ public class MemoryMapMapParserDelegate implements FilePath.FileCallable<List<Me
     public void setParser(AbstractMemoryMapParser parser) {
         this.parser = parser;
     }
-    
-    public File findFile(File file) throws IOException {
-        FileSet fileSet = new FileSet();
-        org.apache.tools.ant.Project project = new org.apache.tools.ant.Project();
-        fileSet.setProject(project);
-        fileSet.setDir(file);
-        fileSet.setIncludes(parser.getMapFile());
-        
-        int numberOfFoundFiles = fileSet.getDirectoryScanner(project).getIncludedFiles().length;
-        if(numberOfFoundFiles == 0) {
-            throw new FileNotFoundException(String.format("Filematcher found no files using pattern %s in folder %s",parser.getMapFile(),file.getAbsolutePath()));
-        } 
-        
-        File f = new File(file.getAbsoluteFile() + System.getProperty("file.separator") + fileSet.getDirectoryScanner(project).getIncludedFiles()[0]);
-
-        if(!f.exists()) {
-            throw new FileNotFoundException(String.format("File %s not found workspace was %s scanner found %s files.", f.getAbsolutePath(),file.getAbsolutePath(),numberOfFoundFiles));
-        }
-        return f;
-    }
-
 }

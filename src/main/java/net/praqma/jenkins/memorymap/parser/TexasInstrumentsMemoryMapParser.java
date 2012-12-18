@@ -66,8 +66,8 @@ public class TexasInstrumentsMemoryMapParser extends AbstractMemoryMapParser {
     
     
     @DataBoundConstructor
-    public TexasInstrumentsMemoryMapParser(String mapFile, String configurationFile, Integer wordSize) {
-        super(mapFile, configurationFile, wordSize, TEXT_DOT, CONST_DOT, ECONST_DOT, PINIT, SWITCH, CINIT_DOT, STACK_DOT, BSS_DOT, EBSS_DOT, SYSMEM, ESYSMEM, CIO, DATA);
+    public TexasInstrumentsMemoryMapParser(String mapFile, String configurationFile, Integer wordSize, Boolean bytesOnGraph) {
+        super(mapFile, configurationFile, wordSize, bytesOnGraph, TEXT_DOT, CONST_DOT, ECONST_DOT, PINIT, SWITCH, CINIT_DOT, STACK_DOT, BSS_DOT, EBSS_DOT, SYSMEM, ESYSMEM, CIO, DATA);
     }
     
     public TexasInstrumentsMemoryMapParser() {
@@ -122,7 +122,7 @@ public class TexasInstrumentsMemoryMapParser extends AbstractMemoryMapParser {
 
     @Override
     public MemoryMapConfigMemory parseConfigFile(File f) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return super.parseConfigFile(f);
     }
     
     @Extension

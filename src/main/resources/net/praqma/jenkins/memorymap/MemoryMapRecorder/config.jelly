@@ -43,7 +43,7 @@
         </f:entry>
         
         <f:entry field="configurationFile" name="configurationFile">
-            ${%Compiler configuration file}
+            ${%Linker command file}
             <f:textbox/>
         </f:entry>
         
@@ -51,6 +51,11 @@
             ${%Word size}
             <f:textbox/>
         </f:entry>
+        <f:entry field="showBytesOnGraph" name="showBytesOnGraph">
+            
+            <f:checkbox/>
+        </f:entry>
+        
         
         <f:entry>
             <strong>${%Compiler}</strong>

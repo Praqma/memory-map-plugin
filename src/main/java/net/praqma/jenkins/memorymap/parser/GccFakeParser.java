@@ -53,8 +53,8 @@ public class GccFakeParser extends AbstractMemoryMapParser implements Serializab
     private static final Pattern BSS_DOT = Pattern.compile("^\\.ebss\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
     
     @DataBoundConstructor
-    public GccFakeParser(String mapFile, String configurationFile, Integer wordSize) {
-        super(mapFile, configurationFile, wordSize, TEXT_DOT, CONST_DOT, CINIT_DOT, STACK_DOT, BSS_DOT);
+    public GccFakeParser(String mapFile, String configurationFile, Integer wordSize, Boolean bytesOnGraph) {
+        super(mapFile, configurationFile, wordSize, bytesOnGraph, TEXT_DOT, CONST_DOT, CINIT_DOT, STACK_DOT, BSS_DOT);
     }
     
     public GccFakeParser() { 

@@ -51,7 +51,7 @@ public class MemoryMapParserDelegateTest {
         
         MemoryMapMapParserDelegate delegate = new MemoryMapMapParserDelegate();
         
-        TexasInstrumentsMemoryMapParser parser = new TexasInstrumentsMemoryMapParser("*.config","*.test",16);
+        TexasInstrumentsMemoryMapParser parser = new TexasInstrumentsMemoryMapParser("*.config","*.test",16,true);
         delegate.setParser(parser);
         
         assertNotNull(delegate.getParser());
@@ -62,7 +62,7 @@ public class MemoryMapParserDelegateTest {
         
         
         try {
-            File foundfile = delegate.findFile(test);
+            File foundfile = delegate.findFile(test,"*.test");
             
         } catch(Exception ex) {
             

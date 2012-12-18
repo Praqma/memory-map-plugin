@@ -23,12 +23,32 @@
  */
 package net.praqma.jenkins.memorymap.result;
 
+import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Set;
 
 /**
  *
  * @author Praqma
  */
-public class MemoryMapConfigMemory extends HashMap<String, MemoryMapConfigMemoryItem> {
+public class MemoryMapConfigMemory extends HashMap<String, MemoryMapConfigMemoryItem> implements Serializable{
     private Integer page = null;
+    
+    public MemoryMapConfigMemory() {}
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        
+        for (String name : keySet()) {
+            MemoryMapConfigMemoryItem item = get(name);
+            builder.append(item.toString());
+            builder.append("\n");
+        }
+        
+        return builder.toString();
+    }
+    
+    
+    
 }

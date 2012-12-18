@@ -23,19 +23,19 @@
  */
 package net.praqma.jenkins.memorymap.parser;
 
-import hudson.FilePath;
 import hudson.remoting.VirtualChannel;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
+import net.praqma.jenkins.memorymap.util.FileFoundable;
 
 /**
  *
  * @author Praqma
  */
-public class MemoryMapConfigFileParserDelegate implements FilePath.FileCallable<MemoryMapConfigMemory>  {
+public class MemoryMapConfigFileParserDelegate extends FileFoundable<MemoryMapConfigMemory>  {
 
     private static final Logger log = Logger.getLogger(MemoryMapMapParserDelegate.class.getName());
     private AbstractMemoryMapParser parser;
@@ -51,10 +51,15 @@ public class MemoryMapConfigFileParserDelegate implements FilePath.FileCallable<
         MemoryMapConfigMemory mmcm = null;
         
         try {
-            mmcm = parser.parseConfigFile(f);
+            mmcm = parser.parseConfigFile(findFile(f, parser.getConfigurationFile()));
         } catch (IOException ex) {
             log.logp(Level.WARNING, "invoke", MemoryMapConfigFileParserDelegate.class.getName(), "invoke caught file not found exception", ex);
             throw new IOException(ex.getMessage());
+        }
+        
+        if(mmcm == null) {
+            log.warning("Result was null, and no exception was thrown, this should NOT happen");
+            throw new IOException("Result was null, and no exception was thrown, this should NOT happen");
         }
         
         return mmcm;
