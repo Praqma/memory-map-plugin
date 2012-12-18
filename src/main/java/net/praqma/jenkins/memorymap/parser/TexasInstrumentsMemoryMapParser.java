@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
 import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -40,6 +41,7 @@ import org.kohsuke.stapler.StaplerRequest;
  */
 public class TexasInstrumentsMemoryMapParser extends AbstractMemoryMapParser {
     
+    
     /*
      * Flash
      */
@@ -49,6 +51,10 @@ public class TexasInstrumentsMemoryMapParser extends AbstractMemoryMapParser {
     private static final Pattern PINIT = Pattern.compile("^\\.pinit\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
     private static final Pattern SWITCH = Pattern.compile("^\\.switch\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
     
+    
+    /*
+     * Ram
+     */
     private static final Pattern CINIT_DOT = Pattern.compile("^\\.cinit\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
     private static final Pattern STACK_DOT = Pattern.compile("^\\.stack\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
     private static final Pattern BSS_DOT = Pattern.compile("^\\.bss\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
@@ -60,8 +66,8 @@ public class TexasInstrumentsMemoryMapParser extends AbstractMemoryMapParser {
     
     
     @DataBoundConstructor
-    public TexasInstrumentsMemoryMapParser(String mapFile) {
-        super(mapFile, TEXT_DOT, CONST_DOT, ECONST_DOT, PINIT, SWITCH, CINIT_DOT, STACK_DOT, BSS_DOT, EBSS_DOT, SYSMEM, ESYSMEM, CIO, DATA);
+    public TexasInstrumentsMemoryMapParser(String mapFile, String configurationFile, Integer wordSize) {
+        super(mapFile, configurationFile, wordSize, TEXT_DOT, CONST_DOT, ECONST_DOT, PINIT, SWITCH, CINIT_DOT, STACK_DOT, BSS_DOT, EBSS_DOT, SYSMEM, ESYSMEM, CIO, DATA);
     }
     
     public TexasInstrumentsMemoryMapParser() {
@@ -70,7 +76,7 @@ public class TexasInstrumentsMemoryMapParser extends AbstractMemoryMapParser {
 
     //TODO:Why come i cannot use pattern.equals(other.patter)? I have to use the string representation in order to get it working...
     @Override
-    public LinkedList<MemoryMapParsingResult> parse(File f) throws IOException {
+    public LinkedList<MemoryMapParsingResult> parseMapFile(File f) throws IOException {
         LinkedList<MemoryMapParsingResult> res = new LinkedList<MemoryMapParsingResult>();
         for(Pattern p : patterns) {
             Matcher m = p.matcher(createCharSequenceFromFile(f));
@@ -112,6 +118,11 @@ public class TexasInstrumentsMemoryMapParser extends AbstractMemoryMapParser {
             }
         }        
         return res;
+    }
+
+    @Override
+    public MemoryMapConfigMemory parseConfigFile(File f) throws IOException {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
     
     @Extension

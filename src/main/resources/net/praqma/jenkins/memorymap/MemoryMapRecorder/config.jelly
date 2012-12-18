@@ -47,6 +47,11 @@
             <f:textbox/>
         </f:entry>
         
+        <f:entry field="wordSize" name="wordSize">
+            ${%Word size}
+            <f:textbox/>
+        </f:entry>
+        
         <f:entry>
             <strong>${%Compiler}</strong>
         </f:entry>

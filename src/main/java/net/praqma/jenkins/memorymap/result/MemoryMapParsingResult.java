@@ -28,11 +28,18 @@ import java.io.Serializable;
 /**
  *
  * @author Praqma 
+ * 
+ * The name of the result is the 'section' name in the configuration file.
 */
 public class MemoryMapParsingResult implements Serializable {
     private String name;
     private String rawvalue;
     private int value;
+    
+    private String length;
+    private String used;
+    private String unused;
+    
     
     //Empty constructor for serialization
     public MemoryMapParsingResult() {}
@@ -58,7 +65,9 @@ public class MemoryMapParsingResult implements Serializable {
 
     /**
      * @return the rawvalue
+     * 
      */
+    @Deprecated
     public String getRawvalue() {
         return rawvalue;
     }
@@ -66,6 +75,7 @@ public class MemoryMapParsingResult implements Serializable {
     /**
      * @param rawvalue the rawvalue to set
      */
+    @Deprecated
     public void setRawvalue(String rawvalue) {
         this.rawvalue = rawvalue;
     }
@@ -73,6 +83,7 @@ public class MemoryMapParsingResult implements Serializable {
     /**
      * @return the value
      */
+    @Deprecated
     public int getValue() {
         return value;
     }
@@ -80,8 +91,51 @@ public class MemoryMapParsingResult implements Serializable {
     /**
      * @param value the value to set
      */
+    @Deprecated
     public void setValue(int value) {
         this.value = value;
+    }
+
+    /**
+     * @return the length
+     */
+    public String getLength() {
+        return length;
+    }
+
+    /**
+     * @param length the length to set
+     */
+    public void setLength(String length) {
+        this.length = length;
+    }
+
+    /**
+     * @return the used
+     */
+    public String getUsed() {
+        return used;
+    }
+
+    /**
+     * @param used the used to set
+     */
+    public void setUsed(String used) {
+        this.used = used;
+    }
+
+    /**
+     * @return the unused
+     */
+    public String getUnused() {
+        return unused;
+    }
+
+    /**
+     * @param unused the unused to set
+     */
+    public void setUnused(String unused) {
+        this.unused = unused;
     }
 
 }

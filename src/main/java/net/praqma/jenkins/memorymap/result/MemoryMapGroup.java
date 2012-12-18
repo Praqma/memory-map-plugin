@@ -25,6 +25,7 @@ package net.praqma.jenkins.memorymap.result;
 
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
@@ -33,10 +34,19 @@ import java.util.LinkedList;
 public class MemoryMapGroup extends LinkedList<String> {
     private String groupName;
     private int threshold;
+    private List<String> accepts;
+    private List<MemoryMapParsingResult> results;
     
+    @Deprecated
     public MemoryMapGroup(String groupName, int threshold) {
         this.groupName = groupName;
         this.threshold = threshold;
+    }
+    
+    public MemoryMapGroup(String groupName, List<MemoryMapParsingResult> results, String... accepts) {
+        this.results = results;
+        this.groupName = groupName;
+        this.accepts = Arrays.asList(accepts);
     }
     
     public MemoryMapGroup() { }

@@ -25,7 +25,7 @@ package net.praqma.jenkins.unit;
 
 import java.io.File;
 import java.io.IOException;
-import net.praqma.jenkins.memorymap.parser.MemoryMapParserDelegate;
+import net.praqma.jenkins.memorymap.parser.MemoryMapMapParserDelegate;
 import net.praqma.jenkins.memorymap.parser.TexasInstrumentsMemoryMapParser;
 import org.apache.commons.lang.SerializationUtils;
 import static org.junit.Assert.*;
@@ -39,7 +39,7 @@ public class MemoryMapParserDelegateTest {
     
     @Test
     public void isMemoryMapParserDelegateSerializable_test() {
-        SerializationUtils.serialize(new MemoryMapParserDelegate());
+        SerializationUtils.serialize(new MemoryMapMapParserDelegate());
     }
     
     @Test
@@ -49,9 +49,9 @@ public class MemoryMapParserDelegateTest {
                 
         System.out.println(f.getAbsolutePath());
         
-        MemoryMapParserDelegate delegate = new MemoryMapParserDelegate();
+        MemoryMapMapParserDelegate delegate = new MemoryMapMapParserDelegate();
         
-        TexasInstrumentsMemoryMapParser parser = new TexasInstrumentsMemoryMapParser("*.test");
+        TexasInstrumentsMemoryMapParser parser = new TexasInstrumentsMemoryMapParser("*.config","*.test",16);
         delegate.setParser(parser);
         
         assertNotNull(delegate.getParser());

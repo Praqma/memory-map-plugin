@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
 import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -60,8 +61,8 @@ public class KeilMemoryMapParser extends AbstractMemoryMapParser {
     
     
     @DataBoundConstructor
-    public KeilMemoryMapParser(String mapFile) {
-        super(mapFile, TEXT_DOT, CONST_DOT, ECONST_DOT, PINIT, SWITCH, CINIT_DOT, STACK_DOT, BSS_DOT, EBSS_DOT, SYSMEM, ESYSMEM, CIO, DATA);
+    public KeilMemoryMapParser(String mapFile, String configurationFile, Integer wordSize) {
+        super(mapFile, configurationFile, wordSize, TEXT_DOT, CONST_DOT, ECONST_DOT, PINIT, SWITCH, CINIT_DOT, STACK_DOT, BSS_DOT, EBSS_DOT, SYSMEM, ESYSMEM, CIO, DATA);
     }
     
     public KeilMemoryMapParser() {
@@ -69,7 +70,7 @@ public class KeilMemoryMapParser extends AbstractMemoryMapParser {
     }
     
     @Override
-    public LinkedList<MemoryMapParsingResult> parse(File f) throws IOException {
+    public LinkedList<MemoryMapParsingResult> parseMapFile(File f) throws IOException {
         LinkedList<MemoryMapParsingResult> res = new LinkedList<MemoryMapParsingResult>();
         for(Pattern p : patterns) {
             Matcher m = p.matcher(createCharSequenceFromFile(f));
@@ -111,6 +112,11 @@ public class KeilMemoryMapParser extends AbstractMemoryMapParser {
             }
         }        
         return res;
+    }
+
+    @Override
+    public MemoryMapConfigMemory parseConfigFile(File f) throws IOException {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
     
     @Extension

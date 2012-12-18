@@ -42,8 +42,10 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import net.praqma.jenkins.memorymap.parser.AbstractMemoryMapParser;
-import net.praqma.jenkins.memorymap.parser.MemoryMapParserDelegate;
+import net.praqma.jenkins.memorymap.parser.MemoryMapConfigFileParserDelegate;
+import net.praqma.jenkins.memorymap.parser.MemoryMapMapParserDelegate;
 import net.praqma.jenkins.memorymap.parser.MemoryMapParserDescriptor;
+import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
 import net.praqma.jenkins.memorymap.result.MemoryMapGroup;
 import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
 import net.sf.json.JSONObject;
@@ -86,11 +88,14 @@ public class MemoryMapRecorder extends Recorder {
         PrintStream out = listener.getLogger();
                 
         List<MemoryMapParsingResult> res = new LinkedList<MemoryMapParsingResult>();
+        MemoryMapConfigMemory config = null;
+        
         String version = Hudson.getInstance().getPlugin( "memory-map" ).getWrapper().getVersion();
 		out.println( "Memory Map Plugin version " + version );
         
         try { 
-            res = build.getWorkspace().act(new MemoryMapParserDelegate(chosenParser));
+            res = build.getWorkspace().act(new MemoryMapMapParserDelegate(chosenParser));
+            config = build.getWorkspace().act(new MemoryMapConfigFileParserDelegate(chosenParser));
         } catch(IOException ex) {
             out.println(ex.getCause().getMessage());
             failed = true;

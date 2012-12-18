@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import jenkins.model.Jenkins;
+import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
 import org.apache.commons.collections.ListUtils;
 
 /**
@@ -55,19 +56,23 @@ public abstract class AbstractMemoryMapParser implements Describable<AbstractMem
     
     protected List<Pattern> patterns;
     protected String mapFile;
+    protected String configurationFile;
+    private Integer wordSize;
     
     public AbstractMemoryMapParser () {  
         this.patterns = ListUtils.EMPTY_LIST;
     }
     
-    public AbstractMemoryMapParser(String mapFile, Pattern... pattern) {
+    public AbstractMemoryMapParser(String mapFile, String configurationFile, Integer wordSize, Pattern... pattern) {
         this.patterns = Arrays.asList(pattern);
         this.mapFile = mapFile;
+        this.configurationFile = configurationFile;
+        this.wordSize = wordSize;
     }
      
     protected CharSequence createCharSequenceFromFile(File f) throws IOException {
         return createCharSequenceFromFile(UTF_8_CHARSET, f);
-    }
+    }    
      
     protected CharSequence createCharSequenceFromFile(String charset, File f) throws IOException {
         String chosenCharset = charset;
@@ -95,7 +100,14 @@ public abstract class AbstractMemoryMapParser implements Describable<AbstractMem
             }
         }
         return cbuf;
-    } 
+    }
+    
+    
+    
+    @Override
+    public MemoryMapConfigMemory parseConfigFile(File f) throws IOException {
+        return null;
+    }
 
     /**
      * @return the includeFilePattern
@@ -130,4 +142,18 @@ public abstract class AbstractMemoryMapParser implements Describable<AbstractMem
 		}
 		return list;
 	}
+
+    /**
+     * @return the wordSize
+     */
+    public Integer getWordSize() {
+        return wordSize;
+    }
+
+    /**
+     * @param wordSize the wordSize to set
+     */
+    public void setWordSize(Integer wordSize) {
+        this.wordSize = wordSize;
+    }
 }

@@ -29,6 +29,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
 import org.apache.tools.ant.types.FileSet;
 
@@ -36,13 +38,14 @@ import org.apache.tools.ant.types.FileSet;
  * Class to wrap the FileCallable method. Serves as a proxy to the parser method. 
  * @author Praqma
  */
-public class MemoryMapParserDelegate implements FilePath.FileCallable<List<MemoryMapParsingResult>> 
+public class MemoryMapMapParserDelegate implements FilePath.FileCallable<List<MemoryMapParsingResult>> 
 {
+    private static final Logger log = Logger.getLogger(MemoryMapMapParserDelegate.class.getName());
     private AbstractMemoryMapParser parser;
     //Empty constructor. For serialization purposes.
-    public MemoryMapParserDelegate() { }
+    public MemoryMapMapParserDelegate() { }
 
-    public MemoryMapParserDelegate(AbstractMemoryMapParser parser) {
+    public MemoryMapMapParserDelegate(AbstractMemoryMapParser parser) {
         this.parser = parser;
     }
 
@@ -50,8 +53,9 @@ public class MemoryMapParserDelegate implements FilePath.FileCallable<List<Memor
     public List<MemoryMapParsingResult> invoke(File file, VirtualChannel vc) throws IOException, InterruptedException {        
 
         try {
-            return getParser().parse(findFile(file));
+            return getParser().parseMapFile(findFile(file));
         } catch (FileNotFoundException fnfex) {
+            log.logp(Level.WARNING, "invoke", MemoryMapConfigFileParserDelegate.class.getName(), "incvok caught file not found exception", fnfex);
             throw new IOException(fnfex.getMessage());
         }
     }

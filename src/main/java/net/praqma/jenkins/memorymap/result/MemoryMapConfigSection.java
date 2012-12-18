@@ -21,20 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package net.praqma.jenkins.memorymap.parser;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
-import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
+package net.praqma.jenkins.memorymap.result;
 
 /**
  *
  * @author Praqma
  */
-public interface MemoryMapParsable {
-    public List<MemoryMapParsingResult> parseMapFile(File f) throws IOException;
-    public MemoryMapConfigMemory parseConfigFile(File f) throws IOException;
+public class MemoryMapConfigSection {
     
 }
