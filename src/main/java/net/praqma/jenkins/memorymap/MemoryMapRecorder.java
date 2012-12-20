@@ -60,17 +60,12 @@ import org.kohsuke.stapler.StaplerRequest;
 public class MemoryMapRecorder extends Recorder {
 
     private String mapFile;
-    private int ramCapacity;
-    private int flashCapacity;
-    
     private Integer wordSize;
-    
     
     private String configurationFile;
     private boolean showBytesOnGraph;
     
     private AbstractMemoryMapParser chosenParser;
-    private List<MemoryMapGroup> groups;
     private List<MemoryMapGraphConfiguration> graphConfiguration;
         
     @Override
@@ -79,9 +74,8 @@ public class MemoryMapRecorder extends Recorder {
     }
     
     @DataBoundConstructor
-    public MemoryMapRecorder(AbstractMemoryMapParser chosenParser, List<MemoryMapGroup> groups, String configurationFile, boolean showBytesOnGraph, String wordSize) {
+    public MemoryMapRecorder(AbstractMemoryMapParser chosenParser, String configurationFile, boolean showBytesOnGraph, String wordSize) {
         this.chosenParser = chosenParser;
-        this.groups = groups;
         this.configurationFile = configurationFile;        
         this.showBytesOnGraph = showBytesOnGraph;
         this.wordSize = StringUtils.isBlank(wordSize) ? 16 : Integer.parseInt(wordSize);        
@@ -144,20 +138,6 @@ public class MemoryMapRecorder extends Recorder {
     }
 
     /**
-     * @return the memoryCapacity
-     */
-    public int getRamCapacity() {
-        return ramCapacity;
-    }
-
-    /**
-     * @param memoryCapacity the memoryCapacity to set
-     */
-    public void setRamCapacity(int ramCapacity) {
-        this.ramCapacity = ramCapacity;
-    }
-
-    /**
      * @return the chosenParser
      */
     public AbstractMemoryMapParser getChosenParser() {
@@ -169,39 +149,6 @@ public class MemoryMapRecorder extends Recorder {
      */
     public void setChosenParser(AbstractMemoryMapParser chosenParser) {
         this.chosenParser = chosenParser;
-    }
-
-    /**
-     * @return the flashCapacity
-     */
-    public int getFlashCapacity() {
-        return flashCapacity;
-    }
-
-    /**
-     * @param flashCapacity the flashCapacity to set
-     */
-    public void setFlashCapacity(int flashCapacity) {
-        this.flashCapacity = flashCapacity;
-    }
-
-    /**
-     * @return the groups
-     */
-    public List<MemoryMapGroup> getGroups() {
-        if(groups == null) {
-            groups = new ArrayList<MemoryMapGroup>();
-            groups.add(MemoryMapGroup.defaultFlashGroup());
-            groups.add(MemoryMapGroup.defaultRamGroup());
-        }
-        return groups;
-    }
-
-    /**
-     * @param groups the groups to set
-     */
-    public void setGroups(List<MemoryMapGroup> groups) {
-        this.groups = groups;
     }
 
     /**
@@ -262,32 +209,6 @@ public class MemoryMapRecorder extends Recorder {
     
     @Extension
     public static final class DescriptorImpl extends BuildStepDescriptor<Publisher> {
-        
-        public FormValidation doCheckFlashCapacity(@QueryParameter String value) {
-            try 
-            {
-                int val = Integer.parseInt(value);        
-                if(val < 0) {
-                    return FormValidation.error("Number must be 0 or greater");
-                }
-            } catch (NumberFormatException nfe) {
-                return FormValidation.error("Not a valid integer value");
-            }
-            return FormValidation.ok();          
-        }
-
-        public FormValidation doCheckRamCapacity(@QueryParameter String value) {
-            try 
-            {
-                int val = Integer.parseInt(value);
-                if(val < 0) {
-                    return FormValidation.error("Number must be 0 or greater");
-                }
-            } catch (NumberFormatException nfe) {
-                return FormValidation.error("Not a valid integer value");
-            }
-            return FormValidation.ok();           
-        }
 
         @Override
         public boolean isApplicable(Class<? extends AbstractProject> type) {
@@ -306,15 +227,11 @@ public class MemoryMapRecorder extends Recorder {
         @Override
         public Publisher newInstance(StaplerRequest req, JSONObject formData) throws FormException {
             MemoryMapRecorder instance = req.bindJSON(MemoryMapRecorder.class, formData);
-            List<MemoryMapGroup> groups = req.bindParametersToList(MemoryMapGroup.class, "group.");
              
             List<MemoryMapGraphConfiguration> graphConfiguration = req.bindParametersToList(MemoryMapGraphConfiguration.class, "graph.config.");
             if(graphConfiguration != null) {
-                System.out.println(formData);
-                System.out.println("Graph configuration: "+graphConfiguration);
                 instance.setGraphConfiguration(graphConfiguration);
             }
-            instance.setGroups(groups);
             save();
             return instance;
         }

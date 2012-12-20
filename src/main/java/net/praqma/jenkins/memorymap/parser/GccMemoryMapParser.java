@@ -28,11 +28,8 @@ import hudson.Extension;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.LinkedList;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
-import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
@@ -65,7 +62,7 @@ public class GccMemoryMapParser extends AbstractMemoryMapParser implements Seria
     }
 
     @Extension
-    public static final class DescriptorImpl extends MemoryMapParserDescriptor<TexasInstrumentsMemoryMapParser> {
+    public static final class DescriptorImpl extends MemoryMapParserDescriptor<GccMemoryMapParser> {
 
         @Override
         public String getDisplayName() {

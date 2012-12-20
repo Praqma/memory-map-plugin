@@ -54,8 +54,6 @@ import org.apache.commons.collections.ListUtils;
  */
 public abstract class AbstractMemoryMapParser implements Describable<AbstractMemoryMapParser>, ExtensionPoint, MemoryMapParsable, Serializable {
 
-    /* FULLY FUNCTIONAL FIND ALL */
-    
     private static final String UTF_8_CHARSET = "UTF8";
     protected static final Logger logger = Logger.getLogger(AbstractMemoryMapParser.class.toString());
     
@@ -169,24 +167,24 @@ public abstract class AbstractMemoryMapParser implements Describable<AbstractMem
     }
     
     @Override
-	public Descriptor<AbstractMemoryMapParser> getDescriptor() {
-		return (Descriptor<AbstractMemoryMapParser>) Jenkins.getInstance().getDescriptorOrDie( getClass() );
-	}
+    public Descriptor<AbstractMemoryMapParser> getDescriptor() {
+            return (Descriptor<AbstractMemoryMapParser>) Jenkins.getInstance().getDescriptorOrDie( getClass() );
+    }
     
     /**
-	 * All registered {@link AbstractConfigurationRotatorSCM}s.
-	 */
-	public static DescriptorExtensionList<AbstractMemoryMapParser, MemoryMapParserDescriptor<AbstractMemoryMapParser>> all() {
-		return Jenkins.getInstance().<AbstractMemoryMapParser, MemoryMapParserDescriptor<AbstractMemoryMapParser>> getDescriptorList( AbstractMemoryMapParser.class );
-	}
-    
-    public static List<MemoryMapParserDescriptor<?>> getDescriptors() {
-		List<MemoryMapParserDescriptor<?>> list = new ArrayList<MemoryMapParserDescriptor<?>>();
-		for( MemoryMapParserDescriptor<?> d : all() ) {
-			list.add( d );
-		}
-		return list;
-	}
+    * All registered {@link AbstractConfigurationRotatorSCM}s.
+    */
+   public static DescriptorExtensionList<AbstractMemoryMapParser, MemoryMapParserDescriptor<AbstractMemoryMapParser>> all() {
+           return Jenkins.getInstance().<AbstractMemoryMapParser, MemoryMapParserDescriptor<AbstractMemoryMapParser>> getDescriptorList( AbstractMemoryMapParser.class );
+   }
+
+   public static List<MemoryMapParserDescriptor<?>> getDescriptors() {
+        List<MemoryMapParserDescriptor<?>> list = new ArrayList<MemoryMapParserDescriptor<?>>();
+        for( MemoryMapParserDescriptor<?> d : all() ) {
+                list.add( d );
+        }
+        return list;
+   }
 
     /**
      * @return the wordSize

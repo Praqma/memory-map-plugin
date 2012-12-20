@@ -1,11 +1,12 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
          xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+    
     <style type="text/css">
         td.setting-name {
             vertical-align:middle;
         }             
     </style>
-	<f:section title="General options">        
+     
         <f:entry title="${%Linker command file}" field="configurationFile" name="configurationFile">            
             <f:textbox/>
         </f:entry>        
@@ -17,8 +18,7 @@
         </f:entry>
 
         <f:dropdownDescriptorSelector title="${%Parser selection}" descriptors="${descriptor.getParsers()}" field="chosenParser" />
-    </f:section>
-    <f:section title="Graph configuration">
+
         <f:entry title="List of configured graphs">
             <f:repeatable varStatus="instStatus" var="inst" items="${instance.graphConfiguration}">
                 <table style="width:100%">
@@ -43,5 +43,4 @@
             </f:repeatable>
             
         </f:entry>   
-	</f:section>   
 </j:jelly>

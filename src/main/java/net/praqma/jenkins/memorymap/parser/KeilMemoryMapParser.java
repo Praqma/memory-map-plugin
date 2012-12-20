@@ -64,7 +64,7 @@ public class KeilMemoryMapParser extends AbstractMemoryMapParser {
     }
     
     @Extension
-    public static final class DescriptorImpl extends MemoryMapParserDescriptor<TexasInstrumentsMemoryMapParser> {
+    public static final class DescriptorImpl extends MemoryMapParserDescriptor<KeilMemoryMapParser> {
 
         @Override
         public String getDisplayName() {
