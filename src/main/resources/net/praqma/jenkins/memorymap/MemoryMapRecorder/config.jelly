@@ -1,37 +1,40 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
          xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-	<f:block>        
-        <f:entry field="configurationFile" name="configurationFile">
-            ${%Linker command file}
+    <style type="text/css">
+        td.setting-name {
+            vertical-align:middle;
+        }             
+    </style>
+	<f:section title="General options">        
+        <f:entry title="${%Linker command file}" field="configurationFile" name="configurationFile">            
             <f:textbox/>
         </f:entry>        
-        <f:entry field="wordSize" name="wordSize"> 
-           ${%Word size}
+        <f:entry title="${%Word size}" field="wordSize" name="wordSize">            
             <f:textbox/>
         </f:entry>
-        <f:entry field="showBytesOnGraph" name="showBytesOnGraph">
-            ${%Show bytes on graphs}
+        <f:entry title="${%Show bytes on graphs}" field="showBytesOnGraph" name="showBytesOnGraph">            
             <f:checkbox value="${instance.showBytesOnGraph}" checked="${instance.showBytesOnGraph}"/>
         </f:entry>
 
-        <f:dropdownDescriptorSelector descriptors="${descriptor.getParsers()}" field="chosenParser" />
-        
+        <f:dropdownDescriptorSelector title="${%Parser selection}" descriptors="${descriptor.getParsers()}" field="chosenParser" />
+    </f:section>
+    <f:section title="Graph configuration">
         <f:entry title="List of configured graphs">
             <f:repeatable varStatus="instStatus" var="inst" items="${instance.graphConfiguration}">
-                <table>
-                    <tr>
-                        <td>
+                <table style="width:100%">
+                    <tr> 
+                        <td style="width:15%;">
                             Graph name
                         </td>
-                        <td>
+                        <td style="width:85%;">
                             <f:textbox name="graph.config.graphCaption" value="${inst.graphCaption}"/>
                         </td>
                     </tr>
-                    <tr>
-                        <td>
+                    <tr style="width:100%">
+                        <td style="width:15%;">
                             Program memory sections
                         </td>
-                        <td>
+                        <td style="width:85%;">
                             <f:textbox name="graph.config.graphDataList" value="${inst.graphDataList}"/>
                         </td>
                     </tr>                    
@@ -40,5 +43,5 @@
             </f:repeatable>
             
         </f:entry>   
-	</f:block>   
+	</f:section>   
 </j:jelly>
