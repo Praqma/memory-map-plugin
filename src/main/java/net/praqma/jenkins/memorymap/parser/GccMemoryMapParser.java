@@ -41,10 +41,8 @@ import org.kohsuke.stapler.StaplerRequest;
  *
  * @author Praqma
  */
-public class GccFakeParser extends AbstractMemoryMapParser implements Serializable {
-    
-   //private static final Pattern PATTERN_FLASH = Pattern.compile("(FLASH\\s+\\S+\\s+)(\\S)\\s");
-    //private static final Pattern PATTERN_FLASH = Pattern.compile("FLASH\\s+\\S+\\s+(\\S+)");
+public class GccMemoryMapParser extends AbstractMemoryMapParser implements Serializable {
+
     private static final Pattern TEXT_DOT = Pattern.compile("^\\.text\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
     private static final Pattern CONST_DOT = Pattern.compile("^\\.econst\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
     
@@ -53,45 +51,16 @@ public class GccFakeParser extends AbstractMemoryMapParser implements Serializab
     private static final Pattern BSS_DOT = Pattern.compile("^\\.ebss\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
     
     @DataBoundConstructor
-    public GccFakeParser(String mapFile, String configurationFile, Integer wordSize, Boolean bytesOnGraph) {
+    public GccMemoryMapParser(String mapFile, String configurationFile, Integer wordSize, Boolean bytesOnGraph) {
         super(mapFile, configurationFile, wordSize, bytesOnGraph, TEXT_DOT, CONST_DOT, CINIT_DOT, STACK_DOT, BSS_DOT);
     }
     
-    public GccFakeParser() { 
+    public GccMemoryMapParser() { 
         super();
     }
 
     @Override
-    public LinkedList<MemoryMapParsingResult> parseMapFile(File f) throws IOException {
-        LinkedList<MemoryMapParsingResult> res = new LinkedList<MemoryMapParsingResult>();
-        for(Pattern p : patterns) {
-            Matcher m = p.matcher(createCharSequenceFromFile(f));
-            while(m.find()) {
-                String parsedValue = m.group(1);
-                MemoryMapParsingResult pres = new MemoryMapParsingResult();                
-                if(p.toString().equals(TEXT_DOT.toString())) {
-                    pres.setName(".text");
-                } else if (p.toString().equals(CONST_DOT.toString())) {
-                    pres.setName(".econst");
-                } else if (p.toString().equals(CINIT_DOT.toString())) {
-                    pres.setName(".cinit");
-                } else if (p.toString().equals(STACK_DOT.toString())) {
-                    pres.setName(".stack");
-                } else if (p.toString().equals(BSS_DOT.toString())) {
-                    pres.setName(".ebss");
-                } else {
-                    throw new IOException("Illegal pattern passed to method", new IllegalArgumentException(p.toString()));
-                }
-                pres.setRawvalue(parsedValue);
-                pres.setValue(Integer.parseInt(parsedValue, 16));
-                res.add(pres);
-            }
-        }        
-        return res;
-    }
-
-    @Override
-    public MemoryMapConfigMemory parseMapFile(File f, MemoryMapConfigMemory configuration) {
+    public MemoryMapConfigMemory parseMapFile(File f, MemoryMapConfigMemory configuration) throws IOException {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -100,12 +69,12 @@ public class GccFakeParser extends AbstractMemoryMapParser implements Serializab
 
         @Override
         public String getDisplayName() {
-            return "Gcc Fake Parser";
+            return "Gcc";
         }
 
         @Override
         public AbstractMemoryMapParser newInstance(StaplerRequest req, JSONObject formData, AbstractMemoryMapParser instance) throws FormException {
-            GccFakeParser parser = (GccFakeParser)instance;
+            GccMemoryMapParser parser = (GccMemoryMapParser)instance;
             save();
             return parser;
         } 

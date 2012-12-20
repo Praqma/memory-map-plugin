@@ -24,13 +24,7 @@
 package net.praqma.jenkins.memorymap.parser;
 
 import hudson.Extension;
-import java.io.File;
-import java.io.IOException;
-import java.util.LinkedList;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
-import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
@@ -67,51 +61,6 @@ public class KeilMemoryMapParser extends AbstractMemoryMapParser {
     
     public KeilMemoryMapParser() {
         super();
-    }
-    
-    @Override
-    public LinkedList<MemoryMapParsingResult> parseMapFile(File f) throws IOException {
-        LinkedList<MemoryMapParsingResult> res = new LinkedList<MemoryMapParsingResult>();
-        for(Pattern p : patterns) {
-            Matcher m = p.matcher(createCharSequenceFromFile(f));
-            while(m.find()) {
-                String parsedValue = m.group(1);
-                MemoryMapParsingResult pres = new MemoryMapParsingResult();                
-                if(p.toString().equals(TEXT_DOT.toString())) {
-                    pres.setName(".text");
-                } else if (p.toString().equals(ECONST_DOT.toString())) {
-                    pres.setName(".econst");
-                } else if (p.toString().equals(CINIT_DOT.toString())) {
-                    pres.setName(".cinit");
-                } else if (p.toString().equals(STACK_DOT.toString())) {
-                    pres.setName(".stack");
-                } else if (p.toString().equals(EBSS_DOT.toString())) {
-                    pres.setName(".ebss");
-                } else if (p.toString().equals(BSS_DOT.toString())) {
-                    pres.setName(".bss");
-                } else if (p.toString().equals(CONST_DOT.toString())) {
-                    pres.setName(".const");
-                } else if (p.toString().equals(PINIT.toString())) {
-                    pres.setName(".pinit");
-                } else if (p.toString().equals(SWITCH.toString())) {
-                    pres.setName(".switch");
-                } else if (p.toString().equals(SYSMEM.toString())) {
-                    pres.setName(".sysmem");
-                } else if (p.toString().equals(ESYSMEM.toString())) {
-                    pres.setName(".esysmem");
-                } else if(p.toString().equals(CIO.toString())) {
-                    pres.setName(".cio");
-                } else if(p.toString().equals(DATA.toString())) {
-                    pres.setName(".data");
-                } else {
-                    throw new IOException("Illegal pattern passed to method", new IllegalArgumentException(p.toString()));
-                }
-                pres.setRawvalue(parsedValue);
-                pres.setValue(Integer.parseInt(parsedValue, 16));
-                res.add(pres);
-            }
-        }        
-        return res;
     }
     
     @Extension

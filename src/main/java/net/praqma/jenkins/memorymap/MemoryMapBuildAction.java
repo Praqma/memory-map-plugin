@@ -31,6 +31,7 @@ import hudson.util.ShiftedCategoryAxis;
 import hudson.util.StackedAreaRenderer2;
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.GraphicsConfiguration;
 import java.awt.Paint;
 import java.io.IOException;
@@ -180,6 +181,9 @@ public class MemoryMapBuildAction implements Action {
         String members = req.getParameter("categories");
         String graphTitle = req.getParameter("title");
         
+        int w = Integer.parseInt(req.getParameter("width"));
+        int h = Integer.parseInt(req.getParameter("height"));
+        
         List<String> memberList = Arrays.asList(members.split(","));
         
         List<ValueMarker> markers = new ArrayList<ValueMarker>();
@@ -237,7 +241,7 @@ public class MemoryMapBuildAction implements Action {
          
         chart.setBackgroundPaint(Color.WHITE);
         chart.getLegend().setPosition( RectangleEdge.BOTTOM );
-        ChartUtil.generateGraph( req, rsp, chart, 400, 300 );     
+        ChartUtil.generateGraph( req, rsp, chart, w, h );     
     }    
     
     /**

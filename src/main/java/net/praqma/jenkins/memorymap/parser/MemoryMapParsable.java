@@ -28,15 +28,12 @@ import java.io.IOException;
 import java.util.List;
 import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfiguration;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
-import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
 
 /**
  *
  * @author Praqma
  */
 public interface MemoryMapParsable {
-    @Deprecated
-    public List<MemoryMapParsingResult> parseMapFile(File f) throws IOException;
     public MemoryMapConfigMemory parseConfigFile(List<MemoryMapGraphConfiguration> config, File f) throws IOException;
     public MemoryMapConfigMemory parseMapFile(File f, MemoryMapConfigMemory configuration) throws IOException;
     

@@ -2,9 +2,14 @@
          xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt" xmlns:local="local">
     <l:layout title="PRQA Results">
         <l:main-panel>
+            <!--
             <j:forEach var="category" items="${it.getCategories()}">
                 <img src="drawMemoryMapUsageGraph?category=${category}"/>
             </j:forEach>
+            -->
+                <j:forEach var="graphTitle" items="${it.getGraphTitles()}">        
+        <img src="drawMemoryMapUsageGraph?categories=${it.getAssociatedProgramMemoryAreas(graphTitle)}&amp;title=${graphTitle}&amp;width=600&amp;height=450"/>
+    </j:forEach>
 
         </l:main-panel>
     </l:layout>

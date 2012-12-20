@@ -54,9 +54,8 @@ import org.apache.commons.collections.ListUtils;
 public abstract class AbstractMemoryMapParser implements Describable<AbstractMemoryMapParser>, ExtensionPoint, MemoryMapParsable, Serializable {
 
     /* FULLY FUNCTIONAL FIND ALL */
-    private static final Pattern CONFIG_FILE_PATTERN =  Pattern.compile("^(\\s+)(\\S+)(.*origin\\s=\\s)(0x\\S+)(,.*)(0x\\S+)(.*)$",Pattern.MULTILINE);   
+    
     private static final String UTF_8_CHARSET = "UTF8";
-    private static final String ISO_8859_1 = "8859_1";
     protected static final Logger logger = Logger.getLogger(AbstractMemoryMapParser.class.toString());
     
     protected List<Pattern> patterns;
@@ -114,48 +113,31 @@ public abstract class AbstractMemoryMapParser implements Describable<AbstractMem
     public MemoryMapConfigMemory parseConfigFile(List<MemoryMapGraphConfiguration> graphConfig, File f) throws IOException {
         MemoryMapConfigMemory config =  new MemoryMapConfigMemory();
         CharSequence sequence = createCharSequenceFromFile(f);
-        System.out.println("Number of items found; "+config.size());
-        System.out.println("Graphconfig size; "+graphConfig.size());
-        //Matcher m = CONFIG_FILE_PATTERN.matcher(sequence);
         for(MemoryMapGraphConfiguration graph : graphConfig) {
             String[] split = graph.getGraphDataList().split(",");
             for(String s : split) {
-                //throw new IOException(" 0 = "+split[0]+ "" + " 1 = "+split[1] + " "+MemoryMapConfigFileParserDelegate.getPatternForMemoryLayout(s).toString());
-                
                 Matcher m = MemoryMapConfigFileParserDelegate.getPatternForMemoryLayout(s).matcher(sequence);                
                 while(m.find()) {
                     MemoryMapConfigMemoryItem item = new MemoryMapConfigMemoryItem(m.group(1), m.group(3), m.group(5));
                     config.add(item);
-                    System.out.println(item);
                 }
                 
             }
         }
-       
-        
-        //TODO:Remove before release
-        System.out.println("Number of items found; "+config.size());
         return config;
     }
     
     @Override
     public MemoryMapConfigMemory parseMapFile(File f, MemoryMapConfigMemory configuration) throws IOException {
         CharSequence sequence = createCharSequenceFromFile(f);
-        //throw new IOException("MATCH FOUND");
         
-        for(MemoryMapConfigMemoryItem item : configuration) {
-            //// (1)   (2)FLASH (3)                  (4)003e8000 (5)    (6)0000ff80 (7)   (8)0000f1a6 (9)   (10)00000dda (11)  
-            
+        for(MemoryMapConfigMemoryItem item : configuration) {            
             Matcher matcher = MemoryMapMapParserDelegate.getPatternForMemorySection(item.getName()).matcher(sequence);
             while(matcher.find()) {
-                //throw new IOException("MATCH FOUND");
                 item.setUsed(matcher.group(8));
                 item.setUnused(matcher.group(10));
             }      
-            
-            //throw new IOException("Pattern: "+MemoryMapMapParserDelegate.getPatternForMemorySection(item.getName()).toString());
         }
-        //return null;
         return configuration;
     }
 
@@ -178,7 +160,7 @@ public abstract class AbstractMemoryMapParser implements Describable<AbstractMem
 		return (Descriptor<AbstractMemoryMapParser>) Jenkins.getInstance().getDescriptorOrDie( getClass() );
 	}
     
-    	/**
+    /**
 	 * All registered {@link AbstractConfigurationRotatorSCM}s.
 	 */
 	public static DescriptorExtensionList<AbstractMemoryMapParser, MemoryMapParserDescriptor<AbstractMemoryMapParser>> all() {

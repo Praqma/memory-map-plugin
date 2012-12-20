@@ -87,12 +87,9 @@ public class MemoryMapMapParserDelegate extends FileFoundable<MemoryMapConfigMem
         if(patternRegistry == null) {
             patternRegistry = new HashMap<String, Pattern>();
         }
-        //"^(\\s+)(\\bFLASH)(\\s+)(\\S+)(\\s+)(\\S+)(\\s+)(\\S+)(\\s+)(\\S+)(\\s+)(\\S+)"
-        // (1)   (2)FLASH (3)                  (4)003e8000 (5)    (6)0000ff80 (7)   (8)0000f1a6 (9)   (10)00000dda (11)  
         if(patternRegistry.containsKey(sectionName)) {
             return patternRegistry.get(sectionName);
         } else {
-            //String regex = String.format("^(\\s+%s\\s+)(\\S+)(\\s+)(\\S+)(\\s+)(\\S+)(\\s+)(\\S+)(\\s+)(\\S+)", sectionName);
             String regex = String.format("^(\\s+)(\\b%s)(\\s+)(\\S+)(\\s+)(\\S+)(\\s+)(\\S+)(\\s+)(\\S+)(\\s+)(\\S+)", sectionName);
             Pattern memsection = Pattern.compile(regex,Pattern.MULTILINE);
             patternRegistry.put(sectionName, memsection);
