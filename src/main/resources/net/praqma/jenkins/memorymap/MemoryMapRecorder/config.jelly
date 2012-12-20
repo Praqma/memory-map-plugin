@@ -32,7 +32,7 @@
                     </tr>
                     <tr style="width:100%">
                         <td style="width:15%;">
-                            Program memory sections
+                            Program memory selection
                         </td>
                         <td style="width:85%;">
                             <f:textbox name="graph.config.graphDataList" value="${inst.graphDataList}"/>

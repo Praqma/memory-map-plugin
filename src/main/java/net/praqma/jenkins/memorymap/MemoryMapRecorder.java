@@ -106,13 +106,11 @@ public class MemoryMapRecorder extends Recorder {
             ex.printStackTrace(out);
             failed = true;
         }
-        
-        out.println("Printing graph configuration");
-        out.println(graphConfiguration);
+
         out.println("Printing configuration");
-        out.println(chosenParser.getConfigurationFile());
         if(config != null) {
             out.println("== Configuration start ==");
+            out.println();
             out.println(config.toString());
             out.println("== Configuration end ==");
         }

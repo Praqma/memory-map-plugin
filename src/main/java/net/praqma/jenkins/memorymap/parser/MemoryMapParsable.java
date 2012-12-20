@@ -34,7 +34,24 @@ import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
  * @author Praqma
  */
 public interface MemoryMapParsable {
+    
+    /**
+     * 
+     * @param config
+     * @param f
+     * @return
+     * @throws IOException 
+     */
     public MemoryMapConfigMemory parseConfigFile(List<MemoryMapGraphConfiguration> config, File f) throws IOException;
+    
+    /**
+     * This method needs to overriden in a subclass of AbstractMemoryMapParser. 
+     * 
+     * @param f
+     * @param configuration
+     * @return
+     * @throws IOException 
+     */
     public MemoryMapConfigMemory parseMapFile(File f, MemoryMapConfigMemory configuration) throws IOException;
     
 }

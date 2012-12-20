@@ -65,6 +65,9 @@ public class MemoryMapMapParserDelegate extends FileFoundable<MemoryMapConfigMem
         } catch (FileNotFoundException fnfex) {
             log.logp(Level.WARNING, "invoke", MemoryMapConfigFileParserDelegate.class.getName(), "invoke caught file not found exception", fnfex);
             throw new IOException(fnfex.getMessage());
+        } catch (IOException ex) {
+            log.logp(Level.WARNING, "invoke", MemoryMapConfigFileParserDelegate.class.getName(), "invoke caught IOException", ex);
+            throw new IOException(ex.getMessage());                    
         }
  
     }

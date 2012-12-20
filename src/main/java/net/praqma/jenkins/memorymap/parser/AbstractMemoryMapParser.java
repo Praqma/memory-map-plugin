@@ -38,6 +38,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -116,10 +117,16 @@ public abstract class AbstractMemoryMapParser implements Describable<AbstractMem
         for(MemoryMapGraphConfiguration graph : graphConfig) {
             String[] split = graph.getGraphDataList().split(",");
             for(String s : split) {
-                Matcher m = MemoryMapConfigFileParserDelegate.getPatternForMemoryLayout(s).matcher(sequence);                
+                Matcher m = MemoryMapConfigFileParserDelegate.getPatternForMemoryLayout(s).matcher(sequence);
+                MemoryMapConfigMemoryItem item = null;
                 while(m.find()) {
-                    MemoryMapConfigMemoryItem item = new MemoryMapConfigMemoryItem(m.group(1), m.group(3), m.group(5));
+                    item = new MemoryMapConfigMemoryItem(m.group(1), m.group(3), m.group(5));                    
                     config.add(item);
+                }
+                
+                if(item == null) {
+                    logger.logp(Level.WARNING, "parseConfigFile", AbstractMemoryMapParser.class.getName(), String.format("parseConfigFile(List<MemoryMapGraphConfiguration> graphConfig, File f) non existing item: %s",s));
+                    throw new IOException(String.format("No match found for program memory named %s",s));
                 }
                 
             }
@@ -133,10 +140,16 @@ public abstract class AbstractMemoryMapParser implements Describable<AbstractMem
         
         for(MemoryMapConfigMemoryItem item : configuration) {            
             Matcher matcher = MemoryMapMapParserDelegate.getPatternForMemorySection(item.getName()).matcher(sequence);
+            boolean found = false;
             while(matcher.find()) {
                 item.setUsed(matcher.group(8));
                 item.setUnused(matcher.group(10));
-            }      
+                found = true;
+            }
+            if(!found) {
+                logger.logp(Level.WARNING, "parseMapFile", AbstractMemoryMapParser.class.getName(), String.format("parseMapFile(File f, MemoryMapConfigMemory configuration) non existing item: %s",item));
+                throw new IOException(String.format("Linker command element %s not found in .map file", item));
+            }
         }
         return configuration;
     }
