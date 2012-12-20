@@ -32,11 +32,14 @@ import hudson.util.StackedAreaRenderer2;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.GraphicsConfiguration;
+import java.awt.Paint;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfiguration;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemoryItem;
@@ -54,6 +57,7 @@ import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.chart.renderer.category.StackedAreaRenderer;
 import org.jfree.chart.title.LegendTitle;
 import org.jfree.data.category.CategoryDataset;
+import org.jfree.ui.RectangleAnchor;
 import org.jfree.ui.RectangleEdge;
 import org.jfree.ui.RectangleInsets;
 import org.kohsuke.stapler.StaplerRequest;
@@ -182,6 +186,8 @@ public class MemoryMapBuildAction implements Action {
 
         int max = Integer.MIN_VALUE;
         boolean markersMarked = false;
+        Set<String> drawnMarker = new HashSet<String>();
+        
         
         
         for(MemoryMapBuildAction membuild = this; membuild != null; membuild = membuild.getPreviousAction()) {            
@@ -191,15 +197,31 @@ public class MemoryMapBuildAction implements Action {
             
             for(MemoryMapConfigMemoryItem res : result) {
                 if(memberList.contains(res.getName())) {                    
-                    int value = HexUtils.bitCount(res.getUsed(), 16);
-                    int maxx = HexUtils.bitCount(res.getLength(), 16);
-                    dataset.add(value, res.getName(), label);
+                    int value = HexUtils.bitCount(res.getUsed(), getRecorder().getWordSize());
+                    int byteValue = HexUtils.byteCount(res.getUsed(), getRecorder().getWordSize());
+                    int maxx = HexUtils.bitCount(res.getLength(), getRecorder().getWordSize());
+                    if(getRecorder().getShowBytesOnGraph()) {
+                        maxx = HexUtils.byteCount(res.getLength(), getRecorder().getWordSize());
+                    }
                     
-                    if(!markersMarked) {
-                        markers.add(new ValueMarker((double)maxx, Color.BLACK, new BasicStroke(
-                                    2.0f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER,
+                    if(getRecorder().getShowBytesOnGraph()) {
+                        dataset.add(byteValue, res.getName(), label);
+                    } else {                    
+                        dataset.add(value, res.getName(), label);
+                    }
+                    
+                    if(drawnMarker.add(res.getName())) {
+                        ValueMarker vm = new ValueMarker((double)maxx, Color.BLACK, new BasicStroke(
+                                    1.2f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER,
                                     1.0f, new float[] {6.0f, 6.0f}, 0.0f
-                                    )));
+                                    ));
+                        vm.setLabel(String.format("%s(max)", res.getName()));
+                        vm.setLabelOffset(new RectangleInsets(5, 50, -20, 5));
+                        vm.setLabelAnchor(RectangleAnchor.TOP_LEFT);
+                        vm.setPaint(Color.BLACK);
+                        vm.setOutlinePaint(Color.BLACK);
+                        vm.setAlpha(1.0f);
+                        markers.add(vm);
                     }
                     
                     if(maxx > max) {
@@ -211,7 +233,7 @@ public class MemoryMapBuildAction implements Action {
             markersMarked = true;
         }
 
-        JFreeChart chart = createPairedBarCharts(graphTitle, "Words", (int)((double)max*1.10), 0, dataset.build(), markers);
+        JFreeChart chart = createPairedBarCharts(graphTitle, getRecorder().getShowBytesOnGraph() ? "Bytes" : "Words", (int)((double)max*1.10), 0, dataset.build(), markers);
          
         chart.setBackgroundPaint(Color.WHITE);
         chart.getLegend().setPosition( RectangleEdge.BOTTOM );
@@ -229,7 +251,7 @@ public class MemoryMapBuildAction implements Action {
      */
     protected JFreeChart createStackedCharts(String title, String yaxis, int max, int min, CategoryDataset dataset, List<ValueMarker> markers) {
         final CategoryAxis domainAxis = new ShiftedCategoryAxis(null);
-        final NumberAxis rangeAxis = new NumberAxis("Words");
+        final NumberAxis rangeAxis = new NumberAxis(yaxis);
         rangeAxis.setStandardTickUnits( NumberAxis.createIntegerTickUnits() );
         rangeAxis.setUpperBound( max );
         rangeAxis.setLowerBound( min );
@@ -261,7 +283,7 @@ public class MemoryMapBuildAction implements Action {
     
     protected JFreeChart createPairedBarCharts(String title, String yaxis, int max, int min, CategoryDataset dataset, List<ValueMarker> markers) {
         final CategoryAxis domainAxis = new ShiftedCategoryAxis(null);
-        final NumberAxis rangeAxis = new NumberAxis("Words");
+        final NumberAxis rangeAxis = new NumberAxis(yaxis);
         rangeAxis.setStandardTickUnits( NumberAxis.createIntegerTickUnits() );
         rangeAxis.setUpperBound( max );
         rangeAxis.setLowerBound( min );

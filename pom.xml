@@ -8,7 +8,7 @@
     </parent>
     <groupId>net.praqma</groupId>
     <artifactId>memory-map</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.1.0</version>
     <packaging>hpi</packaging>
     <name>Memory Map Plugin</name>
     <build>

@@ -39,7 +39,6 @@ import hudson.util.FormValidation;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfiguration;
 import net.praqma.jenkins.memorymap.parser.AbstractMemoryMapParser;
@@ -48,8 +47,8 @@ import net.praqma.jenkins.memorymap.parser.MemoryMapMapParserDelegate;
 import net.praqma.jenkins.memorymap.parser.MemoryMapParserDescriptor;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
 import net.praqma.jenkins.memorymap.result.MemoryMapGroup;
-import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
@@ -63,8 +62,12 @@ public class MemoryMapRecorder extends Recorder {
     private String mapFile;
     private int ramCapacity;
     private int flashCapacity;
+    
+    private Integer wordSize;
+    
+    
     private String configurationFile;
-    private Boolean showBytesOnGraph;
+    private boolean showBytesOnGraph;
     
     private AbstractMemoryMapParser chosenParser;
     private List<MemoryMapGroup> groups;
@@ -76,14 +79,12 @@ public class MemoryMapRecorder extends Recorder {
     }
     
     @DataBoundConstructor
-    public MemoryMapRecorder(AbstractMemoryMapParser chosenParser, List<MemoryMapGroup> groups, int ramCapacity, int flashCapacity, String configurationFile, Boolean showBytesOnGraph) {
+    public MemoryMapRecorder(AbstractMemoryMapParser chosenParser, List<MemoryMapGroup> groups, String configurationFile, boolean showBytesOnGraph, String wordSize) {
         this.chosenParser = chosenParser;
-        this.ramCapacity = ramCapacity;
-        this.flashCapacity = flashCapacity;
         this.groups = groups;
         this.configurationFile = configurationFile;        
         this.showBytesOnGraph = showBytesOnGraph;
-        
+        this.wordSize = StringUtils.isBlank(wordSize) ? 16 : Integer.parseInt(wordSize);        
     }
     
     @Override
@@ -103,10 +104,9 @@ public class MemoryMapRecorder extends Recorder {
             config = build.getWorkspace().act(new MemoryMapMapParserDelegate(chosenParser, config));
         } catch(IOException ex) {
             ex.printStackTrace(out);
-            //out.println(ex.getCause().getMessage());
             failed = true;
         }
-        //TODO:Remove before release
+        
         out.println("Printing graph configuration");
         out.println(graphConfiguration);
         out.println("Printing configuration");
@@ -116,13 +116,7 @@ public class MemoryMapRecorder extends Recorder {
             out.println(config.toString());
             out.println("== Configuration end ==");
         }
-        
-        
-        //
-  
-        /*
-         * Create a build action and store the result.
-         */
+
         MemoryMapBuildAction mmba = new MemoryMapBuildAction(build, config);
         mmba.setRecorder(this);
         mmba.setMemoryMapConfig(config);        
@@ -132,34 +126,6 @@ public class MemoryMapRecorder extends Recorder {
             return false;
         }
         
-        
-        /*
-        boolean validFlashCapacity = mmba.validateThreshold(getFlashCapacity(), MemoryMapGroup.defaultFlashGroup());
-        int flashCount = mmba.sumOfValues(MemoryMapGroup.defaultFlashGroup());
-        
-        boolean validRamCapacity = mmba.validateThreshold(getRamCapacity(), MemoryMapGroup.defaultRamGroup());
-        int ramCount = mmba.sumOfValues(MemoryMapGroup.defaultRamGroup());
-
-        out.println("Recorded flash memory usage: "+flashCount);        
-        out.println("Recorded ram usage: "+ramCount);        
-        
-        out.println(String.format("Maximum flash setting: %s", getFlashCapacity()));
-        out.println(String.format("Maximum ram setting: %s", getRamCapacity()));
-        
-        if(!validFlashCapacity) {
-            out.println("Flash capacity exceeded.");
-            build.setResult(Result.FAILURE);            
-        }
-        
-        if(!validRamCapacity) {
-            out.println("Ram capacity exceeded.");
-            build.setResult(Result.FAILURE);            
-        }
-        
-        if(validRamCapacity && validFlashCapacity) {
-            out.println("Ram and flash usage within capacity");
-        }
-        */
         build.getActions().add(mmba);
         
         return true;        
@@ -280,6 +246,20 @@ public class MemoryMapRecorder extends Recorder {
      */
     public void setShowBytesOnGraph(Boolean showBytesOnGraph) {
         this.showBytesOnGraph = showBytesOnGraph;
+    }
+
+    /**
+     * @return the wordSize
+     */
+    public Integer getWordSize() {
+        return wordSize;
+    }
+
+    /**
+     * @param wordSize the wordSize to set
+     */
+    public void setWordSize(Integer wordSize) {
+        this.wordSize = wordSize;
     }
     
     @Extension

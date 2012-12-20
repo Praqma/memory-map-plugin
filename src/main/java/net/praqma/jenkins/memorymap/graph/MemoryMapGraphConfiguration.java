@@ -41,13 +41,12 @@ public class MemoryMapGraphConfiguration implements Serializable {
     
     private String graphCaption = "Specify graph caption";
     private String graphDataList ="Specify graph datasets for graph";
-    private Boolean displayUsageInBytes = false;
     
     public MemoryMapGraphConfiguration() { }
+    
     public MemoryMapGraphConfiguration(String graphDataList, String graphCaption, Boolean displayUsageInBytes) {
         this.graphDataList = graphDataList;
         this.graphCaption = graphCaption;
-        this.displayUsageInBytes = (displayUsageInBytes == null ? false : displayUsageInBytes);
     }
     /**
      * @return the graphCaption
@@ -75,20 +74,5 @@ public class MemoryMapGraphConfiguration implements Serializable {
      */
     public void setGraphDataList(String graphDataList) {
         this.graphDataList = graphDataList;
-    }
-
-    /**
-     * @return the displayUsageInBytes
-     */
-    public Boolean getDisplayUsageInBytes() {
-        return displayUsageInBytes;
-    }
-
-    /**
-     * @param displayUsageInBytes the displayUsageInBytes to set
-     */
-    public void setDisplayUsageInBytes(Boolean displayUsageInBytes) {
-        this.displayUsageInBytes = displayUsageInBytes;
-    }
-    
+    }    
 }
