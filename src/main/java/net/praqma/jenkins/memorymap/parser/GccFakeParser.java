@@ -91,16 +91,6 @@ public class GccFakeParser extends AbstractMemoryMapParser implements Serializab
     }
 
     @Override
-    public MemoryMapConfigMemory parseConfigFile(File f) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public MemoryMapConfigMemory parseMapFile2(File f) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
     public MemoryMapConfigMemory parseMapFile(File f, MemoryMapConfigMemory configuration) {
         throw new UnsupportedOperationException("Not supported yet.");
     }

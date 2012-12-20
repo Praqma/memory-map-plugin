@@ -1,6 +1,6 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
-         xmlns:t="/lib/hudson" xmlns:f="/lib/form">    
-    <j:forEach var="category" items="${from.getCategories()}">        
-        <img src="${from.urlName}/drawMemoryMapUsageGraph?category=${category}"/>
+         xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+    <j:forEach var="graphTitle" items="${from.getGraphTitles()}">        
+        <img src="${from.urlName}/drawMemoryMapUsageGraph?categories=${from.getAssociatedProgramMemoryAreas(graphTitle)}&amp;title=${graphTitle}"/>
     </j:forEach>
 </j:jelly>

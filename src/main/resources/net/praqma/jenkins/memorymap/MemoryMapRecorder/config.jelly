@@ -46,23 +46,70 @@
             ${%Linker command file}
             <f:textbox/>
         </f:entry>        
-        <f:entry field="wordSize" name="wordSize">
-            ${%Word size}
+        <f:entry field="wordSize" name="wordSize"> 
+           ${%Word size}
             <f:textbox/>
         </f:entry>
         <f:entry field="showBytesOnGraph" name="showBytesOnGraph">
             ${%Show bytes on graphs}
-            <f:checkbox/>
+            <f:checkbox value="${instance.showBytesOnGraph}" checked="${instance.showBytesOnGraph}"/>
         </f:entry>
+        <!--
+        <f:entry>
+            <f:repeatable field="graphConfiguration"/>
+        </f:entry>      
+        -->
+        <!--
+        <f:entry>
+            <f:repeatable items="graphConfiguration" var="loopme"/>
+        </f:entry>
+        -->
+        <!--
+        <f:entry name="">
+            <f:repeatableProperty field="graphConfiguration" add="Add new graph"/>
+        </f:entry>
+        -->
+        <!--
         <f:entry>
             <strong>${%Compiler}</strong>
         </f:entry>
-        <f:repeatable>
-            
-        </f:repeatable>
-        
-        
-        <f:dropdownDescriptorSelector descriptors="${descriptor.getParsers()}" field="chosenParser" />
+        -->
 
+        <f:dropdownDescriptorSelector descriptors="${descriptor.getParsers()}" field="chosenParser" />
+        
+        <f:entry title="List of configured graphs">
+            <f:repeatable varStatus="instStatus" var="inst" items="${instance.graphConfiguration}">
+                <table>
+                    <tr>
+                        <td>
+                            Caption
+                        </td>
+                        <td>
+                            <f:textbox name="graph.config.graphCaption" value="${inst.graphCaption}"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Data sets
+                        </td>
+                        <td>
+                            <f:textbox name="graph.config.graphDataList" value="${inst.graphDataList}"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Show usage in bytes on graphs 
+                        </td>
+                        <td>
+                            <f:checkbox name="graph.config.displayUsageInBytes" checked="${inst.displayUsageInBytes != null &amp;&amp; inst.displayUsageInBytes == true }" value="${inst.displayUsageInBytes}"/>
+                        </td>
+                    </tr>
+                    
+                </table>
+                
+                <f:repeatableDeleteButton/>
+            </f:repeatable>
+            
+        </f:entry>   
 	</f:block>   
 </j:jelly>

@@ -21,23 +21,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package net.praqma.jenkins.memorymap.parser;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfiguration;
-import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
-import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
+package net.praqma.jenkins.memorymap.util;
 
 /**
  *
  * @author Praqma
  */
-public interface MemoryMapParsable {
-    @Deprecated
-    public List<MemoryMapParsingResult> parseMapFile(File f) throws IOException;
-    public MemoryMapConfigMemory parseConfigFile(List<MemoryMapGraphConfiguration> config, File f) throws IOException;
-    public MemoryMapConfigMemory parseMapFile(File f, MemoryMapConfigMemory configuration) throws IOException;
+public class HexUtils {
+    public static Integer bitCount(String hexString, int wordSize) {
+        return HexUtils.getRadix(hexString, 16);
+    }
     
+    public static int byteCount(String hexString, int wordSize) {
+        return HexUtils.bitCount(hexString, wordSize) / 8;
+    }
+    
+    private static Integer getRadix(String hexString, int radix) {
+        Integer i = Integer.parseInt(hexString.replace("0x",""), radix);
+        return i;
+    }
 }

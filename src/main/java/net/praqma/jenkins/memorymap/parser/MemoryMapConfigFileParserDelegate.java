@@ -26,8 +26,12 @@ package net.praqma.jenkins.memorymap.parser;
 import hudson.remoting.VirtualChannel;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
+import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfiguration;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
 import net.praqma.jenkins.memorymap.util.FileFoundable;
 
@@ -39,11 +43,14 @@ public class MemoryMapConfigFileParserDelegate extends FileFoundable<MemoryMapCo
 
     private static final Logger log = Logger.getLogger(MemoryMapMapParserDelegate.class.getName());
     private AbstractMemoryMapParser parser;
+    private List<MemoryMapGraphConfiguration> graphConfig;
+    private static HashMap<String,Pattern> patternRegistry;
     
     public MemoryMapConfigFileParserDelegate() { }
     
-    public MemoryMapConfigFileParserDelegate(AbstractMemoryMapParser parser) { 
+    public MemoryMapConfigFileParserDelegate(List<MemoryMapGraphConfiguration> graphConfig, AbstractMemoryMapParser parser) { 
         this.parser = parser;
+        this.graphConfig = graphConfig;
     }
     
     @Override
@@ -51,7 +58,7 @@ public class MemoryMapConfigFileParserDelegate extends FileFoundable<MemoryMapCo
         MemoryMapConfigMemory mmcm = null;
         
         try {
-            mmcm = parser.parseConfigFile(findFile(f, parser.getConfigurationFile()));
+            mmcm = parser.parseConfigFile(graphConfig, findFile(f, parser.getConfigurationFile()));
         } catch (IOException ex) {
             log.logp(Level.WARNING, "invoke", MemoryMapConfigFileParserDelegate.class.getName(), "invoke caught file not found exception", ex);
             throw new IOException(ex.getMessage());
@@ -77,6 +84,21 @@ public class MemoryMapConfigFileParserDelegate extends FileFoundable<MemoryMapCo
      */
     public void setParser(AbstractMemoryMapParser parser) {
         this.parser = parser;
+    }
+    
+    public static Pattern getPatternForMemoryLayout(String sectionName) {
+        if(patternRegistry == null) {
+            patternRegistry = new HashMap<String, Pattern>();
+        }
+        
+        if(patternRegistry.containsKey(sectionName)) {
+            return patternRegistry.get(sectionName);
+        } else {
+            String regex = String.format("^(\\s+%s\\b)(.*origin\\s=\\s)(0x\\S+)(,.*)(0x\\S+)(.*)$", sectionName);
+            Pattern memsection = Pattern.compile(regex, Pattern.MULTILINE);
+            patternRegistry.put(sectionName, memsection);
+            return memsection;
+        }
     }
     
 }

@@ -23,7 +23,6 @@
  */
 package net.praqma.jenkins.memorymap.parser;
 
-import com.sun.org.apache.xerces.internal.impl.xpath.regex.Match;
 import hudson.DescriptorExtensionList;
 import hudson.ExtensionPoint;
 import hudson.model.Describable;
@@ -43,6 +42,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import jenkins.model.Jenkins;
+import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfiguration;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemoryItem;
 import org.apache.commons.collections.ListUtils;
@@ -53,6 +53,7 @@ import org.apache.commons.collections.ListUtils;
  */
 public abstract class AbstractMemoryMapParser implements Describable<AbstractMemoryMapParser>, ExtensionPoint, MemoryMapParsable, Serializable {
 
+    /* FULLY FUNCTIONAL FIND ALL */
     private static final Pattern CONFIG_FILE_PATTERN =  Pattern.compile("^(\\s+)(\\S+)(.*origin\\s=\\s)(0x\\S+)(,.*)(0x\\S+)(.*)$",Pattern.MULTILINE);   
     private static final String UTF_8_CHARSET = "UTF8";
     private static final String ISO_8859_1 = "8859_1";
@@ -63,6 +64,7 @@ public abstract class AbstractMemoryMapParser implements Describable<AbstractMem
     private String configurationFile;
     private Integer wordSize;
     private Boolean bytesOnGraph;
+
     
     public AbstractMemoryMapParser () {  
         this.patterns = ListUtils.EMPTY_LIST;
@@ -109,15 +111,27 @@ public abstract class AbstractMemoryMapParser implements Describable<AbstractMem
     }    
     
     @Override
-    public MemoryMapConfigMemory parseConfigFile(File f) throws IOException {
+    public MemoryMapConfigMemory parseConfigFile(List<MemoryMapGraphConfiguration> graphConfig, File f) throws IOException {
         MemoryMapConfigMemory config =  new MemoryMapConfigMemory();
         CharSequence sequence = createCharSequenceFromFile(f);
-
-        Matcher m = CONFIG_FILE_PATTERN.matcher(sequence);
-        while(m.find()) {
-            MemoryMapConfigMemoryItem item = new MemoryMapConfigMemoryItem(m.group(2), m.group(4), m.group(6));
-            config.add(item);
+        System.out.println("Number of items found; "+config.size());
+        System.out.println("Graphconfig size; "+graphConfig.size());
+        //Matcher m = CONFIG_FILE_PATTERN.matcher(sequence);
+        for(MemoryMapGraphConfiguration graph : graphConfig) {
+            String[] split = graph.getGraphDataList().split(",");
+            for(String s : split) {
+                //throw new IOException(" 0 = "+split[0]+ "" + " 1 = "+split[1] + " "+MemoryMapConfigFileParserDelegate.getPatternForMemoryLayout(s).toString());
+                
+                Matcher m = MemoryMapConfigFileParserDelegate.getPatternForMemoryLayout(s).matcher(sequence);                
+                while(m.find()) {
+                    MemoryMapConfigMemoryItem item = new MemoryMapConfigMemoryItem(m.group(1), m.group(3), m.group(5));
+                    config.add(item);
+                    System.out.println(item);
+                }
+                
+            }
         }
+       
         
         //TODO:Remove before release
         System.out.println("Number of items found; "+config.size());
@@ -127,14 +141,21 @@ public abstract class AbstractMemoryMapParser implements Describable<AbstractMem
     @Override
     public MemoryMapConfigMemory parseMapFile(File f, MemoryMapConfigMemory configuration) throws IOException {
         CharSequence sequence = createCharSequenceFromFile(f);
+        //throw new IOException("MATCH FOUND");
+        
         for(MemoryMapConfigMemoryItem item : configuration) {
+            //// (1)   (2)FLASH (3)                  (4)003e8000 (5)    (6)0000ff80 (7)   (8)0000f1a6 (9)   (10)00000dda (11)  
+            
             Matcher matcher = MemoryMapMapParserDelegate.getPatternForMemorySection(item.getName()).matcher(sequence);
             while(matcher.find()) {
-                item.setUsed(matcher.group(6));
-                item.setUnused(matcher.group(8));
+                //throw new IOException("MATCH FOUND");
+                item.setUsed(matcher.group(8));
+                item.setUnused(matcher.group(10));
             }      
-                    
+            
+            //throw new IOException("Pattern: "+MemoryMapMapParserDelegate.getPatternForMemorySection(item.getName()).toString());
         }
+        //return null;
         return configuration;
     }
 

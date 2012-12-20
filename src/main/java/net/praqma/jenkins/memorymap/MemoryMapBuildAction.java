@@ -31,12 +31,17 @@ import hudson.util.ShiftedCategoryAxis;
 import hudson.util.StackedAreaRenderer2;
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.GraphicsConfiguration;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfiguration;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
+import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemoryItem;
 import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
+import net.praqma.jenkins.memorymap.util.HexUtils;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.CategoryAxis;
@@ -45,6 +50,7 @@ import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.ValueMarker;
+import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.chart.renderer.category.StackedAreaRenderer;
 import org.jfree.chart.title.LegendTitle;
 import org.jfree.data.category.CategoryDataset;
@@ -60,19 +66,10 @@ import org.kohsuke.stapler.StaplerResponse;
 public class MemoryMapBuildAction implements Action {
 
     private MemoryMapConfigMemory memoryMapConfig;
-    private List<MemoryMapParsingResult> results;
     private AbstractBuild<?,?> build;
     private MemoryMapRecorder recorder;
-
-    private static final HashMap<MemoryMapProjectAction.GraphCategories,List<String>> categoryMap = new HashMap<MemoryMapProjectAction.GraphCategories, List<String>>();
     
-    static {
-        categoryMap.put(MemoryMapProjectAction.GraphCategories.Flash, Arrays.asList(".econst",".const",".text",".cinit",".switch",".pinit"));
-        categoryMap.put(MemoryMapProjectAction.GraphCategories.Ram, Arrays.asList(".stack",".ebss",".bss",".sysmem",".esysmem",".cio",".data"));
-    }
-    
-    public MemoryMapBuildAction(AbstractBuild<?,?> build, MemoryMapConfigMemory memoryMapConfig, List<MemoryMapParsingResult> results) {
-        this.results = results;
+    public MemoryMapBuildAction(AbstractBuild<?,?> build, MemoryMapConfigMemory memoryMapConfig) {
         this.build = build;
         this.memoryMapConfig = memoryMapConfig;
         
@@ -110,6 +107,7 @@ public class MemoryMapBuildAction implements Action {
     
     public int sumOfValues(String... valuenames) { 
         int sum = 0;
+        /*
         for(MemoryMapParsingResult res : getResults()) {
             for(String s : valuenames) {
                 if(res.getName().equals(s)) {
@@ -117,11 +115,13 @@ public class MemoryMapBuildAction implements Action {
                 }
             }
         }
+        */
         return sum;
     }
     
     public int sumOfValues(List<String> values) { 
         int sum = 0;
+        /*
         for(MemoryMapParsingResult res : getResults()) {
             for(String s : values) {
                 if(res.getName().equals(s)) {
@@ -129,6 +129,7 @@ public class MemoryMapBuildAction implements Action {
                 }
             }
         }
+        */
         return sum;
     }
     
@@ -161,63 +162,61 @@ public class MemoryMapBuildAction implements Action {
                 return null;
             }
             action = start.getAction(MemoryMapBuildAction.class);            
-            if(action != null && (action.getResults() != null && action.getResults().size() > 0)) {
+            
+            if(action != null && (action.isValidConfigurationWithData())) {
                 return action;
             }
         }
     }
 
+
     public void doDrawMemoryMapUsageGraph(StaplerRequest req, StaplerResponse rsp) throws IOException {
         DataSetBuilder<String, ChartUtil.NumberOnlyBuildLabel> dataset = new DataSetBuilder<String, ChartUtil.NumberOnlyBuildLabel>();
-        MemoryMapProjectAction.GraphCategories category = MemoryMapProjectAction.GraphCategories.valueOf(req.getParameter("category"));
-        List<String> valuesInCategory = categoryMap.get(category);
+        
+        String members = req.getParameter("categories");
+        String graphTitle = req.getParameter("title");
+        
+        List<String> memberList = Arrays.asList(members.split(","));
+        
+        List<ValueMarker> markers = new ArrayList<ValueMarker>();
+
         int max = Integer.MIN_VALUE;
-        Integer threshold = null;
+        boolean markersMarked = false;
+        
+        
         for(MemoryMapBuildAction membuild = this; membuild != null; membuild = membuild.getPreviousAction()) {            
             ChartUtil.NumberOnlyBuildLabel label = new ChartUtil.NumberOnlyBuildLabel(membuild.build);
-            List<MemoryMapParsingResult> result = membuild.getResults();
-            for(MemoryMapParsingResult res : result) {
-                int sum = membuild.sumOfValues(valuesInCategory);
-                if(sum >= max) {
-                    max = sum; 
-                }
+            MemoryMapConfigMemory result = membuild.getMemoryMapConfig();
+            
+            
+            for(MemoryMapConfigMemoryItem res : result) {
+                if(memberList.contains(res.getName())) {                    
+                    int value = HexUtils.bitCount(res.getUsed(), 16);
+                    int maxx = HexUtils.bitCount(res.getLength(), 16);
+                    dataset.add(value, res.getName(), label);
+                    
+                    if(!markersMarked) {
+                        markers.add(new ValueMarker((double)maxx, Color.BLACK, new BasicStroke(
+                                    2.0f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER,
+                                    1.0f, new float[] {6.0f, 6.0f}, 0.0f
+                                    )));
+                    }
+                    
+                    if(maxx > max) {
+                        max = maxx;
+                    }
                 
-                if(valuesInCategory.contains(res.getName())) {
-                    dataset.add(res.getValue(), res.getName(), label);
                 }
             }
-            if(threshold == null) {
-                if(getRecorder() != null) {
-                    threshold = category.equals(MemoryMapProjectAction.GraphCategories.Flash) ? getRecorder().getFlashCapacity() : getRecorder().getRamCapacity();
-                }                    
-            }
+            markersMarked = true;
         }
 
-        JFreeChart chart = null;
-        if(threshold <= max) {
-            chart = createStackedCharts(category.toString(), "Words", (int)((double)max*1.10), 0, threshold, dataset.build());
-        } else {
-            chart = createStackedCharts(category.toString(), "Words", (int)((double)threshold*1.10), 0, threshold, dataset.build());
-        }
+        JFreeChart chart = createPairedBarCharts(graphTitle, "Words", (int)((double)max*1.10), 0, dataset.build(), markers);
          
         chart.setBackgroundPaint(Color.WHITE);
         chart.getLegend().setPosition( RectangleEdge.BOTTOM );
         ChartUtil.generateGraph( req, rsp, chart, 400, 300 );     
     }    
-
-    /**
-     * @return the results
-     */
-    public List<MemoryMapParsingResult> getResults() {
-        return results;
-    }
-
-    /**
-     * @param results the results to set
-     */
-    public void setResults(List<MemoryMapParsingResult> results) {
-        this.results = results;
-    }
     
     /**
      * The simplest way to represent the threshold boundary. Use the same plot type as the parent plots. 
@@ -228,7 +227,7 @@ public class MemoryMapBuildAction implements Action {
      * @param dataset
      * @return 
      */
-    protected JFreeChart createStackedCharts(String title, String yaxis, int max, int min, int thresholdMarker, CategoryDataset dataset) {
+    protected JFreeChart createStackedCharts(String title, String yaxis, int max, int min, CategoryDataset dataset, List<ValueMarker> markers) {
         final CategoryAxis domainAxis = new ShiftedCategoryAxis(null);
         final NumberAxis rangeAxis = new NumberAxis("Words");
         rangeAxis.setStandardTickUnits( NumberAxis.createIntegerTickUnits() );
@@ -251,18 +250,48 @@ public class MemoryMapBuildAction implements Action {
         plot.setRangeGridlinePaint( Color.black );
         plot.setInsets( new RectangleInsets( 5.0, 0, 0, 5.0 ) );
 
-        if(thresholdMarker > 0) {
-            ValueMarker vma = new ValueMarker((double)thresholdMarker, Color.BLACK, new BasicStroke(
-                2.0f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER,
-                1.0f, new float[] {6.0f, 6.0f}, 0.0f
-            ));
-            plot.addRangeMarker(vma);
-        }
+        for(ValueMarker mkr : markers) {
+            plot.addRangeMarker(mkr);
+        }       
 
         JFreeChart chart = new JFreeChart(plot);
         chart.setTitle(title);
         return chart;
     }
+    
+    protected JFreeChart createPairedBarCharts(String title, String yaxis, int max, int min, CategoryDataset dataset, List<ValueMarker> markers) {
+        final CategoryAxis domainAxis = new ShiftedCategoryAxis(null);
+        final NumberAxis rangeAxis = new NumberAxis("Words");
+        rangeAxis.setStandardTickUnits( NumberAxis.createIntegerTickUnits() );
+        rangeAxis.setUpperBound( max );
+        rangeAxis.setLowerBound( min );
+
+        //StackedAreaRenderer2 renderer = new StackedAreaRenderer2();
+        BarRenderer renderer = new BarRenderer();
+
+        CategoryPlot plot = new CategoryPlot(dataset, domainAxis, rangeAxis, renderer);
+        plot.setDomainAxis( domainAxis );
+        domainAxis.setCategoryLabelPositions( CategoryLabelPositions.UP_90 );
+        domainAxis.setLowerMargin( 0.0 );
+        domainAxis.setUpperMargin( 0.0 );
+        domainAxis.setCategoryMargin( 0.0 );
+
+        plot.setOrientation(PlotOrientation.VERTICAL);
+        plot.setBackgroundPaint( Color.WHITE );
+        plot.setOutlinePaint( null );
+        plot.setRangeGridlinesVisible( true );
+        plot.setRangeGridlinePaint( Color.black );
+        plot.setInsets( new RectangleInsets( 5.0, 0, 0, 5.0 ) );
+
+        for(ValueMarker mkr : markers) {
+            plot.addRangeMarker(mkr);
+        }       
+
+        JFreeChart chart = new JFreeChart(plot);
+        chart.setTitle(title);
+        return chart;
+    }
+    
     
     protected JFreeChart createChart( CategoryDataset dataset, String title, String yaxis, int max, int min ) {
         final JFreeChart chart = ChartFactory.createStackedAreaChart( title, // chart                                                                                                                                       // title
@@ -302,7 +331,6 @@ public class MemoryMapBuildAction implements Action {
         
         final StackedAreaRenderer renderer = (StackedAreaRenderer) plot.getRenderer();
         renderer.setBaseStroke( new BasicStroke( 2.0f ) );
-        //ColorPalette.apply( renderer );
         plot.setInsets( new RectangleInsets( 5.0, 0, 0, 5.0 ) );
         return chart;
     }
@@ -333,5 +361,9 @@ public class MemoryMapBuildAction implements Action {
      */
     public void setMemoryMapConfig(MemoryMapConfigMemory memoryMapConfig) {
         this.memoryMapConfig = memoryMapConfig;
+    }
+    
+    public boolean isValidConfigurationWithData() {
+        return memoryMapConfig != null && memoryMapConfig.size() >= 1;
     }
 }

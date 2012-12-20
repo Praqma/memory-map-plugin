@@ -28,19 +28,17 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
-import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
 import net.praqma.jenkins.memorymap.util.FileFoundable;
 
 /**
  * Class to wrap the FileCallable method. Serves as a proxy to the parser method. 
  * @author Praqma
  */
-public class MemoryMapMapParserDelegate extends FileFoundable<List<MemoryMapParsingResult>> 
+public class MemoryMapMapParserDelegate extends FileFoundable<MemoryMapConfigMemory> 
 {
     private static final Logger log = Logger.getLogger(MemoryMapMapParserDelegate.class.getName());
     private AbstractMemoryMapParser parser;
@@ -60,19 +58,15 @@ public class MemoryMapMapParserDelegate extends FileFoundable<List<MemoryMapPars
     }
 
     @Override
-    public List<MemoryMapParsingResult> invoke(File file, VirtualChannel vc) throws IOException, InterruptedException {        
+    public MemoryMapConfigMemory invoke(File file, VirtualChannel vc) throws IOException, InterruptedException {        
 
         try {
-              if(parser == null) {
-                return getParser().parseMapFile(findFile(file, parser.getMapFile()));
-              } else {
-                getParser().parseMapFile(findFile(file, parser.getMapFile()), config);
-                throw new IOException(config.toString());   
-              }
+            return getParser().parseMapFile(findFile(file, parser.getMapFile()), config); 
         } catch (FileNotFoundException fnfex) {
             log.logp(Level.WARNING, "invoke", MemoryMapConfigFileParserDelegate.class.getName(), "invoke caught file not found exception", fnfex);
             throw new IOException(fnfex.getMessage());
         }
+ 
     }
 
     /**
@@ -93,11 +87,13 @@ public class MemoryMapMapParserDelegate extends FileFoundable<List<MemoryMapPars
         if(patternRegistry == null) {
             patternRegistry = new HashMap<String, Pattern>();
         }
-        
+        //"^(\\s+)(\\bFLASH)(\\s+)(\\S+)(\\s+)(\\S+)(\\s+)(\\S+)(\\s+)(\\S+)(\\s+)(\\S+)"
+        // (1)   (2)FLASH (3)                  (4)003e8000 (5)    (6)0000ff80 (7)   (8)0000f1a6 (9)   (10)00000dda (11)  
         if(patternRegistry.containsKey(sectionName)) {
             return patternRegistry.get(sectionName);
         } else {
-            String regex = String.format("^(\\s+%s\\s+)(\\S+)(\\s+)(\\S+)(\\s+)(\\S+)(\\s+)(\\S+)(\\s+)(\\S+)", sectionName);
+            //String regex = String.format("^(\\s+%s\\s+)(\\S+)(\\s+)(\\S+)(\\s+)(\\S+)(\\s+)(\\S+)(\\s+)(\\S+)", sectionName);
+            String regex = String.format("^(\\s+)(\\b%s)(\\s+)(\\S+)(\\s+)(\\S+)(\\s+)(\\S+)(\\s+)(\\S+)(\\s+)(\\S+)", sectionName);
             Pattern memsection = Pattern.compile(regex,Pattern.MULTILINE);
             patternRegistry.put(sectionName, memsection);
             return memsection;

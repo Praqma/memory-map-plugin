@@ -41,6 +41,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfiguration;
 import net.praqma.jenkins.memorymap.parser.AbstractMemoryMapParser;
 import net.praqma.jenkins.memorymap.parser.MemoryMapConfigFileParserDelegate;
 import net.praqma.jenkins.memorymap.parser.MemoryMapMapParserDelegate;
@@ -63,22 +64,26 @@ public class MemoryMapRecorder extends Recorder {
     private int ramCapacity;
     private int flashCapacity;
     private String configurationFile;
+    private Boolean showBytesOnGraph;
     
     private AbstractMemoryMapParser chosenParser;
     private List<MemoryMapGroup> groups;
-    
+    private List<MemoryMapGraphConfiguration> graphConfiguration;
+        
     @Override
     public BuildStepMonitor getRequiredMonitorService() {
         return BuildStepMonitor.BUILD;
     }
     
     @DataBoundConstructor
-    public MemoryMapRecorder(AbstractMemoryMapParser chosenParser, List<MemoryMapGroup> groups, int ramCapacity, int flashCapacity, String configurationFile) {
+    public MemoryMapRecorder(AbstractMemoryMapParser chosenParser, List<MemoryMapGroup> groups, int ramCapacity, int flashCapacity, String configurationFile, Boolean showBytesOnGraph) {
         this.chosenParser = chosenParser;
         this.ramCapacity = ramCapacity;
         this.flashCapacity = flashCapacity;
         this.groups = groups;
-        this.configurationFile = configurationFile;              
+        this.configurationFile = configurationFile;        
+        this.showBytesOnGraph = showBytesOnGraph;
+        
     }
     
     @Override
@@ -87,7 +92,6 @@ public class MemoryMapRecorder extends Recorder {
         boolean failed = false;
         PrintStream out = listener.getLogger();
                 
-        List<MemoryMapParsingResult> res = new LinkedList<MemoryMapParsingResult>();
         MemoryMapConfigMemory config = null;
         
         String version = Hudson.getInstance().getPlugin( "memory-map" ).getWrapper().getVersion();
@@ -95,29 +99,33 @@ public class MemoryMapRecorder extends Recorder {
         
         try { 
             chosenParser.setConfigurationFile(configurationFile);
-            config = build.getWorkspace().act(new MemoryMapConfigFileParserDelegate(chosenParser));
-            res = build.getWorkspace().act(new MemoryMapMapParserDelegate(chosenParser, config));
+            config = build.getWorkspace().act(new MemoryMapConfigFileParserDelegate(graphConfiguration, chosenParser));
+            config = build.getWorkspace().act(new MemoryMapMapParserDelegate(chosenParser, config));
         } catch(IOException ex) {
             ex.printStackTrace(out);
-            out.println(ex.getCause().getMessage());
+            //out.println(ex.getCause().getMessage());
             failed = true;
         }
         //TODO:Remove before release
+        out.println("Printing graph configuration");
+        out.println(graphConfiguration);
         out.println("Printing configuration");
         out.println(chosenParser.getConfigurationFile());
         if(config != null) {
+            out.println("== Configuration start ==");
             out.println(config.toString());
+            out.println("== Configuration end ==");
         }
+        
+        
         //
-
-        for(MemoryMapParsingResult result : res) {
-            out.println(result);
-        }        
+  
         /*
          * Create a build action and store the result.
          */
-        MemoryMapBuildAction mmba = new MemoryMapBuildAction(build, config, res);
+        MemoryMapBuildAction mmba = new MemoryMapBuildAction(build, config);
         mmba.setRecorder(this);
+        mmba.setMemoryMapConfig(config);        
         
         if(failed) {
             build.setResult(Result.FAILURE);
@@ -125,7 +133,7 @@ public class MemoryMapRecorder extends Recorder {
         }
         
         
-        
+        /*
         boolean validFlashCapacity = mmba.validateThreshold(getFlashCapacity(), MemoryMapGroup.defaultFlashGroup());
         int flashCount = mmba.sumOfValues(MemoryMapGroup.defaultFlashGroup());
         
@@ -151,7 +159,7 @@ public class MemoryMapRecorder extends Recorder {
         if(validRamCapacity && validFlashCapacity) {
             out.println("Ram and flash usage within capacity");
         }
-        
+        */
         build.getActions().add(mmba);
         
         return true;        
@@ -245,6 +253,34 @@ public class MemoryMapRecorder extends Recorder {
     public void setConfigurationFile(String configurationFile) {
         this.configurationFile = configurationFile;
     }
+
+    /**
+     * @return the graphConfiguration
+     */    
+    public List<MemoryMapGraphConfiguration> getGraphConfiguration() {
+        return graphConfiguration;
+    }
+
+    /**
+     * @param graphConfiguration the graphConfiguration to set
+     */
+    public void setGraphConfiguration(List<MemoryMapGraphConfiguration> graphConfiguration) {
+        this.graphConfiguration = graphConfiguration;
+    }
+
+    /**
+     * @return the showBytesOnGraph
+     */
+    public Boolean getShowBytesOnGraph() {
+        return showBytesOnGraph;
+    }
+
+    /**
+     * @param showBytesOnGraph the showBytesOnGraph to set
+     */
+    public void setShowBytesOnGraph(Boolean showBytesOnGraph) {
+        this.showBytesOnGraph = showBytesOnGraph;
+    }
     
     @Extension
     public static final class DescriptorImpl extends BuildStepDescriptor<Publisher> {
@@ -293,6 +329,13 @@ public class MemoryMapRecorder extends Recorder {
         public Publisher newInstance(StaplerRequest req, JSONObject formData) throws FormException {
             MemoryMapRecorder instance = req.bindJSON(MemoryMapRecorder.class, formData);
             List<MemoryMapGroup> groups = req.bindParametersToList(MemoryMapGroup.class, "group.");
+             
+            List<MemoryMapGraphConfiguration> graphConfiguration = req.bindParametersToList(MemoryMapGraphConfiguration.class, "graph.config.");
+            if(graphConfiguration != null) {
+                System.out.println(formData);
+                System.out.println("Graph configuration: "+graphConfiguration);
+                instance.setGraphConfiguration(graphConfiguration);
+            }
             instance.setGroups(groups);
             save();
             return instance;

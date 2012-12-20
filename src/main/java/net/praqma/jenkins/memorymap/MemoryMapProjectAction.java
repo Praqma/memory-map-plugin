@@ -28,6 +28,9 @@ import hudson.model.AbstractProject;
 import hudson.model.Actionable;
 import hudson.model.ProminentProjectAction;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfiguration;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 
@@ -38,11 +41,6 @@ import org.kohsuke.stapler.StaplerResponse;
 public class MemoryMapProjectAction extends Actionable implements ProminentProjectAction {
     public static final String ICON_NAME="/plugin/memory-map/images/64x64/memory.png";
     private AbstractProject<?,?> project;
-        
-    public enum GraphCategories {
-        Flash,
-        Ram 
-    }
     
     public MemoryMapProjectAction(AbstractProject<?,?> project) {
         this.project = project;
@@ -76,11 +74,11 @@ public class MemoryMapProjectAction extends Actionable implements ProminentProje
     }
     
     //Gets the last 'applicable' build action from project. That is a bui
-    public MemoryMapBuildAction getLastApplicableMemmoryMapResult() {
+    public MemoryMapBuildAction getLastApplicableMemoryMapResult() {
         AbstractBuild<?,?> build = project.getLastCompletedBuild();
         while(build != null) {
             MemoryMapBuildAction mmba = build.getAction(MemoryMapBuildAction.class);
-            if(mmba != null && mmba.getResults().size() > 0) {
+            if(mmba != null && mmba.isValidConfigurationWithData()) {
                 return mmba;
             }
             build = build.getPreviousBuild();
@@ -91,11 +89,36 @@ public class MemoryMapProjectAction extends Actionable implements ProminentProje
         
     
     public void doDrawMemoryMapUsageGraph(StaplerRequest req, StaplerResponse rsp) throws IOException {
-        getLastApplicableMemmoryMapResult().doDrawMemoryMapUsageGraph(req, rsp);
+        if(getLastApplicableMemoryMapResult() != null) {
+            getLastApplicableMemoryMapResult().doDrawMemoryMapUsageGraph(req, rsp);
+        }
     }
     
-    public GraphCategories[] getCategories() {        
-        return GraphCategories.values();
+    public List<String> getGraphTitles() {
+        ArrayList<String> titles = new ArrayList<String>();
+        MemoryMapBuildAction mmba = getLastApplicableMemoryMapResult();
+        if(mmba != null) {
+
+            List<MemoryMapGraphConfiguration> configs = mmba.getRecorder().getGraphConfiguration();
+            for (MemoryMapGraphConfiguration conf : configs) {
+                titles.add(conf.getGraphCaption());
+            }
+        }
+        
+        return titles;
+    }
+    
+    public String getAssociatedProgramMemoryAreas(String graphTitle) {
+        MemoryMapBuildAction mmba = getLastApplicableMemoryMapResult();
+        String res = null;
+        
+        List<MemoryMapGraphConfiguration> configs = mmba.getRecorder().getGraphConfiguration();
+        for (MemoryMapGraphConfiguration conf : configs) {
+            if(conf.getGraphCaption().equals(graphTitle)) {
+                res = conf.getGraphDataList();
+            }
+        }
+        return res;
     }
 }
 

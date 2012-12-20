@@ -33,7 +33,7 @@ import java.util.List;
 public class MemoryMapConfigMemoryItem implements Serializable {
     private String name;
     private String origin;
-    private String length;
+    private String length; 
     private String used = "";
     private String unused = "";    
     private List<MemoryMapConfigMemoryItem> associatedSections;
@@ -41,13 +41,13 @@ public class MemoryMapConfigMemoryItem implements Serializable {
     public MemoryMapConfigMemoryItem() {} 
     
     public MemoryMapConfigMemoryItem(String name, String origin, String length) {
-        this.name = name;
+        this.name = name != null ? name.trim() : "";
         this.origin = origin;
         this.length = length;
     }
     
     public MemoryMapConfigMemoryItem(String name, String origin, String length, String used, String unused) {
-        this.name = name;
+        this.name = name != null ? name.trim() : "";
         this.origin = origin;
         this.length = length;
         this.unused = unused;
@@ -65,7 +65,7 @@ public class MemoryMapConfigMemoryItem implements Serializable {
      * @param name the name to set
      */
     public void setName(String name) {
-        this.name = name;
+        this.name = name != null ? name.trim() : "";
     }
 
     /**
@@ -112,7 +112,7 @@ public class MemoryMapConfigMemoryItem implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("%s [origin = 0x%s, length = 0x%s, used = 0x%s, unused = 0x%s]", getName(), getOrigin(), getLength(), getUsed(), getUnused());
+        return String.format("%s [origin = %s, length = %s, used = %s, unused = %s]", getName(), getOrigin(), getLength(), getUsed(), getUnused());
     }      
 
     /**
@@ -141,5 +141,15 @@ public class MemoryMapConfigMemoryItem implements Serializable {
      */
     public void setUnused(String unused) {
         this.unused = unused;
+    }
+    
+    public boolean addChild(String parentName, MemoryMapConfigMemoryItem item) {
+        for(MemoryMapConfigMemoryItem it : getAssociatedSections()) {
+            if(it.name.equals(parentName)) {
+                it.getAssociatedSections().add(item);
+                return true;
+            }
+        }
+        return false;
     }
 }
