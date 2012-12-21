@@ -28,16 +28,33 @@ package net.praqma.jenkins.memorymap.util;
  * @author Praqma
  */
 public class HexUtils {
-    public static Integer bitCount(String hexString, int wordSize) {
-        return HexUtils.getRadix(hexString, 16);
+    
+    private static final int HEXA_RADIX = 16;
+    private static final int BITS_PER_BYTE = 8;
+    private static final double KILO = 1024;
+    
+    public static double wordCount(String hexString, int wordSize) {
+        return HexUtils.getRadix(hexString, wordSize);
     }
     
-    public static int byteCount(String hexString, int wordSize) {
-        return HexUtils.bitCount(hexString, wordSize) / 8;
+    public static double kiloWordCount(String hexString, int wordSize) {
+        return HexUtils.wordCount(hexString, wordSize) / KILO;
     }
     
-    private static Integer getRadix(String hexString, int radix) {
-        Integer i = Integer.parseInt(hexString.replace("0x",""), radix);
+    public static double bitCount(String hexString, int wordSize) {
+        return HexUtils.getRadix(hexString, HEXA_RADIX)*wordSize;
+    }
+    
+    public static double byteCount(String hexString, int wordSize) {
+        return HexUtils.bitCount(hexString, wordSize) / BITS_PER_BYTE;
+    }
+    
+    public static double kiloByteCount(String hexString, int wordSize) {
+        return HexUtils.byteCount(hexString, wordSize) / KILO;
+    }
+    
+    private static double getRadix(String hexString, int radix) {
+        Double i = (double)(Integer.parseInt(hexString.replace("0x",""), radix));
         return i;
     }
 }

@@ -188,12 +188,9 @@ public class MemoryMapBuildAction implements Action {
         
         List<ValueMarker> markers = new ArrayList<ValueMarker>();
 
-        int max = Integer.MIN_VALUE;
-        boolean markersMarked = false;
+        double max = Double.MIN_VALUE;
         Set<String> drawnMarker = new HashSet<String>();
-        
-        
-        
+
         for(MemoryMapBuildAction membuild = this; membuild != null; membuild = membuild.getPreviousAction()) {            
             ChartUtil.NumberOnlyBuildLabel label = new ChartUtil.NumberOnlyBuildLabel(membuild.build);
             MemoryMapConfigMemory result = membuild.getMemoryMapConfig();
@@ -201,11 +198,11 @@ public class MemoryMapBuildAction implements Action {
             
             for(MemoryMapConfigMemoryItem res : result) {
                 if(memberList.contains(res.getName())) {                    
-                    int value = HexUtils.bitCount(res.getUsed(), getRecorder().getWordSize());
-                    int byteValue = HexUtils.byteCount(res.getUsed(), getRecorder().getWordSize());
-                    int maxx = HexUtils.bitCount(res.getLength(), getRecorder().getWordSize());
+                    double value = HexUtils.kiloWordCount(res.getUsed(), getRecorder().getWordSize());
+                    double byteValue = HexUtils.kiloByteCount(res.getUsed(), getRecorder().getWordSize());
+                    double maxx = HexUtils.kiloWordCount(res.getLength(), getRecorder().getWordSize());
                     if(getRecorder().getShowBytesOnGraph()) {
-                        maxx = HexUtils.byteCount(res.getLength(), getRecorder().getWordSize());
+                        maxx = HexUtils.kiloByteCount(res.getLength(), getRecorder().getWordSize());
                     }
                     
                     if(getRecorder().getShowBytesOnGraph()) {
@@ -234,10 +231,9 @@ public class MemoryMapBuildAction implements Action {
                 
                 }
             }
-            markersMarked = true;
         }
 
-        JFreeChart chart = createPairedBarCharts(graphTitle, getRecorder().getShowBytesOnGraph() ? "Bytes" : "Words", (int)((double)max*1.10), 0, dataset.build(), markers);
+        JFreeChart chart = createPairedBarCharts(graphTitle, getRecorder().getShowBytesOnGraph() ? "kB" : "kWords", max*1.1d , 0d, dataset.build(), markers);
          
         chart.setBackgroundPaint(Color.WHITE);
         chart.getLegend().setPosition( RectangleEdge.BOTTOM );
@@ -285,7 +281,7 @@ public class MemoryMapBuildAction implements Action {
         return chart;
     }
     
-    protected JFreeChart createPairedBarCharts(String title, String yaxis, int max, int min, CategoryDataset dataset, List<ValueMarker> markers) {
+    protected JFreeChart createPairedBarCharts(String title, String yaxis, double max, double min, CategoryDataset dataset, List<ValueMarker> markers) {
         final CategoryAxis domainAxis = new ShiftedCategoryAxis(null);
         final NumberAxis rangeAxis = new NumberAxis(yaxis);
         rangeAxis.setStandardTickUnits( NumberAxis.createIntegerTickUnits() );
