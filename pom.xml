@@ -99,7 +99,7 @@
     
     <scm>
         <connection>scm:git:http://github.com/Praqma/memory-map-plugin.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com:Praqma/memory-map-plugin.git</developerConnection>
+        <developerConnection>scm:git:ssh://git@github.com/Praqma/memory-map-plugin.git</developerConnection>
         <url>https://github.com/Praqma/memory-map-plugin.git</url>
     </scm>
 </project>
