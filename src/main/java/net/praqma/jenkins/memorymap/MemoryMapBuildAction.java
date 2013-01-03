@@ -233,7 +233,7 @@ public class MemoryMapBuildAction implements Action {
             }
         }
 
-        JFreeChart chart = createPairedBarCharts(graphTitle, getRecorder().getShowBytesOnGraph() ? "kB" : "kWords", max*1.1d , 0d, dataset.build(), markers);
+        JFreeChart chart = createPairedBarCharts(graphTitle, getRecorder().getShowBytesOnGraph() ? "kBytes" : "kWords", max*1.1d , 0d, dataset.build(), markers);
          
         chart.setBackgroundPaint(Color.WHITE);
         chart.getLegend().setPosition( RectangleEdge.BOTTOM );
