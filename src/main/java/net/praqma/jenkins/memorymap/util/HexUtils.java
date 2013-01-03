@@ -34,23 +34,19 @@ public class HexUtils {
     private static final double KILO = 1024;
     
     public static double wordCount(String hexString, int wordSize) {
-        return HexUtils.getRadix(hexString, wordSize);
+        return HexUtils.getRadix(hexString, HEXA_RADIX);
     }
     
     public static double kiloWordCount(String hexString, int wordSize) {
-        return HexUtils.wordCount(hexString, wordSize) / KILO;
+        return HexUtils.wordCount(hexString, HEXA_RADIX) / KILO;
     }
-    
-    public static double bitCount(String hexString, int wordSize) {
-        return HexUtils.getRadix(hexString, HEXA_RADIX)*wordSize;
-    }
-    
+       
     public static double byteCount(String hexString, int wordSize) {
-        return HexUtils.bitCount(hexString, wordSize) / BITS_PER_BYTE;
+        return HexUtils.wordCount(hexString, HEXA_RADIX) * (wordSize / BITS_PER_BYTE);
     }
     
     public static double kiloByteCount(String hexString, int wordSize) {
-        return HexUtils.byteCount(hexString, wordSize) / KILO;
+        return HexUtils.byteCount(hexString, HEXA_RADIX) / KILO;
     }
     
     private static double getRadix(String hexString, int radix) {
