@@ -10,6 +10,7 @@
     <version>0.1.3-SNAPSHOT</version>
     <packaging>hpi</packaging>
     <name>Memory Map Plugin</name>
+    <url>https://wiki.jenkins-ci.org/display/JENKINS/memory+map+plugin</url>
     <build>
         <plugins>
             <plugin>
