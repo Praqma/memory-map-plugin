@@ -23,6 +23,7 @@
  */
 package net.praqma.jenkins.memorymap;
 
+import com.sun.jna.StringArray;
 import hudson.Extension;
 import hudson.Launcher;
 import hudson.model.AbstractBuild;
@@ -36,8 +37,10 @@ import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
 import hudson.tasks.Recorder;
 import hudson.util.FormValidation;
+import hudson.util.ListBoxModel;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
 import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfiguration;
@@ -64,7 +67,7 @@ public class MemoryMapRecorder extends Recorder {
     
     private String configurationFile;
     private boolean showBytesOnGraph;
-    
+    public final String scale;
     private AbstractMemoryMapParser chosenParser;
     private List<MemoryMapGraphConfiguration> graphConfiguration;
         
@@ -74,11 +77,12 @@ public class MemoryMapRecorder extends Recorder {
     }
     
     @DataBoundConstructor
-    public MemoryMapRecorder(AbstractMemoryMapParser chosenParser, String configurationFile, boolean showBytesOnGraph, String wordSize) {
+    public MemoryMapRecorder(AbstractMemoryMapParser chosenParser, String configurationFile, boolean showBytesOnGraph, String wordSize, final String scale ) {
         this.chosenParser = chosenParser;
         this.configurationFile = configurationFile;        
         this.showBytesOnGraph = showBytesOnGraph;
-        this.wordSize = StringUtils.isBlank(wordSize) ? 16 : Integer.parseInt(wordSize);        
+        this.wordSize = StringUtils.isBlank(wordSize) ? 16 : Integer.parseInt(wordSize);   
+        this.scale = scale;
     }
     
     @Override
@@ -240,6 +244,23 @@ public class MemoryMapRecorder extends Recorder {
             super(MemoryMapRecorder.class);
             load();
         }
+        
+        private List<String> getScales(){
+            List<String> scales = new ArrayList<String>();
+            scales.add("kilo");
+            scales.add("Mega");
+            scales.add("Giga");
+            return scales;
+        }
+        
+         public ListBoxModel doFillScaleItems() {
+            ListBoxModel items = new ListBoxModel();
+            for (String scale : getScales()) {
+                items.add(scale);
+            }
+            return items;
+        }
+        
     }
     
     @Override

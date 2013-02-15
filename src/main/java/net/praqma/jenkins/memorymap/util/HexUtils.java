@@ -23,6 +23,9 @@
  */
 package net.praqma.jenkins.memorymap.util;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  *
  * @author Praqma
@@ -31,24 +34,28 @@ public class HexUtils {
     
     private static final int HEXA_RADIX = 16;
     private static final int BITS_PER_BYTE = 8;
+    
+    
     private static final double KILO = 1024;
+    private static final double MEGA = KILO*1024;
+    private static final double GIGA = MEGA*1024;
+        
+    private static final Map<String, Double> scale = new HashMap<String, Double>();
     
-    public static double wordCount(String hexString, int wordSize) {
-        return HexUtils.getRadix(hexString, HEXA_RADIX);
+    static {
+        scale.put("kilo", KILO);
+        scale.put("mega", MEGA);
+        scale.put("giga", GIGA);
     }
-    
-    public static double kiloWordCount(String hexString, int wordSize) {
-        return HexUtils.wordCount(hexString, HEXA_RADIX) / KILO;
+           
+    public static double wordCount(String hexString, int wordSize, String scale) {
+        return (HexUtils.getRadix(hexString, HEXA_RADIX)) / HexUtils.scale.get(scale.toLowerCase());
     }
        
-    public static double byteCount(String hexString, int wordSize) {
-        return HexUtils.wordCount(hexString, HEXA_RADIX) * (wordSize / BITS_PER_BYTE);
+    public static double byteCount(String hexString, int wordSize, String  scale) {
+        return HexUtils.wordCount(hexString, HEXA_RADIX, scale) * (wordSize / BITS_PER_BYTE);
     }
-    
-    public static double kiloByteCount(String hexString, int wordSize) {
-        return HexUtils.byteCount(hexString, HEXA_RADIX) / KILO;
-    }
-    
+     
     private static double getRadix(String hexString, int radix) {
         Double i = (double)(Integer.parseInt(hexString.replace("0x",""), radix));
         return i;

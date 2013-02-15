@@ -35,6 +35,7 @@ import java.awt.Font;
 import java.awt.GraphicsConfiguration;
 import java.awt.Paint;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -51,6 +52,8 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.CategoryLabelPositions;
 import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.axis.NumberTickUnit;
+import org.jfree.chart.axis.StandardTickUnitSource;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.ValueMarker;
@@ -190,19 +193,23 @@ public class MemoryMapBuildAction implements Action {
 
         double max = Double.MIN_VALUE;
         Set<String> drawnMarker = new HashSet<String>();
-
+        
+        String scale = getRecorder().scale;
+        
         for(MemoryMapBuildAction membuild = this; membuild != null; membuild = membuild.getPreviousAction()) {            
             ChartUtil.NumberOnlyBuildLabel label = new ChartUtil.NumberOnlyBuildLabel(membuild.build);
             MemoryMapConfigMemory result = membuild.getMemoryMapConfig();
             
             
+            
             for(MemoryMapConfigMemoryItem res : result) {
-                if(memberList.contains(res.getName())) {                    
-                    double value = HexUtils.kiloWordCount(res.getUsed(), getRecorder().getWordSize());
-                    double byteValue = HexUtils.kiloByteCount(res.getUsed(), getRecorder().getWordSize());
-                    double maxx = HexUtils.kiloWordCount(res.getLength(), getRecorder().getWordSize());
+                if(memberList.contains(res.getName())) {     
+                    
+                    double value = HexUtils.wordCount(res.getUsed(), getRecorder().getWordSize(), scale);
+                    double byteValue = HexUtils.byteCount(res.getUsed(), getRecorder().getWordSize(), scale);
+                    double maxx = HexUtils.wordCount(res.getLength(), getRecorder().getWordSize(), scale);
                     if(getRecorder().getShowBytesOnGraph()) {
-                        maxx = HexUtils.kiloByteCount(res.getLength(), getRecorder().getWordSize());
+                        maxx = HexUtils.byteCount(res.getLength(), getRecorder().getWordSize(), scale);
                     }
                     
                     if(getRecorder().getShowBytesOnGraph()) {
@@ -233,53 +240,28 @@ public class MemoryMapBuildAction implements Action {
             }
         }
 
-        JFreeChart chart = createPairedBarCharts(graphTitle, getRecorder().getShowBytesOnGraph() ? "kBytes" : "kWords", max*1.1d , 0d, dataset.build(), markers);
+        
+        String s = "";
+        if(scale.equalsIgnoreCase("kilo")){
+            s = "k";
+        }else if(scale.equalsIgnoreCase("mega")){
+            s = "M";
+        }else if(scale.equalsIgnoreCase("giga")){
+            s= "G";
+        }
+        
+        String byteLegend = s+"Bytes";
+        String wordLegend = s+"Words";
+        
+        String legend = getRecorder().getShowBytesOnGraph() ? byteLegend : wordLegend;
+                
+        JFreeChart chart = createPairedBarCharts(graphTitle, legend, max*1.1d , 0d, dataset.build(), markers);
          
         chart.setBackgroundPaint(Color.WHITE);
         chart.getLegend().setPosition( RectangleEdge.BOTTOM );
         ChartUtil.generateGraph( req, rsp, chart, w, h );     
     }    
-    
-    /**
-     * The simplest way to represent the threshold boundary. Use the same plot type as the parent plots. 
-     * @param title
-     * @param yaxis
-     * @param max
-     * @param min
-     * @param dataset
-     * @return 
-     */
-    protected JFreeChart createStackedCharts(String title, String yaxis, int max, int min, CategoryDataset dataset, List<ValueMarker> markers) {
-        final CategoryAxis domainAxis = new ShiftedCategoryAxis(null);
-        final NumberAxis rangeAxis = new NumberAxis(yaxis);
-        rangeAxis.setStandardTickUnits( NumberAxis.createIntegerTickUnits() );
-        rangeAxis.setUpperBound( max );
-        rangeAxis.setLowerBound( min );
-        
-        StackedAreaRenderer2 renderer = new StackedAreaRenderer2();
 
-        CategoryPlot plot = new CategoryPlot(dataset, domainAxis, rangeAxis, renderer);
-        plot.setDomainAxis( domainAxis );
-        domainAxis.setCategoryLabelPositions( CategoryLabelPositions.UP_90 );
-        domainAxis.setLowerMargin( 0.0 );
-        domainAxis.setUpperMargin( 0.0 );
-        domainAxis.setCategoryMargin( 0.0 );
-
-        plot.setOrientation(PlotOrientation.VERTICAL);
-        plot.setBackgroundPaint( Color.WHITE );
-        plot.setOutlinePaint( null );
-        plot.setRangeGridlinesVisible( true );
-        plot.setRangeGridlinePaint( Color.black );
-        plot.setInsets( new RectangleInsets( 5.0, 0, 0, 5.0 ) );
-
-        for(ValueMarker mkr : markers) {
-            plot.addRangeMarker(mkr);
-        }       
-
-        JFreeChart chart = new JFreeChart(plot);
-        chart.setTitle(title);
-        return chart;
-    }
     
     protected JFreeChart createPairedBarCharts(String title, String yaxis, double max, double min, CategoryDataset dataset, List<ValueMarker> markers) {
         final CategoryAxis domainAxis = new ShiftedCategoryAxis(null);
@@ -287,7 +269,18 @@ public class MemoryMapBuildAction implements Action {
         rangeAxis.setStandardTickUnits( NumberAxis.createIntegerTickUnits() );
         rangeAxis.setUpperBound( max );
         rangeAxis.setLowerBound( min );
-
+        /*TODO : wrong scale choosen - Jes
+         * if the user selects Mega or Giga as the scale, but there only are 
+         * a couple of Kilo in the graph it would have no ticks on the axis.
+         * this can be solved by. redefining the ticks,
+         * We have not done this because it's a bit tricky to figure out the rigth 
+         * factor to devid with
+         * 
+         * but the method wuld be 
+         * double factor = 10
+         * rangeAxis.setStandardTickUnits(new StandardTickUnitSource(max / factor));
+        */
+        
         //StackedAreaRenderer2 renderer = new StackedAreaRenderer2();
         BarRenderer renderer = new BarRenderer();
 
