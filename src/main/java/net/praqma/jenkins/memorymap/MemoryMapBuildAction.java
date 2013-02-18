@@ -23,6 +23,7 @@
  */
 package net.praqma.jenkins.memorymap;
 
+import groovy.ui.Console;
 import hudson.model.AbstractBuild;
 import hudson.model.Action;
 import hudson.util.ChartUtil;
@@ -47,6 +48,7 @@ import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemoryItem;
 import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
 import net.praqma.jenkins.memorymap.util.HexUtils;
+import org.apache.commons.jelly.tags.core.ForEachTag;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.CategoryAxis;
@@ -74,15 +76,15 @@ import org.kohsuke.stapler.StaplerResponse;
 public class MemoryMapBuildAction implements Action {
 
     private MemoryMapConfigMemory memoryMapConfig;
-    private AbstractBuild<?,?> build;
+    private AbstractBuild<?, ?> build;
     private MemoryMapRecorder recorder;
-    
-    public MemoryMapBuildAction(AbstractBuild<?,?> build, MemoryMapConfigMemory memoryMapConfig) {
+
+    public MemoryMapBuildAction(AbstractBuild<?, ?> build, MemoryMapConfigMemory memoryMapConfig) {
         this.build = build;
         this.memoryMapConfig = memoryMapConfig;
-        
+
     }
-    
+
     @Override
     public String getIconFileName() {
         return null;
@@ -97,7 +99,7 @@ public class MemoryMapBuildAction implements Action {
     public String getUrlName() {
         return null;
     }
-    
+
     /**
      * Returns an indication wheather as to the requirements are met. You do one check per set of values you wish to compare. 
      * 
@@ -108,167 +110,181 @@ public class MemoryMapBuildAction implements Action {
     public boolean validateThreshold(int threshold, String... valuenames) {
         return sumOfValues(valuenames) <= threshold;
     }
-    
+
     public boolean validateThreshold(int threshold, List<String> valuenames) {
         return sumOfValues(valuenames) <= threshold;
     }
-    
-    public int sumOfValues(String... valuenames) { 
+
+    public int sumOfValues(String... valuenames) {
         int sum = 0;
         /*
         for(MemoryMapParsingResult res : getResults()) {
-            for(String s : valuenames) {
-                if(res.getName().equals(s)) {
-                    sum+=res.getValue();
-                }
-            }
+        for(String s : valuenames) {
+        if(res.getName().equals(s)) {
+        sum+=res.getValue();
         }
-        */
+        }
+        }
+         */
         return sum;
     }
-    
-    public int sumOfValues(List<String> values) { 
+
+    public int sumOfValues(List<String> values) {
         int sum = 0;
         /*
         for(MemoryMapParsingResult res : getResults()) {
-            for(String s : values) {
-                if(res.getName().equals(s)) {
-                    sum+=res.getValue();
-                }
-            }
+        for(String s : values) {
+        if(res.getName().equals(s)) {
+        sum+=res.getValue();
         }
-        */
+        }
+        }
+         */
         return sum;
     }
-    
+
     /**
      * Fetches the previous MemoryMap build. Takes all succesful, but failed builds. 
      * 
      * Goes to the end of list.
-     */ 
-    public MemoryMapBuildAction getPreviousAction(AbstractBuild<?,?> base) {
+     */
+    public MemoryMapBuildAction getPreviousAction(AbstractBuild<?, ?> base) {
         MemoryMapBuildAction action = null;
-        AbstractBuild<?,?> start = base;
-        while(true) {
+        AbstractBuild<?, ?> start = base;
+        while (true) {
             start = start.getPreviousCompletedBuild();
-            if(start == null) {
+            if (start == null) {
                 return null;
             }
-            action = start.getAction(MemoryMapBuildAction.class);            
-            if(action != null) {
-                return action;
-            }
-        }
-    }
-    
-    public MemoryMapBuildAction getPreviousAction() {
-        MemoryMapBuildAction action = null;
-        AbstractBuild<?,?> start = build;
-        while(true) {
-            start = start.getPreviousCompletedBuild();
-            if(start == null) {
-                return null;
-            }
-            action = start.getAction(MemoryMapBuildAction.class);            
-            
-            if(action != null && (action.isValidConfigurationWithData())) {
+            action = start.getAction(MemoryMapBuildAction.class);
+            if (action != null) {
                 return action;
             }
         }
     }
 
+    public MemoryMapBuildAction getPreviousAction() {
+        MemoryMapBuildAction action = null;
+        AbstractBuild<?, ?> start = build;
+        while (true) {
+            start = start.getPreviousCompletedBuild();
+            if (start == null) {
+                return null;
+            }
+            action = start.getAction(MemoryMapBuildAction.class);
+
+            if (action != null && (action.isValidConfigurationWithData())) {
+                return action;
+            }
+        }
+    }
 
     public void doDrawMemoryMapUsageGraph(StaplerRequest req, StaplerResponse rsp) throws IOException {
         DataSetBuilder<String, ChartUtil.NumberOnlyBuildLabel> dataset = new DataSetBuilder<String, ChartUtil.NumberOnlyBuildLabel>();
-        
+
         String members = req.getParameter("categories");
         String graphTitle = req.getParameter("title");
-        
+
         int w = Integer.parseInt(req.getParameter("width"));
         int h = Integer.parseInt(req.getParameter("height"));
-        
+
         List<String> memberList = Arrays.asList(members.split(","));
+        //TODO Trim spaces on items
+        
         
         List<ValueMarker> markers = new ArrayList<ValueMarker>();
 
         double max = Double.MIN_VALUE;
         Set<String> drawnMarker = new HashSet<String>();
-        
+
         String scale = getRecorder().scale;
-        
-        for(MemoryMapBuildAction membuild = this; membuild != null; membuild = membuild.getPreviousAction()) {            
+
+        for (MemoryMapBuildAction membuild = this; membuild != null; membuild = membuild.getPreviousAction()) {
             ChartUtil.NumberOnlyBuildLabel label = new ChartUtil.NumberOnlyBuildLabel(membuild.build);
             MemoryMapConfigMemory result = membuild.getMemoryMapConfig();
-            
-            
-            
-            for(MemoryMapConfigMemoryItem res : result) {
-                if(memberList.contains(res.getName())) {     
-                    
+
+            for (MemoryMapConfigMemoryItem res : result) {
+                if (memberList.contains(res.getName())) {
+
                     double value = HexUtils.wordCount(res.getUsed(), getRecorder().getWordSize(), scale);
                     double byteValue = HexUtils.byteCount(res.getUsed(), getRecorder().getWordSize(), scale);
                     double maxx = HexUtils.wordCount(res.getLength(), getRecorder().getWordSize(), scale);
-                    if(getRecorder().getShowBytesOnGraph()) {
+                    if (getRecorder().getShowBytesOnGraph()) {
                         maxx = HexUtils.byteCount(res.getLength(), getRecorder().getWordSize(), scale);
                     }
-                    
-                    if(getRecorder().getShowBytesOnGraph()) {
+
+                    if (getRecorder().getShowBytesOnGraph()) {
                         dataset.add(byteValue, res.getName(), label);
-                    } else {                    
+                    } else {
                         dataset.add(value, res.getName(), label);
                     }
-                    
-                    if(drawnMarker.add(res.getName())) {
-                        ValueMarker vm = new ValueMarker((double)maxx, Color.BLACK, new BasicStroke(
-                                    1.2f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER,
-                                    1.0f, new float[] {6.0f, 6.0f}, 0.0f
-                                    ));
-                        vm.setLabel(String.format("%s(max)", res.getName()));
-                        vm.setLabelOffset(new RectangleInsets(5, 50, -20, 5));
-                        vm.setLabelAnchor(RectangleAnchor.TOP_LEFT);
-                        vm.setPaint(Color.BLACK);
-                        vm.setOutlinePaint(Color.BLACK);
-                        vm.setAlpha(1.0f);
-                        markers.add(vm);
+
+                    boolean makeMarker = true;
+                    for (ValueMarker vm : markers) {
+                        if (maxx == vm.getValue() && !vm.getLabel().contains(res.getName())) {
+                            drawnMarker.add(vm.getLabel().replace("(MAX) - ", "") + " - " + res.getName());
+                            String s = vm.getLabel().replace("(MAX) - ", "");
+
+                            vm.setLabel(String.format("%s - %s", vm.getLabel(), res.getName()));
+                            //this is the size of cahrs used for setting the offset right
+                            double charSize = 1.3d;
+                            double i = vm.getLabel().length() * charSize;
+                            vm.setLabelOffset(new RectangleInsets(5, 70 + i, -60, 5));
+
+                            makeMarker = false;
+                        }
                     }
-                    
-                    if(maxx > max) {
+
+                    if (drawnMarker.add(res.getName()) ) {
+                        if (makeMarker) {
+                            ValueMarker vm = new ValueMarker((double) maxx, Color.BLACK, new BasicStroke(
+                                    1.2f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER,
+                                    1.0f, new float[]{6.0f, 6.0f}, 0.0f));
+
+                            vm.setLabel(String.format("(MAX) - %s", res.getName()));
+                            vm.setLabelOffset(new RectangleInsets(5, 50, -20, 5));
+                            vm.setLabelAnchor(RectangleAnchor.TOP_LEFT);
+                            vm.setPaint(Color.BLACK);
+                            vm.setOutlinePaint(Color.BLACK);
+                            vm.setAlpha(1.0f);
+                            markers.add(vm);
+                        }
+                    }
+
+                    if (maxx > max) {
                         max = maxx;
                     }
-                
                 }
             }
         }
 
-        
         String s = "";
-        if(scale.equalsIgnoreCase("kilo")){
+        if (scale.equalsIgnoreCase("kilo")) {
             s = "k";
-        }else if(scale.equalsIgnoreCase("mega")){
+        } else if (scale.equalsIgnoreCase("mega")) {
             s = "M";
-        }else if(scale.equalsIgnoreCase("giga")){
-            s= "G";
+        } else if (scale.equalsIgnoreCase("giga")) {
+            s = "G";
         }
-        
-        String byteLegend = s+"Bytes";
-        String wordLegend = s+"Words";
-        
-        String legend = getRecorder().getShowBytesOnGraph() ? byteLegend : wordLegend;
-                
-        JFreeChart chart = createPairedBarCharts(graphTitle, legend, max*1.1d , 0d, dataset.build(), markers);
-         
-        chart.setBackgroundPaint(Color.WHITE);
-        chart.getLegend().setPosition( RectangleEdge.BOTTOM );
-        ChartUtil.generateGraph( req, rsp, chart, w, h );     
-    }    
 
-    
+        String byteLegend = s + "Bytes";
+        String wordLegend = s + "Words";
+
+        String legend = getRecorder().getShowBytesOnGraph() ? byteLegend : wordLegend;
+
+        JFreeChart chart = createPairedBarCharts(graphTitle, legend, max * 1.1d, 0d, dataset.build(), markers);
+
+        chart.setBackgroundPaint(Color.WHITE);
+        chart.getLegend().setPosition(RectangleEdge.BOTTOM);
+        ChartUtil.generateGraph(req, rsp, chart, w, h);
+    }
+
     protected JFreeChart createPairedBarCharts(String title, String yaxis, double max, double min, CategoryDataset dataset, List<ValueMarker> markers) {
         final CategoryAxis domainAxis = new ShiftedCategoryAxis(null);
         final NumberAxis rangeAxis = new NumberAxis(yaxis);
-        rangeAxis.setStandardTickUnits( NumberAxis.createIntegerTickUnits() );
-        rangeAxis.setUpperBound( max );
-        rangeAxis.setLowerBound( min );
+        rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
+        rangeAxis.setUpperBound(max);
+        rangeAxis.setLowerBound(min);
         /*TODO : wrong scale choosen - Jes
          * if the user selects Mega or Giga as the scale, but there only are 
          * a couple of Kilo in the graph it would have no ticks on the axis.
@@ -279,74 +295,73 @@ public class MemoryMapBuildAction implements Action {
          * but the method wuld be 
          * double factor = 10
          * rangeAxis.setStandardTickUnits(new StandardTickUnitSource(max / factor));
-        */
-        
+         */
+
         //StackedAreaRenderer2 renderer = new StackedAreaRenderer2();
         BarRenderer renderer = new BarRenderer();
 
         CategoryPlot plot = new CategoryPlot(dataset, domainAxis, rangeAxis, renderer);
-        plot.setDomainAxis( domainAxis );
-        domainAxis.setCategoryLabelPositions( CategoryLabelPositions.UP_90 );
-        domainAxis.setLowerMargin( 0.0 );
-        domainAxis.setUpperMargin( 0.0 );
-        domainAxis.setCategoryMargin( 0.0 );
+        plot.setDomainAxis(domainAxis);
+        domainAxis.setCategoryLabelPositions(CategoryLabelPositions.UP_90);
+        domainAxis.setLowerMargin(0.0);
+        domainAxis.setUpperMargin(0.0);
+        domainAxis.setCategoryMargin(0.0);
 
         plot.setOrientation(PlotOrientation.VERTICAL);
-        plot.setBackgroundPaint( Color.WHITE );
-        plot.setOutlinePaint( null );
-        plot.setRangeGridlinesVisible( true );
-        plot.setRangeGridlinePaint( Color.black );
-        plot.setInsets( new RectangleInsets( 5.0, 0, 0, 5.0 ) );
+        plot.setBackgroundPaint(Color.WHITE);
+        plot.setOutlinePaint(null);
+        plot.setRangeGridlinesVisible(true);
+        plot.setRangeGridlinePaint(Color.black);
+        plot.setInsets(new RectangleInsets(5.0, 0, 0, 5.0));
 
-        for(ValueMarker mkr : markers) {
+        for (ValueMarker mkr : markers) {
             plot.addRangeMarker(mkr);
-        }       
+        }
 
         JFreeChart chart = new JFreeChart(plot);
         chart.setTitle(title);
         return chart;
     }
-    
-    
-    protected JFreeChart createChart( CategoryDataset dataset, String title, String yaxis, int max, int min ) {
-        final JFreeChart chart = ChartFactory.createStackedAreaChart( title, // chart                                                                                                                                       // title
-                        null, // unused
-                        yaxis, // range axis label
-                        dataset, // data
-                        PlotOrientation.VERTICAL, // orientation
-                        true, // include legend
-                        true, // tooltips
-                        false // urls
-        );
+
+    protected JFreeChart createChart(CategoryDataset dataset, String title, String yaxis, int max, int min) {
+        final JFreeChart chart = ChartFactory.createStackedAreaChart(title, // chart                                                                                                                                       // title
+                null, // unused
+                yaxis, // range axis label
+                dataset, // data
+                PlotOrientation.VERTICAL, // orientation
+                true, // include legend
+                true, // tooltips
+                false // urls
+                );
 
         final LegendTitle legend = chart.getLegend();
 
-        legend.setPosition( RectangleEdge.BOTTOM );
+        legend.setPosition(RectangleEdge.BOTTOM);
 
-        chart.setBackgroundPaint( Color.white );
+        chart.setBackgroundPaint(Color.white);
 
         final CategoryPlot plot = chart.getCategoryPlot();
 
-        plot.setBackgroundPaint( Color.WHITE );
-        plot.setOutlinePaint( null );
-        plot.setRangeGridlinesVisible( true );
-        plot.setRangeGridlinePaint( Color.black );
+        plot.setBackgroundPaint(Color.WHITE);
+        plot.setOutlinePaint(null);
+        plot.setRangeGridlinesVisible(true);
+        plot.setRangeGridlinePaint(Color.black);
 
-        CategoryAxis domainAxis = new ShiftedCategoryAxis( null );
-        plot.setDomainAxis( domainAxis );
-        domainAxis.setCategoryLabelPositions( CategoryLabelPositions.UP_90 );
-        domainAxis.setLowerMargin( 0.0 );
-        domainAxis.setUpperMargin( 0.0 );
-        domainAxis.setCategoryMargin( 0.0 );
+        CategoryAxis domainAxis = new ShiftedCategoryAxis(null);
+        plot.setDomainAxis(domainAxis);
+        domainAxis.setCategoryLabelPositions(CategoryLabelPositions.UP_90);
+        domainAxis.setLowerMargin(0.0);
+        domainAxis.setUpperMargin(0.0);
+        domainAxis.setCategoryMargin(0.0);
 
         final NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
-        rangeAxis.setStandardTickUnits( NumberAxis.createIntegerTickUnits() );
-        rangeAxis.setUpperBound( max );
-        rangeAxis.setLowerBound( min );
-        
+        rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
+        rangeAxis.setUpperBound(max);
+        rangeAxis.setLowerBound(min);
+
         final StackedAreaRenderer renderer = (StackedAreaRenderer) plot.getRenderer();
-        renderer.setBaseStroke( new BasicStroke( 2.0f ) );
-        plot.setInsets( new RectangleInsets( 5.0, 0, 0, 5.0 ) );
+        renderer.setBaseStroke(new BasicStroke(2.0f));
+        plot.setInsets(new RectangleInsets(5.0, 0, 0, 5.0));
         return chart;
     }
 
@@ -377,7 +392,7 @@ public class MemoryMapBuildAction implements Action {
     public void setMemoryMapConfig(MemoryMapConfigMemory memoryMapConfig) {
         this.memoryMapConfig = memoryMapConfig;
     }
-    
+
     public boolean isValidConfigurationWithData() {
         return memoryMapConfig != null && memoryMapConfig.size() >= 1;
     }
