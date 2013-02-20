@@ -152,4 +152,15 @@ public class MemoryMapConfigMemoryItem implements Serializable {
         }
         return false;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof  MemoryMapConfigMemoryItem){
+            MemoryMapConfigMemoryItem item = (MemoryMapConfigMemoryItem)obj;
+         if(item.name.equals(this.name))   {
+             return true;
+         }
+        }
+        return false;
+    }
 }

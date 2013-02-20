@@ -23,39 +23,27 @@
  */
 package net.praqma.jenkins.memorymap;
 
-import groovy.ui.Console;
 import hudson.model.AbstractBuild;
 import hudson.model.Action;
 import hudson.util.ChartUtil;
 import hudson.util.DataSetBuilder;
 import hudson.util.ShiftedCategoryAxis;
-import hudson.util.StackedAreaRenderer2;
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Font;
-import java.awt.GraphicsConfiguration;
-import java.awt.Paint;
 import java.io.IOException;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfiguration;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemoryItem;
-import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
 import net.praqma.jenkins.memorymap.util.HexUtils;
-import org.apache.commons.jelly.tags.core.ForEachTag;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.CategoryLabelPositions;
 import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.axis.NumberTickUnit;
-import org.jfree.chart.axis.StandardTickUnitSource;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.ValueMarker;
@@ -75,6 +63,7 @@ import org.kohsuke.stapler.StaplerResponse;
  */
 public class MemoryMapBuildAction implements Action {
 
+    private static final double labelOffset = 1.2d;
     private MemoryMapConfigMemory memoryMapConfig;
     private AbstractBuild<?, ?> build;
     private MemoryMapRecorder recorder;
@@ -189,9 +178,12 @@ public class MemoryMapBuildAction implements Action {
         int h = Integer.parseInt(req.getParameter("height"));
 
         List<String> memberList = Arrays.asList(members.split(","));
-        //TODO Trim spaces on items
-        
-        
+        List<List<String>> memberLists = new ArrayList<List<String>>();
+
+        for (String s : memberList) {
+            memberLists.add(Arrays.asList(s.split(" ")));
+        }
+
         List<ValueMarker> markers = new ArrayList<ValueMarker>();
 
         double max = Double.MIN_VALUE;
@@ -202,57 +194,68 @@ public class MemoryMapBuildAction implements Action {
         for (MemoryMapBuildAction membuild = this; membuild != null; membuild = membuild.getPreviousAction()) {
             ChartUtil.NumberOnlyBuildLabel label = new ChartUtil.NumberOnlyBuildLabel(membuild.build);
             MemoryMapConfigMemory result = membuild.getMemoryMapConfig();
+            MemoryMapConfigMemory resultBlacklist = new MemoryMapConfigMemory();
+            for (List<String> list : memberLists) {
+                double value = 0.0d;
+                double maxx = 0.0d;
+                String labelName = "";
+                for (MemoryMapConfigMemoryItem res : result) {
+                    if (list.contains(res.getName()) && !resultBlacklist.contains(res)) {
+                        resultBlacklist.add(res);
+                        if (labelName.equals("")) {
+                            labelName = res.getName();
+                        } else {
+                            labelName = String.format("%s+%s", labelName, res.getName());
+                        }
 
-            for (MemoryMapConfigMemoryItem res : result) {
-                if (memberList.contains(res.getName())) {
-
-                    double value = HexUtils.wordCount(res.getUsed(), getRecorder().getWordSize(), scale);
-                    double byteValue = HexUtils.byteCount(res.getUsed(), getRecorder().getWordSize(), scale);
-                    double maxx = HexUtils.wordCount(res.getLength(), getRecorder().getWordSize(), scale);
-                    if (getRecorder().getShowBytesOnGraph()) {
-                        maxx = HexUtils.byteCount(res.getLength(), getRecorder().getWordSize(), scale);
-                    }
-
-                    if (getRecorder().getShowBytesOnGraph()) {
-                        dataset.add(byteValue, res.getName(), label);
+                        if (getRecorder().getShowBytesOnGraph()) {
+                            maxx = maxx + HexUtils.byteCount(res.getLength(), getRecorder().getWordSize(), scale);
+                            value = value + HexUtils.byteCount(res.getUsed(), getRecorder().getWordSize(), scale);
+                        } else {
+                            maxx = maxx + HexUtils.wordCount(res.getLength(), getRecorder().getWordSize(), scale);
+                            value = value + HexUtils.wordCount(res.getUsed(), getRecorder().getWordSize(), scale);
+                        }
                     } else {
-                        dataset.add(value, res.getName(), label);
-                    }
-
-                    boolean makeMarker = true;
-                    for (ValueMarker vm : markers) {
-                        if (maxx == vm.getValue() && !vm.getLabel().contains(res.getName())) {
-                            drawnMarker.add(vm.getLabel().replace("(MAX) - ", "") + " - " + res.getName());
-                            String s = vm.getLabel().replace("(MAX) - ", "");
-
-                            vm.setLabel(String.format("%s - %s", vm.getLabel(), res.getName()));
-                            //this is the size of cahrs used for setting the offset right
-                            double charSize = 1.3d;
-                            double i = vm.getLabel().length() * charSize;
-                            vm.setLabelOffset(new RectangleInsets(5, 70 + i, -60, 5));
-
-                            makeMarker = false;
-                        }
-                    }
-
-                    if (drawnMarker.add(res.getName()) ) {
-                        if (makeMarker) {
-                            ValueMarker vm = new ValueMarker((double) maxx, Color.BLACK, new BasicStroke(
-                                    1.2f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER,
-                                    1.0f, new float[]{6.0f, 6.0f}, 0.0f));
-
-                            vm.setLabel(String.format("(MAX) - %s", res.getName()));
-                            vm.setLabelOffset(new RectangleInsets(5, 50, -20, 5));
-                            vm.setLabelAnchor(RectangleAnchor.TOP_LEFT);
-                            vm.setPaint(Color.BLACK);
-                            vm.setOutlinePaint(Color.BLACK);
-                            vm.setAlpha(1.0f);
-                            markers.add(vm);
-                        }
                     }
 
                     if (maxx > max) {
                         max = maxx;
+                    }
+                }
+                if (!labelName.equals("")) {
+                    dataset.add(value, labelName, label);
+                }
+
+                boolean makeMarker = true;
+                for (ValueMarker vm : markers) {
+                    if (maxx == vm.getValue() && !vm.getLabel().contains(labelName) && !labelName.equals("")) {
+                        drawnMarker.add(vm.getLabel().replace("(MAX) - ", "") + " - " + labelName);
+                        String s = vm.getLabel().replace("(MAX) - ", "");
+
+                        vm.setLabel(String.format("%s - %s", vm.getLabel(), labelName));
+                        //this is the size of chars used for setting the offset right
+                        double i = vm.getLabel().length() * labelOffset + 40;
+                        vm.setLabelOffset(new RectangleInsets(5, i, -20, 5));
+
+                        makeMarker = false;
+                    }
+                }
+
+                if ((!labelName.equals("")) && (drawnMarker.add(labelName))) {
+                    if (makeMarker) {
+                        ValueMarker vm = new ValueMarker((double) maxx, Color.BLACK, new BasicStroke(
+                                1.2f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER,
+                                1.0f, new float[]{6.0f, 6.0f}, 0.0f));
+
+                        vm.setLabel(String.format("(MAX) - %s", labelName));
+
+                        double i = vm.getLabel().length() * labelOffset + 40;
+                        vm.setLabelOffset(new RectangleInsets(5, i, -20, 5));
+                        vm.setLabelAnchor(RectangleAnchor.TOP_LEFT);
+                        vm.setPaint(Color.BLACK);
+                        vm.setOutlinePaint(Color.BLACK);
+                        vm.setAlpha(1.0f);
+                        markers.add(vm);
                     }
                 }
             }

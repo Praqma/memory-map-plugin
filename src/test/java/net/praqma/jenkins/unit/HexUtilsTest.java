@@ -122,26 +122,4 @@ public class HexUtilsTest {
         assertEquals((1025d / 1024 / 1024 / 1024) * (16 / 8), HexUtils.byteCount("401", 16, "Giga"), 0);
 
     }
-//Remove
-    @Test
-    public void test() {
-        HashMap<String, Double> maksValues = new HashMap<String, Double>();
-        maksValues.put("FLASH", 120d);
-        maksValues.put("test", 10d);
-        maksValues.put("ser", 12d);
-        maksValues.put("ram", 5d);
-        
-        double maxx = 10d;
-        boolean skipTest = false;
-        for (String s : maksValues.keySet()) {
-            if (maxx <= maksValues.get(s)*1.1d && maxx >= maksValues.get(s)*0.9d) {
-                maksValues.remove(s);
-                String t =s+" + llabelNew";
-                maksValues.put(t, maxx);      
-                System.out.println("Hello World " + maxx);
-                System.out.print("String: " + t);
-
-            }
-        }
-    }
 }

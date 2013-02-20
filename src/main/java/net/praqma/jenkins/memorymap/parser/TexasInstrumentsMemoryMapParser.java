@@ -26,8 +26,13 @@ package net.praqma.jenkins.memorymap.parser;
 import hudson.Extension;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfiguration;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
+import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemoryItem;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
@@ -37,16 +42,11 @@ import org.kohsuke.stapler.StaplerRequest;
  * @author Praqma
  */
 public class TexasInstrumentsMemoryMapParser extends AbstractMemoryMapParser {
-    
-    
+
     /*
      * Generic design
      */
     private static final Pattern MEMORY_OVERALL_SECTION = Pattern.compile("^\\.text\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
-
-    
-    
-    
     /*
      * Flash
      */
@@ -55,8 +55,6 @@ public class TexasInstrumentsMemoryMapParser extends AbstractMemoryMapParser {
     private static final Pattern ECONST_DOT = Pattern.compile("^\\.econst\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
     private static final Pattern PINIT = Pattern.compile("^\\.pinit\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
     private static final Pattern SWITCH = Pattern.compile("^\\.switch\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
-    
-    
     /*
      * Ram
      */
@@ -68,22 +66,49 @@ public class TexasInstrumentsMemoryMapParser extends AbstractMemoryMapParser {
     private static final Pattern ESYSMEM = Pattern.compile("^\\.esysmem\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
     private static final Pattern CIO = Pattern.compile("^\\.cio\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
     private static final Pattern DATA = Pattern.compile("^\\.data\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
-    
-    
+
     @DataBoundConstructor
     public TexasInstrumentsMemoryMapParser(String mapFile, String configurationFile, Integer wordSize, Boolean bytesOnGraph) {
         super(mapFile, configurationFile, wordSize, bytesOnGraph, TEXT_DOT, CONST_DOT, ECONST_DOT, PINIT, SWITCH, CINIT_DOT, STACK_DOT, BSS_DOT, EBSS_DOT, SYSMEM, ESYSMEM, CIO, DATA);
     }
-    
+
     public TexasInstrumentsMemoryMapParser() {
         super();
+    }
+
+    @Override
+    public MemoryMapConfigMemory parseConfigFile(List<MemoryMapGraphConfiguration> graphConfig, File f) throws IOException {
+        MemoryMapConfigMemory config = new MemoryMapConfigMemory();
+        CharSequence sequence = createCharSequenceFromFile(f);
+        for (MemoryMapGraphConfiguration graph : graphConfig) {
+            String[] split = graph.getGraphDataList().split(",");
+            for (String s : split) {
+                s.trim();
+                String[] multiSections = s.split("\\+");
+                for (String ms : multiSections) {
+                    Matcher m = MemoryMapConfigFileParserDelegate.getPatternForMemoryLayout(ms.replace(" ", "")).matcher(sequence);
+                    MemoryMapConfigMemoryItem item = null;
+                    while (m.find()) {
+                        item = new MemoryMapConfigMemoryItem(m.group(1), m.group(3), m.group(5));
+                        config.add(item);
+                    }
+
+                    if (item == null) {
+                        logger.logp(Level.WARNING, "parseConfigFile", AbstractMemoryMapParser.class.getName(), String.format("parseConfigFile(List<MemoryMapGraphConfiguration> graphConfig, File f) non existing item: %s", s));
+                        throw new IOException(String.format("No match found for program memory named %s", s));
+                    }
+                }
+
+            }
+        }
+        return config;
     }
 
     @Override
     public MemoryMapConfigMemory parseMapFile(File f, MemoryMapConfigMemory config) throws IOException {
         return super.parseMapFile(f, config);
     }
-    
+
     @Extension
     public static final class DescriptorImpl extends MemoryMapParserDescriptor<TexasInstrumentsMemoryMapParser> {
 
@@ -94,9 +119,9 @@ public class TexasInstrumentsMemoryMapParser extends AbstractMemoryMapParser {
 
         @Override
         public AbstractMemoryMapParser newInstance(StaplerRequest req, JSONObject formData, AbstractMemoryMapParser instance) throws FormException {
-            TexasInstrumentsMemoryMapParser parser = (TexasInstrumentsMemoryMapParser)instance;
+            TexasInstrumentsMemoryMapParser parser = (TexasInstrumentsMemoryMapParser) instance;
             save();
             return parser;
-        } 
-    }    
+        }
+    }
 }
