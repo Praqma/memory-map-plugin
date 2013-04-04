@@ -276,6 +276,7 @@ public class MemoryMapBuildAction implements Action {
         String legend = getRecorder().getShowBytesOnGraph() ? byteLegend : wordLegend;
 
         JFreeChart chart = createPairedBarCharts(graphTitle, legend, max * 1.1d, 0d, dataset.build(), markers);
+        
 
         chart.setBackgroundPaint(Color.WHITE);
         chart.getLegend().setPosition(RectangleEdge.BOTTOM);
@@ -302,26 +303,25 @@ public class MemoryMapBuildAction implements Action {
 
         //StackedAreaRenderer2 renderer = new StackedAreaRenderer2();
         BarRenderer renderer = new BarRenderer();
+        
 
-        CategoryPlot plot = new CategoryPlot(dataset, domainAxis, rangeAxis, renderer);
+        CategoryPlot plot = new CategoryPlot(dataset, domainAxis, rangeAxis, renderer);        
         plot.setDomainAxis(domainAxis);
         domainAxis.setCategoryLabelPositions(CategoryLabelPositions.UP_90);
-        domainAxis.setLowerMargin(0.0);
-        domainAxis.setUpperMargin(0.0);
-        domainAxis.setCategoryMargin(0.0);
-
+        
         plot.setOrientation(PlotOrientation.VERTICAL);
         plot.setBackgroundPaint(Color.WHITE);
         plot.setOutlinePaint(null);
         plot.setRangeGridlinesVisible(true);
         plot.setRangeGridlinePaint(Color.black);
-        plot.setInsets(new RectangleInsets(5.0, 0, 0, 5.0));
+
 
         for (ValueMarker mkr : markers) {
             plot.addRangeMarker(mkr);
         }
-
+        
         JFreeChart chart = new JFreeChart(plot);
+        chart.setPadding(new RectangleInsets(30, 15, 15, 15));
         chart.setTitle(title);
         return chart;
     }
