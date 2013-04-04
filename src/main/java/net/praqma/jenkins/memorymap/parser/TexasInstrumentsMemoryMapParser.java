@@ -82,9 +82,8 @@ public class TexasInstrumentsMemoryMapParser extends AbstractMemoryMapParser {
         CharSequence sequence = createCharSequenceFromFile(f);
         for (MemoryMapGraphConfiguration graph : graphConfig) {
             String[] split = graph.getGraphDataList().split(",");
-            for (String s : split) {
-                s.trim();
-                String[] multiSections = s.split("\\+");
+            for (String s : split) {                
+                String[] multiSections = s.trim().split("\\+");
                 for (String ms : multiSections) {
                     Matcher m = MemoryMapConfigFileParserDelegate.getPatternForMemoryLayout(ms.replace(" ", "")).matcher(sequence);
                     MemoryMapConfigMemoryItem item = null;
@@ -92,7 +91,6 @@ public class TexasInstrumentsMemoryMapParser extends AbstractMemoryMapParser {
                         item = new MemoryMapConfigMemoryItem(m.group(1), m.group(3), m.group(5));
                         config.add(item);
                     }
-
                     if (item == null) {
                         logger.logp(Level.WARNING, "parseConfigFile", AbstractMemoryMapParser.class.getName(), String.format("parseConfigFile(List<MemoryMapGraphConfiguration> graphConfig, File f) non existing item: %s", s));
                         throw new IOException(String.format("No match found for program memory named %s", s));
