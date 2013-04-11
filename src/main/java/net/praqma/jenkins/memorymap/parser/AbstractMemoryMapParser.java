@@ -119,8 +119,7 @@ public abstract class AbstractMemoryMapParser implements Describable<AbstractMem
                 while(m.find()) {
                     item = new MemoryMapConfigMemoryItem(m.group(1), m.group(3), m.group(5));                    
                     config.add(item);
-                }
-                
+                }                
                 if(item == null) {
                     logger.logp(Level.WARNING, "parseConfigFile", AbstractMemoryMapParser.class.getName(), String.format("parseConfigFile(List<MemoryMapGraphConfiguration> graphConfig, File f) non existing item: %s",s));
                     throw new IOException(String.format("No match found for program memory named %s",s));

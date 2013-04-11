@@ -31,21 +31,22 @@ import java.util.List;
  * @author Praqma
  */
 public class MemoryMapConfigMemoryItem implements Serializable {
+
     private String name;
     private String origin;
-    private String length; 
+    private String length;
     private String used = "";
-    private String unused = "";    
+    private String unused = "";
     private List<MemoryMapConfigMemoryItem> associatedSections;
-    
-    public MemoryMapConfigMemoryItem() {} 
-    
+
+    public MemoryMapConfigMemoryItem() { }
+
     public MemoryMapConfigMemoryItem(String name, String origin, String length) {
         this.name = name != null ? name.trim() : "";
         this.origin = origin;
         this.length = length;
     }
-    
+
     public MemoryMapConfigMemoryItem(String name, String origin, String length, String used, String unused) {
         this.name = name != null ? name.trim() : "";
         this.origin = origin;
@@ -53,7 +54,7 @@ public class MemoryMapConfigMemoryItem implements Serializable {
         this.unused = unused;
         this.used = used;
     }
-    
+
     /**
      * @return the name
      */
@@ -113,7 +114,7 @@ public class MemoryMapConfigMemoryItem implements Serializable {
     @Override
     public String toString() {
         return String.format("%s [origin = %s, length = %s, used = %s, unused = %s]", getName(), getOrigin(), getLength(), getUsed(), getUnused());
-    }      
+    }
 
     /**
      * @return the used
@@ -142,10 +143,10 @@ public class MemoryMapConfigMemoryItem implements Serializable {
     public void setUnused(String unused) {
         this.unused = unused;
     }
-    
+
     public boolean addChild(String parentName, MemoryMapConfigMemoryItem item) {
-        for(MemoryMapConfigMemoryItem it : getAssociatedSections()) {
-            if(it.name.equals(parentName)) {
+        for (MemoryMapConfigMemoryItem it : getAssociatedSections()) {
+            if (it.name.equals(parentName)) {
                 it.getAssociatedSections().add(item);
                 return true;
             }
@@ -155,11 +156,11 @@ public class MemoryMapConfigMemoryItem implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        if(obj instanceof  MemoryMapConfigMemoryItem){
-            MemoryMapConfigMemoryItem item = (MemoryMapConfigMemoryItem)obj;
-         if(item.name.equals(this.name))   {
-             return true;
-         }
+        if (obj instanceof MemoryMapConfigMemoryItem) {
+            MemoryMapConfigMemoryItem item = (MemoryMapConfigMemoryItem) obj;
+            if (item.name.equals(this.name)) {
+                return true;
+            }
         }
         return false;
     }
