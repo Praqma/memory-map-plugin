@@ -95,24 +95,19 @@ public class MemoryMapProjectAction extends Actionable implements ProminentProje
     }
     
     public List<String> getGraphTitles() {
-        ArrayList<String> titles = new ArrayList<String>();
-        MemoryMapBuildAction mmba = getLastApplicableMemoryMapResult();
-        if(mmba != null) {
-
-            List<MemoryMapGraphConfiguration> configs = mmba.getRecorder().getGraphConfiguration();
-            for (MemoryMapGraphConfiguration conf : configs) {
-                titles.add(conf.getGraphCaption());
-            }
-        }
+        ArrayList<String> titles = new ArrayList<String>();;
+        List<MemoryMapGraphConfiguration> configs = project.getPublishersList().get(MemoryMapRecorder.class).getGraphConfiguration();
         
+        for (MemoryMapGraphConfiguration conf : configs) {
+            titles.add(conf.getGraphCaption());
+        }        
         return titles;
     }
     
-    public String getAssociatedProgramMemoryAreas(String graphTitle) {
-        MemoryMapBuildAction mmba = getLastApplicableMemoryMapResult();
-        String res = null;
+    public String getAssociatedProgramMemoryAreas(String graphTitle) {    
+        String res = null;       
         
-        List<MemoryMapGraphConfiguration> configs = mmba.getRecorder().getGraphConfiguration();
+        List<MemoryMapGraphConfiguration> configs = project.getPublishersList().get(MemoryMapRecorder.class).getGraphConfiguration();
         for (MemoryMapGraphConfiguration conf : configs) {
             if(conf.getGraphCaption().equals(graphTitle)) {
                 res = conf.getGraphDataList();

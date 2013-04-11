@@ -59,7 +59,6 @@ public class MemoryMapRecorder extends Recorder {
 
     private String mapFile;
     private Integer wordSize;
-    
     private String configurationFile;
     private boolean showBytesOnGraph;
     public final String scale;
@@ -226,12 +225,12 @@ public class MemoryMapRecorder extends Recorder {
         @Override
         public Publisher newInstance(StaplerRequest req, JSONObject formData) throws FormException {
             MemoryMapRecorder instance = req.bindJSON(MemoryMapRecorder.class, formData);
-             
-            List<MemoryMapGraphConfiguration> graphConfiguration = req.bindParametersToList(MemoryMapGraphConfiguration.class, "graph.config.");
+            
+            List<MemoryMapGraphConfiguration> graphConfiguration = req.bindParametersToList(MemoryMapGraphConfiguration.class, "graph.config.");                        
             if(graphConfiguration != null) {
                 instance.setGraphConfiguration(graphConfiguration);
             }
-            save();
+            save();            
             return instance;
         }
         
@@ -239,6 +238,8 @@ public class MemoryMapRecorder extends Recorder {
             super(MemoryMapRecorder.class);
             load();
         }
+        
+        
         
         private List<String> getScales(){
             List<String> scales = new ArrayList<String>();
