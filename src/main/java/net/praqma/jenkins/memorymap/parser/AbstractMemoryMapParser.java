@@ -96,7 +96,8 @@ public abstract class AbstractMemoryMapParser implements Describable<AbstractMem
                 cbuf = Charset.defaultCharset().newDecoder().decode(bbuf);
             } else {
                 cbuf = Charset.forName(charset).newDecoder().decode(bbuf);
-            }            
+            }
+            
         } catch (IOException ex) {
             throw ex;
         } finally {
