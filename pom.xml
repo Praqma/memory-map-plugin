@@ -13,40 +13,10 @@
     <url>https://wiki.jenkins-ci.org/display/JENKINS/memory+map+plugin</url>
     
     <developers>
-        
         <developer>
-            <id>MadsNielsen</id>
-            <email>man@praqma.net</email>
-            <name>Mads Nielsen&gt;</name>            
-            <organization>Prama</organization>
-            <organizationUrl>http://www.praqma.com</organizationUrl>
-            <roles>
-                <role>developer</role>
-            </roles>              
+            <id>praqma_josra</id>
+            <name>Praqma Josra</name>
         </developer>
-        
-        <developer>
-            <id>jes-struck</id>
-            <email>jes@praqma.net</email>
-            <name>Jes Struck</name>            
-            <organization>Praqma</organization>
-            <organizationUrl>http://www.praqma.com</organizationUrl>
-            <roles>
-                <role>developer</role>
-            </roles>            
-        </developer>
-        
-        <developer>
-            <id>buep</id>            
-            <name>Bue Petersen</name>
-            <email>bue@praqma.net</email>                
-            <organization>Praqma</organization>
-            <organizationUrl>http://www.praqma.com</organizationUrl>
-            <roles>
-                <role>developer</role>
-            </roles>  
-        </developer>        
-        
     </developers>
     
     <build>
