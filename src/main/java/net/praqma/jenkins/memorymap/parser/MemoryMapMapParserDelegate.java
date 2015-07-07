@@ -25,10 +25,9 @@ package net.praqma.jenkins.memorymap.parser;
 
 import hudson.remoting.VirtualChannel;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.logging.Level;
+import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
@@ -38,52 +37,45 @@ import net.praqma.jenkins.memorymap.util.FileFoundable;
  * Class to wrap the FileCallable method. Serves as a proxy to the parser method. 
  * @author Praqma
  */
-public class MemoryMapMapParserDelegate extends FileFoundable<MemoryMapConfigMemory> 
+public class MemoryMapMapParserDelegate extends FileFoundable<HashMap<String,MemoryMapConfigMemory>> 
 {
     private static final Logger log = Logger.getLogger(MemoryMapMapParserDelegate.class.getName());
-    private AbstractMemoryMapParser parser;
-    private MemoryMapConfigMemory config;
+    private List<AbstractMemoryMapParser> parsers;
+    private HashMap<String, MemoryMapConfigMemory> config;
     private static HashMap<String,Pattern> patternRegistry;
     
     //Empty constructor. For serialization purposes.
     public MemoryMapMapParserDelegate() { }
 
-    public MemoryMapMapParserDelegate(AbstractMemoryMapParser parser) {
-        this.parser = parser;
+    public MemoryMapMapParserDelegate(List<AbstractMemoryMapParser> parsers) {
+        this.parsers = parsers;
     }
     
-    public MemoryMapMapParserDelegate(AbstractMemoryMapParser parser, MemoryMapConfigMemory config) {
-        this.parser = parser;
+    public MemoryMapMapParserDelegate(List<AbstractMemoryMapParser> parsers, HashMap<String,MemoryMapConfigMemory> config) {
+        this.parsers = parsers;
         this.config = config;        
     }
 
     @Override
-    public MemoryMapConfigMemory invoke(File file, VirtualChannel vc) throws IOException, InterruptedException {        
-
-        try {
-            return getParser().parseMapFile(findFile(file, parser.getMapFile()), config); 
-        } catch (FileNotFoundException fnfex) {
-            log.logp(Level.WARNING, "invoke", MemoryMapConfigFileParserDelegate.class.getName(), "invoke caught file not found exception", fnfex);
-            throw new IOException(fnfex.getMessage());
-        } catch (IOException ex) {
-            log.logp(Level.WARNING, "invoke", MemoryMapConfigFileParserDelegate.class.getName(), "invoke caught IOException", ex);
-            throw new IOException(ex.getMessage());                    
+    public HashMap<String, MemoryMapConfigMemory> invoke(File file, VirtualChannel vc) throws IOException, InterruptedException {        
+        for(AbstractMemoryMapParser parser : parsers) {
+            MemoryMapConfigMemory mem = parser.parseMapFile(findFile(file, parser.mapFile), config.get(parser.getParserUniqueName()));
         }
- 
+        return config;
     }
 
     /**
      * @return the parser
      */
-    public AbstractMemoryMapParser getParser() {
-        return parser;
+    public List<AbstractMemoryMapParser> getParsers() {
+        return parsers;
     }
 
     /**
      * @param parser the parser to set
      */
-    public void setParser(AbstractMemoryMapParser parser) {
-        this.parser = parser;
+    public void setParsers(List<AbstractMemoryMapParser> parsers) {
+        this.parsers = parsers;
     }
     
     public static Pattern getPatternForMemorySection(String sectionName) {

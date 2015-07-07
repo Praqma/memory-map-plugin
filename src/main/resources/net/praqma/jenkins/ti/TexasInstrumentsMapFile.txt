@@ -1,0 +1,403 @@
+PraqmaMemoryMapDemo.map
+
+******************************************************************************
+             TMS320C2000 Linker Unix v6.1.0                    
+******************************************************************************
+>> Linked Mon Aug 12 17:50:53 2013
+
+OUTPUT FILE NAME:   <PraqmaMemoryMapDemo.out>
+ENTRY POINT SYMBOL: "_c_int00"  address: 0000979b
+
+
+MEMORY CONFIGURATION
+
+         name            origin    length      used     unused   attr    fill
+----------------------  --------  ---------  --------  --------  ----  --------
+PAGE 0:
+  BEGIN                 00000000   00000002  00000000  00000002  RWIX
+  RAMM0                 00000050   000003b0  00000195  0000021b  RWIX
+  RAML0_L3              00008000   00002000  00001a8f  00000571  RWIX
+  FPUTABLES             003fd860   000006a0  00000000  000006a0  RWIX
+  IQTABLES              003fdf00   00000b50  00000000  00000b50  RWIX
+  IQTABLES2             003fea50   0000008c  00000000  0000008c  RWIX
+  IQTABLES3             003feadc   000000aa  00000000  000000aa  RWIX
+  BOOTROM               003ff3b0   00000c10  00000000  00000c10  RWIX
+  RESET                 003fffc0   00000002  00000000  00000002  RWIX
+
+PAGE 1:
+  BOOT_RSVD             00000002   0000004e  00000000  0000004e  RWIX
+  RAMM1                 00000400   00000400  00000300  00000100  RWIX
+  RAML4                 0000a000   00002000  000019c8  00000638  RWIX
+  RAML5                 0000c000   00002000  000002f8  00001d08  RWIX
+  RAML6                 0000e000   00002000  00000400  00001c00  RWIX
+  RAML7                 00010000   00002000  00000000  00002000  RWIX
+  RAML8                 00012000   00002000  00000000  00002000  RWIX
+  USB_RAM               00040000   00000800  00000000  00000800  RWIX
+
+
+SECTION ALLOCATION MAP
+
+ output                                  attributes/
+section   page    origin      length       input sections
+--------  ----  ----------  ----------   ----------------
+.pinit     1    00000400    00000000     UNINITIALIZED
+
+.cio       0    00000080    00000120     UNINITIALIZED
+                  00000080    00000120     rts2800_fpu32.lib : ankmsg.obj (.cio)
+
+.cinit     0    000001a0    00000075     
+                  000001a0    0000002d     rts2800_fpu32.lib : lowlev.obj (.cinit)
+                  000001cd    0000002a                       : defs.obj (.cinit)
+                  000001f7    0000000a                       : _lock.obj (.cinit)
+                  00000201    0000000a                       : exit.obj (.cinit)
+                  0000020b    00000004                       : fopen.obj (.cinit)
+                  0000020f    00000004                       : memory.obj (.cinit)
+                  00000213    00000002     --HOLE-- [fill = 0]
+
+.text      0    00008000    00001a8f     
+                  00008000    00000911     rts2800_fpu32.lib : _printfi.obj (.text)
+                  00008911    0000024b                       : lowlev.obj (.text)
+                  00008b5c    00000201                       : trgdrv.obj (.text)
+                  00008d5d    000001d4                       : memory.obj (.text)
+                  00008f31    000001a4     hello.obj (.text)
+                  000090d5    00000107     rts2800_fpu32.lib : ll_div.obj (.text)
+                  000091dc    00000101                       : fopen.obj (.text)
+                  000092dd    000000af                       : fputs.obj (.text)
+                  0000938c    0000009c                       : fd_add.obj (.text)
+                  00009428    0000008b                       : fd_div.obj (.text)
+                  000094b3    00000001     --HOLE-- [fill = 0]
+                  000094b4    00000086                       : ankmsg.obj (.text)
+                  0000953a    00000083                       : fd_mpy.obj (.text)
+                  000095bd    00000076                       : setvbuf.obj (.text)
+                  00009633    00000065                       : _io_perm.obj (.text)
+                  00009698    00000060                       : fflush.obj (.text)
+                  000096f8    00000054                       : fputc.obj (.text)
+                  0000974c    0000004f                       : fclose.obj (.text)
+                  0000979b    00000046                       : boot.obj (.text)
+                  000097e1    0000003d                       : fseek.obj (.text)
+                  0000981e    00000032                       : printf.obj (.text)
+                  00009850    00000031                       : atoi.obj (.text)
+                  00009881    0000002c                       : ltoa.obj (.text)
+                  000098ad    0000002a                       : fd_cmp.obj (.text)
+                  000098d7    0000002a                       : l_div.obj (.text)
+                  00009901    00000021                       : fd_toi.obj (.text)
+                  00009922    00000021                       : memcpy_ff.obj (.text)
+                  00009943    0000001f                       : fd_tol.obj (.text)
+                  00009962    0000001f                       : strncpy.obj (.text)
+                  00009981    0000001e                       : ll_cmp.obj (.text)
+                  0000999f    0000001c                       : fs_tofd.obj (.text)
+                  000099bb    0000001c                       : l_tofd.obj (.text)
+                  000099d7    00000019                       : args_main.obj (.text)
+                  000099f0    00000019                       : exit.obj (.text)
+                  00009a09    00000014                       : ll_mpy.obj (.text)
+                  00009a1d    00000012                       : memccpy.obj (.text)
+                  00009a2f    0000000e                       : fd_sub.obj (.text)
+                  00009a3d    0000000d                       : memchr.obj (.text)
+                  00009a4a    0000000c                       : strchr.obj (.text)
+                  00009a56    0000000a                       : strcmp.obj (.text)
+                  00009a60    0000000a                       : strlen.obj (.text)
+                  00009a6a    00000009                       : _lock.obj (.text)
+                  00009a73    00000009                       : fd_neg.obj (.text)
+                  00009a7c    00000009                       : strcpy.obj (.text)
+                  00009a85    00000007                       : memset.obj (.text)
+                  00009a8c    00000003                       : remove.obj (.text)
+
+.reset     0    003fffc0    00000002     DSECT
+                  003fffc0    00000002     rts2800_fpu32.lib : boot.obj (.reset)
+
+.stack     1    00000400    00000300     UNINITIALIZED
+                  00000400    00000300     --HOLE--
+
+.ebss      1    0000a000    000019c8     UNINITIALIZED
+                  0000a000    000017b8     hello.obj (.ebss)
+                  0000b7b8    00000008     rts2800_fpu32.lib : memory.obj (.ebss)
+                  0000b7c0    00000160                       : defs.obj (.ebss)
+                  0000b920    00000008                       : trgdrv.obj (.ebss)
+                  0000b928    00000004                       : _lock.obj (.ebss)
+                  0000b92c    00000004                       : exit.obj (.ebss)
+                  0000b930    00000001                       : fopen.obj (.ebss)
+                  0000b931    0000000f     --HOLE--
+                  0000b940    00000088                       : lowlev.obj (.ebss)
+
+.econst    1    0000c000    000002f8     
+                  0000c000    000001b9     hello.obj (.econst:.string)
+                  0000c1b9    00000101     rts2800_fpu32.lib : ctype.obj (.econst:__ctypes_)
+                  0000c2ba    00000024                       : _printfi.obj (.econst:.string)
+                  0000c2de    00000018                       : _printfi.obj (.econst)
+                  0000c2f6    00000002                       : fputs.obj (.econst:.string)
+
+.sysmem    1    0000e000    00000400     UNINITIALIZED
+                  0000e000    00000001     rts2800_fpu32.lib : memory.obj (.sysmem)
+                  0000e001    000003ff     --HOLE--
+
+
+GLOBAL SYMBOLS: SORTED ALPHABETICALLY BY Name 
+
+address    name
+--------   ----
+00008000   .text
+000099f0   C$$EXIT
+00009500   C$$IO$$
+0000938c   FD$$ADD
+000098ad   FD$$CMP
+00009428   FD$$DIV
+0000953a   FD$$MPY
+00009a73   FD$$NEG
+00009a2f   FD$$SUB
+00009901   FD$$TOI
+00009943   FD$$TOL
+0000999f   FS$$TOFD
+000098d7   L$$DIV
+000098e6   L$$MOD
+000099bb   L$$TOFD
+00009981   LL$$CMP
+000090d5   LL$$DIV
+00009111   LL$$MOD
+00009a09   LL$$MPY
+000098f4   UL$$DIV
+000098fb   UL$$MOD
+00009993   ULL$$CMP
+0000914b   ULL$$DIV
+0000917a   ULL$$MOD
+00008d31   _HOSTclock
+00008d0a   _HOSTclose
+00008ce2   _HOSTgetenv
+00008c9a   _HOSTlseek
+00008c5e   _HOSTopen
+00008c24   _HOSTread
+00008be7   _HOSTrename
+00008bbb   _HOSTtime
+00008b96   _HOSTunlink
+00008b5c   _HOSTwrite
+00000080   __CIOBUF_
+00000700   __STACK_END
+00000300   __STACK_SIZE
+00000400   __SYSMEM_SIZE
+00000001   __TI_args_main
+ffffffff   ___binit__
+ffffffff   ___c_args__
+000001a0   ___cinit__
+00009a8f   ___etext__
+00009922   ___memcpy_ff
+ffffffff   ___pinit__
+00008000   ___text__
+000099d7   __args_main
+00009254   __cleanup
+0000b92c   __cleanup_ptr
+0000974c   __closefile
+0000c1b9   __ctypes_
+00009698   __doflush
+0000b92e   __dtors_ptr
+0000b7c0   __ft_end
+0000b800   __ftable
+0000b92a   __lock
+00009a72   __nop
+0000880e   __printfi
+0000966d   __rd_ok
+00009a6e   __register_lock
+00009a6a   __register_unlock
+00000400   __stack
+0000e000   __sys_memory
+0000b880   __tmpnams
+0000b928   __unlock
+00009633   __wrt_ok
+00008f53   _a
+000099f0   _abort
+00008aea   _add_device
+00009850   _atoi
+00008f50   _b
+00008f4d   _c
+0000979b   _c_int00
+00008f17   _calloc
+00008f15   _chkheap
+00008ab8   _close
+00008f46   _d
+00008f40   _e
+00008f56   _example
+000099f2   _exit
+00008f31   _f
+00009788   _fclose
+000096c7   _fflush
+000092c3   _fopen
+000096f8   _fputc
+000092dd   _fputs
+00008d5d   _free
+00008ef7   _free_memory
+00009272   _freopen
+000097e1   _fseek
+00008f3a   _g
+00008a8a   _lseek
+00009881   _ltoa
+00009070   _main
+0000a000   _mainIntegerArray
+00008dc8   _malloc
+00008ed5   _max_free
+00009a1d   _memccpy
+00009a3d   _memchr
+00009a85   _memset
+00008da2   _minit
+0000a400   _myCharArray
+0000ac00   _myIntArray
+00008a34   _open
+00009824   _printf
+000096f8   _putc
+00009747   _putchar
+0000937a   _puts
+000089e6   _read
+00009504   _readmsg
+00008e1e   _realloc
+00009a8c   _remove
+000089cc   _remove_device
+000089a3   _rename
+000095bd   _setvbuf
+00009a4a   _strchr
+00009a56   _strcmp
+00009a7c   _strcpy
+00009a60   _strlen
+00009962   _strncpy
+0000898b   _unlink
+00008911   _write
+000094b4   _writemsg
+00008f87   _yetMoreCodeToStack
+00008f38   _z
+ffffffff   binit
+000001a0   cinit
+00009a8f   etext
+ffffffff   pinit
+
+
+GLOBAL SYMBOLS: SORTED BY Symbol Address 
+
+address    name
+--------   ----
+00000001   __TI_args_main
+00000080   __CIOBUF_
+000001a0   ___cinit__
+000001a0   cinit
+00000300   __STACK_SIZE
+00000400   __SYSMEM_SIZE
+00000400   __stack
+00000700   __STACK_END
+00008000   .text
+00008000   ___text__
+0000880e   __printfi
+00008911   _write
+0000898b   _unlink
+000089a3   _rename
+000089cc   _remove_device
+000089e6   _read
+00008a34   _open
+00008a8a   _lseek
+00008ab8   _close
+00008aea   _add_device
+00008b5c   _HOSTwrite
+00008b96   _HOSTunlink
+00008bbb   _HOSTtime
+00008be7   _HOSTrename
+00008c24   _HOSTread
+00008c5e   _HOSTopen
+00008c9a   _HOSTlseek
+00008ce2   _HOSTgetenv
+00008d0a   _HOSTclose
+00008d31   _HOSTclock
+00008d5d   _free
+00008da2   _minit
+00008dc8   _malloc
+00008e1e   _realloc
+00008ed5   _max_free
+00008ef7   _free_memory
+00008f15   _chkheap
+00008f17   _calloc
+00008f31   _f
+00008f38   _z
+00008f3a   _g
+00008f40   _e
+00008f46   _d
+00008f4d   _c
+00008f50   _b
+00008f53   _a
+00008f56   _example
+00008f87   _yetMoreCodeToStack
+00009070   _main
+000090d5   LL$$DIV
+00009111   LL$$MOD
+0000914b   ULL$$DIV
+0000917a   ULL$$MOD
+00009254   __cleanup
+00009272   _freopen
+000092c3   _fopen
+000092dd   _fputs
+0000937a   _puts
+0000938c   FD$$ADD
+00009428   FD$$DIV
+000094b4   _writemsg
+00009500   C$$IO$$
+00009504   _readmsg
+0000953a   FD$$MPY
+000095bd   _setvbuf
+00009633   __wrt_ok
+0000966d   __rd_ok
+00009698   __doflush
+000096c7   _fflush
+000096f8   _fputc
+000096f8   _putc
+00009747   _putchar
+0000974c   __closefile
+00009788   _fclose
+0000979b   _c_int00
+000097e1   _fseek
+00009824   _printf
+00009850   _atoi
+00009881   _ltoa
+000098ad   FD$$CMP
+000098d7   L$$DIV
+000098e6   L$$MOD
+000098f4   UL$$DIV
+000098fb   UL$$MOD
+00009901   FD$$TOI
+00009922   ___memcpy_ff
+00009943   FD$$TOL
+00009962   _strncpy
+00009981   LL$$CMP
+00009993   ULL$$CMP
+0000999f   FS$$TOFD
+000099bb   L$$TOFD
+000099d7   __args_main
+000099f0   C$$EXIT
+000099f0   _abort
+000099f2   _exit
+00009a09   LL$$MPY
+00009a1d   _memccpy
+00009a2f   FD$$SUB
+00009a3d   _memchr
+00009a4a   _strchr
+00009a56   _strcmp
+00009a60   _strlen
+00009a6a   __register_unlock
+00009a6e   __register_lock
+00009a72   __nop
+00009a73   FD$$NEG
+00009a7c   _strcpy
+00009a85   _memset
+00009a8c   _remove
+00009a8f   ___etext__
+00009a8f   etext
+0000a000   _mainIntegerArray
+0000a400   _myCharArray
+0000ac00   _myIntArray
+0000b7c0   __ft_end
+0000b800   __ftable
+0000b880   __tmpnams
+0000b928   __unlock
+0000b92a   __lock
+0000b92c   __cleanup_ptr
+0000b92e   __dtors_ptr
+0000c1b9   __ctypes_
+0000e000   __sys_memory
+ffffffff   ___binit__
+ffffffff   ___c_args__
+ffffffff   ___pinit__
+ffffffff   binit
+ffffffff   pinit
+
+[129 symbols]

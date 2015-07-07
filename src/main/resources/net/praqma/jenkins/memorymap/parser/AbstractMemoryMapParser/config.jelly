@@ -1,0 +1,24 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
+         xmlns:t="/lib/hudson" xmlns:f="/lib/form">    
+    
+    <f:entry field="parserUniqueName" title="${%Unique parser name}" description="A unique parser name. This has to be unique among the parsers chosen in this job otherwise results will get mixed together, renaming this invalidates previous results.">
+        <f:textbox />
+    </f:entry>
+    
+    <f:entry field="parserTitle" title="${%Parser title}" description="The title displayed when grouping the  graphs in the UI.">
+        <f:textbox />
+    </f:entry>
+    
+    <f:entry title="${%Linker command file}" field="configurationFile">            
+        <f:textbox name="configurationFile"/>
+    </f:entry>
+      
+    <f:entry title="${%Path to map file}" field="mapFile">
+        <f:textbox name="mapFile"/>
+    </f:entry>
+    
+    <f:entry field="graphConfiguration" title="Configure graphs">
+        <f:hetero-list name="graphConfiguration" oneEach="false" items="${instance.graphConfiguration}" addCaption="Add graph" deleteCaption="Remove graph" descriptors="${descriptor.getGraphOptions()}"/>
+    </f:entry> 
+             
+</j:jelly>

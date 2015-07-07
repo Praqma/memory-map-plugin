@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2012 Praqma.
+ * Copyright 2013 mads.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,26 +21,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package net.praqma.jenkins.unit;
+package net.praqma.jenkins.memorymap.util;
 
-import net.praqma.jenkins.memorymap.MemoryMapBuildAction;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import java.io.File;
+import java.io.IOException;
 
 /**
  *
- * @author Praqma
+ * @author mads
  */
-
-
-public class MemoryMapBuildActionSimpleTest {
-    
-    @Test
-    public void memoryMapBuildAction_trivial_accessor_mutator_test() throws Exception {
-        MemoryMapBuildAction memoryMapBuildAction = new MemoryMapBuildAction(null, null);
-        assertNull(memoryMapBuildAction.getIconFileName());
-        assertNull(memoryMapBuildAction.getUrlName());
-        assertEquals("Memory map", memoryMapBuildAction.getDisplayName());
+public class MemoryMapFileNotFoundError extends IOException implements MemoryMapError {
+    public MemoryMapFileNotFoundError(String msg, File file) {
+        super(msg);
     }
 
+    public MemoryMapFileNotFoundError() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

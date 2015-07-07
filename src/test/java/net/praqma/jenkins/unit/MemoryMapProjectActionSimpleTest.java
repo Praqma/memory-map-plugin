@@ -21,37 +21,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package net.praqma.jenkins.memorymap.parser;
+package net.praqma.jenkins.unit;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfiguration;
-import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
+import net.praqma.jenkins.memorymap.MemoryMapProjectAction;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  *
  * @author Praqma
  */
-public interface MemoryMapParsable {
+public class MemoryMapProjectActionSimpleTest {
     
-    /**
-     * 
-     * @param config
-     * @param f
-     * @return
-     * @throws IOException 
-     */
-    public MemoryMapConfigMemory parseConfigFile(List<MemoryMapGraphConfiguration> config, File f) throws IOException;
+    @Test
+    public void memoryMapProjectAction_trivial_accessor_mutator_test()  {
+        MemoryMapProjectAction mmpaj = new MemoryMapProjectAction(null);
+        assertNotNull(mmpaj.getIconFileName());
+        assertEquals("memory-map",mmpaj.getUrlName());
+        assertEquals("Memory map",mmpaj.getSearchUrl());
+        assertEquals("Memory Map Publisher", mmpaj.getDisplayName());
+    }
     
-    /**
-     * This method needs to overriden in a subclass of AbstractMemoryMapParser. 
-     * 
-     * @param f
-     * @param configuration
-     * @return
-     * @throws IOException 
-     */
-    public MemoryMapConfigMemory parseMapFile(File f, MemoryMapConfigMemory configuration) throws IOException;
+    @Test(expected=NullPointerException.class)
+    public void memoryMapProjectAction_null_pointer_is_thrown_test() {
+        MemoryMapProjectAction mmpaj = new MemoryMapProjectAction(null);
+        mmpaj.getLastApplicableMemoryMapResult();
+        
+    }
     
+    @Test(expected=NullPointerException.class)
+    public void memoryMapProjectAction_null_pointer_is_thrown_get_latest_action_in_project_test() {
+        MemoryMapProjectAction mmpaj = new MemoryMapProjectAction(null);
+        mmpaj.getLatestActionInProject();
+        
+    }
 }

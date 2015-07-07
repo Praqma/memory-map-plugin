@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2012 Praqma.
+ * Copyright 2013 mads.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,44 +22,34 @@
  * THE SOFTWARE.
  */
 package net.praqma.jenkins.unit;
-
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.ObjectOutputStream;
-import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfiguration;
+import net.praqma.jenkins.memorymap.parser.gcc.GccMemoryMapParser;
+import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
 import static org.junit.Assert.*;
 import org.junit.Test;
-
 /**
  *
- * @author Praqma
+ * @author mads
  */
-public class MemoryMapParsingResultTest {
+public class MemoryMapGccParserTest {
     
     @Test
-    public void data_MemoryMapParsingResult_test()  {
-        MemoryMapParsingResult mmpr = new MemoryMapParsingResult();
-        String name = "dataName";
-        String rawvalue = "00010100111";
-        int value = 1000;
+    public void testParsingOfMemorySegmentInLinkerCommandFile() throws IOException {
+        GccMemoryMapParser parser = new GccMemoryMapParser();
+        MemoryMapGraphConfiguration conf = new MemoryMapGraphConfiguration("application", "Application test", Boolean.TRUE);
+        List<MemoryMapGraphConfiguration> singletonList = Collections.singletonList(conf);
         
-        mmpr.setName(name);
-        mmpr.setRawvalue(rawvalue);
-        mmpr.setValue(value);
+        String fileNameLinker = MemoryMapGccParserTest.class.getResource("prom.ld").getFile();
+        String fileNameMap = MemoryMapGccParserTest.class.getResource("prom.map").getFile();
         
-        assertEquals(name, mmpr.getName());
-        assertEquals(rawvalue, mmpr.getRawvalue());
-        assertEquals(value, mmpr.getValue());
+        File f = new File(fileNameLinker);
+        MemoryMapConfigMemory mem = parser.parseConfigFile(f);
+        
+        File f2 = new File(fileNameMap);
+        mem = parser.parseMapFile(f2, mem);
     }
-    
-    @Test
-    public void data_MemoryMapParsingResult_serialization_test() throws Exception {
-        File f = File.createTempFile("testSerialization", ".test");
-        FileOutputStream fos = new FileOutputStream(f);
-        ObjectOutputStream ous = new ObjectOutputStream(fos);
-        ous.writeObject(new MemoryMapParsingResult());
-        ous.close();
-        f.deleteOnExit();
-    }
-   
 }

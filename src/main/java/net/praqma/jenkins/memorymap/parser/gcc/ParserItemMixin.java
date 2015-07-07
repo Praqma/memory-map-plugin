@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2012 Praqma.
+ * Copyright 2015 Mads.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,26 +21,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package net.praqma.jenkins.unit;
+package net.praqma.jenkins.memorymap.parser.gcc;
 
-import net.praqma.jenkins.memorymap.MemoryMapBuildAction;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import groovy.lang.GroovyShell;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import net.praqma.jenkins.memorymap.parser.AbstractMemoryMapParser;
 
 /**
  *
- * @author Praqma
+ * @author Mads
  */
-
-
-public class MemoryMapBuildActionSimpleTest {
+public class ParserItemMixin {
     
-    @Test
-    public void memoryMapBuildAction_trivial_accessor_mutator_test() throws Exception {
-        MemoryMapBuildAction memoryMapBuildAction = new MemoryMapBuildAction(null, null);
-        assertNull(memoryMapBuildAction.getIconFileName());
-        assertNull(memoryMapBuildAction.getUrlName());
-        assertEquals("Memory map", memoryMapBuildAction.getDisplayName());
+    public final String script;
+    public final String contents;
+    private static final Logger LOG = Logger.getLogger(ParserItemMixin.class.getName());
+    
+    public ParserItemMixin(String script, String contents) {
+        this.script = script;
+        this.contents = contents;
     }
-
+    
+    public Object evaluate() throws Exception {
+        Object o = null;
+        GroovyShell shell = new GroovyShell(AbstractMemoryMapParser.class.getClassLoader());        
+        shell.setVariable("mapfile", contents);
+        
+        try {        
+            o = shell.evaluate(script);
+        } catch (Exception ex) {
+            LOG.log(Level.OFF, this.getClass().getSimpleName()+"#evalute", ex);
+            ex.printStackTrace(System.out);
+            throw ex;
+        }
+        
+        return o;
+    }
 }

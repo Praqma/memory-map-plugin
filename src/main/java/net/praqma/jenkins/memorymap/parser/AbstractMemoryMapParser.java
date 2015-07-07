@@ -29,6 +29,7 @@ import hudson.model.Describable;
 import hudson.model.Descriptor;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.ByteBuffer;
@@ -40,54 +41,84 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import jenkins.model.Jenkins;
 import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfiguration;
+import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfigurationDescriptor;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
-import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemoryItem;
 import org.apache.commons.collections.ListUtils;
+import org.kohsuke.stapler.DataBoundSetter;
 
 /**
  *
  * @author Praqma
  */
-public abstract class AbstractMemoryMapParser implements Describable<AbstractMemoryMapParser>, ExtensionPoint, MemoryMapParsable, Serializable {
+public abstract class AbstractMemoryMapParser implements Describable<AbstractMemoryMapParser>, ExtensionPoint, Serializable {
 
     private static final String UTF_8_CHARSET = "UTF8";
+   
     protected static final Logger logger = Logger.getLogger(AbstractMemoryMapParser.class.toString());
     
     protected List<Pattern> patterns;
+    private List<MemoryMapGraphConfiguration> graphConfiguration;
+    private String parserUniqueName;
     protected String mapFile;
     private String configurationFile;
     private Integer wordSize;
     private Boolean bytesOnGraph;
+    private String parserTitle;
 
+    /**
+     * 
+     * @return  The default word size. If the map files contains usages in decimal value of bytes (say 1 200 bytes used). Use a word size of 8.
+     * else use what your compiler prefers. 
+     */
+    public abstract int getDefaultWordSize();
     
     public AbstractMemoryMapParser () {  
         this.patterns = ListUtils.EMPTY_LIST;
+        this.graphConfiguration = new ArrayList<MemoryMapGraphConfiguration>();
+        this.parserUniqueName = "Default";
     }
     
-    public AbstractMemoryMapParser(String mapFile, String configurationFile, Integer wordSize, Boolean bytesOnGraph, Pattern... pattern) {
+    public AbstractMemoryMapParser(String parserUniqueName, String mapFile, String configurationFile, Integer wordSize, Boolean bytesOnGraph, List<MemoryMapGraphConfiguration> graphConfiguration, Pattern... pattern) {
         this.patterns = Arrays.asList(pattern);
         this.mapFile = mapFile;
         this.configurationFile = configurationFile;
         this.wordSize = wordSize;
         this.bytesOnGraph = bytesOnGraph;
+        this.graphConfiguration = graphConfiguration;
+        this.parserUniqueName = parserUniqueName;
+    }
+    
+    public Object readResolve(){
+        if(getParserUniqueName() == null || getParserUniqueName() == null){
+            logger.log(Level.FINE, "Entering 1.x compatibility block, assigning name: Default");
+            setParserUniqueName("Default");
+        }
+        return this;
+    }
+
+    /**
+     * Implemented in order to get a unique name for the chosen parser
+     * @return 
+     */
+    public String getUniqueName() {
+        return String.format("%s_%s_%s", this.getClass().getSimpleName().replace(".class", ""), mapFile, configurationFile);
     }
      
     protected CharSequence createCharSequenceFromFile(File f) throws IOException {
         return createCharSequenceFromFile(UTF_8_CHARSET, f);
-    }    
+    }
      
     protected CharSequence createCharSequenceFromFile(String charset, File f) throws IOException {
         String chosenCharset = charset;
         
         CharBuffer cbuf = null;
         FileInputStream fis = null;
-        try 
-        {
+        try {
             fis = new FileInputStream(f.getAbsolutePath());
+            logger.log(java.util.logging.Level.FINE, String.format("Parser %s created input stream for file.", getParserUniqueName()));
             FileChannel fc = fis.getChannel();
             ByteBuffer bbuf = fc.map(FileChannel.MapMode.READ_ONLY, 0, (int)fc.size());
             
@@ -96,60 +127,25 @@ public abstract class AbstractMemoryMapParser implements Describable<AbstractMem
                 cbuf = Charset.defaultCharset().newDecoder().decode(bbuf);
             } else {
                 cbuf = Charset.forName(charset).newDecoder().decode(bbuf);
-            }
-            
+            }            
+        } catch (FileNotFoundException ex){
+            logger.log(java.util.logging.Level.FINE, String.format("Parser %s reported exception of type FileNotFoundException.", getParserUniqueName()));
+             throw ex;  
         } catch (IOException ex) {
+            logger.log(java.util.logging.Level.FINE, String.format("Parser %s reported exception of type IOException.", getParserUniqueName()));
             throw ex;
         } finally {
             if(fis != null) {
                 fis.close();
+                logger.log(java.util.logging.Level.FINE, String.format("Parser %s closed input stream for file.", getParserUniqueName()));
             }
         }
         return cbuf;
     }    
     
-    @Override
-    public MemoryMapConfigMemory parseConfigFile(List<MemoryMapGraphConfiguration> graphConfig, File f) throws IOException {
-        MemoryMapConfigMemory config =  new MemoryMapConfigMemory();
-        CharSequence sequence = createCharSequenceFromFile(f);
-        for(MemoryMapGraphConfiguration graph : graphConfig) {
-            String[] split = graph.getGraphDataList().split(",");
-            for(String s : split) {
-                Matcher m = MemoryMapConfigFileParserDelegate.getPatternForMemoryLayout(s).matcher(sequence);
-                MemoryMapConfigMemoryItem item = null;
-                while(m.find()) {
-                    item = new MemoryMapConfigMemoryItem(m.group(1), m.group(3), m.group(5));                    
-                    config.add(item);
-                }                
-                if(item == null) {
-                    logger.logp(Level.WARNING, "parseConfigFile", AbstractMemoryMapParser.class.getName(), String.format("parseConfigFile(List<MemoryMapGraphConfiguration> graphConfig, File f) non existing item: %s",s));
-                    throw new IOException(String.format("No match found for program memory named %s",s));
-                }
-                
-            }
-        }
-        return config;
-    }
-    
-    @Override
-    public MemoryMapConfigMemory parseMapFile(File f, MemoryMapConfigMemory configuration) throws IOException {
-        CharSequence sequence = createCharSequenceFromFile(f);
-        
-        for(MemoryMapConfigMemoryItem item : configuration) {            
-            Matcher matcher = MemoryMapMapParserDelegate.getPatternForMemorySection(item.getName()).matcher(sequence);
-            boolean found = false;
-            while(matcher.find()) {
-                item.setUsed(matcher.group(8));
-                item.setUnused(matcher.group(10));
-                found = true;
-            }
-            if(!found) {
-                logger.logp(Level.WARNING, "parseMapFile", AbstractMemoryMapParser.class.getName(), String.format("parseMapFile(File f, MemoryMapConfigMemory configuration) non existing item: %s",item));
-                throw new IOException(String.format("Linker command element %s not found in .map file", item));
-            }
-        }
-        return configuration;
-    }
+    public abstract MemoryMapConfigMemory parseConfigFile(File f) throws IOException;
+    public abstract MemoryMapConfigMemory parseMapFile(File f, MemoryMapConfigMemory configuration) throws IOException;
+
 
     /**
      * @return the includeFilePattern
@@ -225,5 +221,57 @@ public abstract class AbstractMemoryMapParser implements Describable<AbstractMem
      */
     public void setConfigurationFile(String configurationFile) {
         this.configurationFile = configurationFile;
+    } 
+   
+    public List<MemoryMapGraphConfigurationDescriptor<?>> getGraphOptions() {
+        return MemoryMapGraphConfiguration.getDescriptors();
+    }
+
+    @Override
+    public String toString() {
+        return getUniqueName();
+    }
+
+    /**
+     * @return the parserUniqueName
+     */
+    public String getParserUniqueName() {
+        return parserUniqueName;
+    }
+
+    /**
+     * @param parserUniqueName the parserUniqueName to set
+     */
+    public void setParserUniqueName(String parserUniqueName) {
+        this.parserUniqueName = parserUniqueName;
+    }
+
+    /**
+     * @return the parserTitle
+     */    
+    public String getParserTitle() {
+        return parserTitle;
+    }
+
+    /**
+     * @param parserTitle the parserTitle to set
+     */
+    @DataBoundSetter
+    public void setParserTitle(String parserTitle) {
+        this.parserTitle = parserTitle;
+    }
+
+    /**
+     * @return the graphConfiguration
+     */
+    public List<MemoryMapGraphConfiguration> getGraphConfiguration() {
+        return graphConfiguration;
+    }
+
+    /**
+     * @param graphConfiguration the graphConfiguration to set
+     */
+    public void setGraphConfiguration(List<MemoryMapGraphConfiguration> graphConfiguration) {
+        this.graphConfiguration = graphConfiguration;
     }
 }
