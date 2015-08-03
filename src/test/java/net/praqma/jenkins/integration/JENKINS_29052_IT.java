@@ -10,7 +10,7 @@ import org.jvnet.hudson.test.JenkinsRule;
 
 import java.util.UUID;
 
-public class GraphlessPublisherFailsIT {
+public class JENKINS_29052_IT {
 
     @Rule
     public JenkinsRule jenkins = new JenkinsRule();
