@@ -35,8 +35,11 @@ import org.eclipse.jgit.lib.MutableObjectId;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.lib.RepositoryBuilder;
+import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevCommitList;
+import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 
 /**
  *
@@ -48,6 +51,7 @@ public class MemoryMapBranchManipulator {
     private File workDir;
     
     //Create the repository for this use case. We create a bare repo and commit push each commit as required. 
+    //This is the bare repository that the jenkins project will poll on.
     public File initRepositoryForUseCase() throws IOException, GitAPIException {
         
         File dir = new File(FileUtils.getTempDirectory(),"/"+useCase.getBranchName()+".git");
@@ -56,27 +60,39 @@ public class MemoryMapBranchManipulator {
         }
         dir.mkdir();
         
-        Git.cloneRepository().setURI(useCase.getBareGitRepo().getDirectory().getAbsolutePath()).
-                setBranch("master").
-                setBare(true).
-                setDirectory(dir).call().close();
-        
-        
+        Git.init().setBare(true).setDirectory(dir).call().close();
         return dir;
     }
     
+    //Create the repository where we can work and cherry pick our commits
+    //When calling useCase.getBareRepo() we have the local master copy of the projects directory
     public File createWorkRepo(File bareRepo) throws IOException, GitAPIException {
         File dir = new File(FileUtils.getTempDirectory(),"/"+useCase.getBranchName());
         if(dir.exists()) {
             FileUtils.deleteDirectory(dir);
         }
-        dir.mkdir();
+        dir.mkdirs();
+
+        Git.init().setDirectory(dir).call().close();
         
-        Git.cloneRepository().setURI(bareRepo.getAbsolutePath()).
-        setBranch("master").
-        setBare(false).
-        setDirectory(dir).call().close();
+        StoredConfig config = Git.open(dir).getRepository().getConfig();
         
+        String fileRemoteName = "file://"+useCase.getBareRepo().getAbsolutePath();
+        
+        config.setString("remote", "origin", "url", fileRemoteName);
+        config.setString("remote", "origin" , "fetch", "+refs/heads/*:refs/remotes/origin/*");
+        config.save();
+
+        System.out.printf("Remote set to: %s%n", fileRemoteName);
+        
+        System.out.printf("Initialized empty repository (Working directory for use case) in %s%n", dir.getAbsolutePath());
+        
+        Git.open(dir).fetch().setRemote("origin").call();
+        
+        String deliverBranchName = "deliver_"+useCase.getBranchName();        
+        Git.open(dir).branchCreate().setStartPoint("remotes/origin/master").setName(deliverBranchName).call();               
+        Git.open(dir).checkout().setName(deliverBranchName).call();
+        Git.open(dir).push().setRemote("origin").add(deliverBranchName).call();       
         this.workDir = dir;
         
         return dir;

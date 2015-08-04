@@ -55,10 +55,11 @@ public class MemoryMapCommitListForUseCase implements Iterable<ObjectId>{
         this.bareRepo = bareRepo;
         init();
     }
-    
+      
     //Determine order for commit for the use case
     private void init() throws IOException, GitAPIException {
         Repository repo = getBareGitRepo();
+            
         List<Ref> list = Git.open(bareRepo).tagList().call();
         Ref first = null;
         Ref last = null;
@@ -79,21 +80,18 @@ public class MemoryMapCommitListForUseCase implements Iterable<ObjectId>{
         
         RevWalk walker = new RevWalk(repo);
        
-        walker.markStart(walker.parseCommit(first.getObjectId()));
-        walker.markUninteresting(walker.parseCommit(last.getObjectId()));
+        walker.markStart(walker.parseCommit(last.getObjectId()));
+        walker.markUninteresting(walker.parseCommit(first.getObjectId()));
+        
         
         Iterator<RevCommit> itcommit = walker.iterator();
         
         while(itcommit.hasNext()) {
             ObjectId it_c = itcommit.next().getId();
-            System.out.printf("%sFound commit %s%n", PREFIX, it_c.getName());
             commits.add(it_c);
         }
         
-        commits.add(walker.parseCommit(last.getObjectId()));
-        
-        //Add the last tag also (since it was the break off point)
-        
+        commits.add(walker.parseCommit(first.getObjectId()));
         
         repo.close();        
     }
@@ -109,8 +107,7 @@ public class MemoryMapCommitListForUseCase implements Iterable<ObjectId>{
     public Iterator<ObjectId> iterator() {
         
         final Stack<ObjectId> ids = new Stack<>();
-        final List<ObjectId> mutableIds = new ArrayList<>(commits);
-        Collections.reverse(mutableIds);
+        final List<ObjectId> mutableIds = new ArrayList<>(commits);        
         ids.addAll(mutableIds);
         
         return new Iterator<ObjectId>() {
