@@ -91,8 +91,7 @@ public class MemoryMapCommitListForUseCase implements Iterable<ObjectId>{
             commits.add(it_c);
         }
         
-        commits.add(walker.parseCommit(first.getObjectId()));
-        
+        commits.add(walker.parseCommit(first.getObjectId()));        
         repo.close();        
     }
 
@@ -137,6 +136,10 @@ public class MemoryMapCommitListForUseCase implements Iterable<ObjectId>{
      */
     public File getBareRepo() {
         return bareRepo;
+    }
+    
+    public String getFileRemoteName() {
+        return "file://"+bareRepo.getAbsolutePath();
     }
     
     public Repository getBareGitRepo() throws IOException {

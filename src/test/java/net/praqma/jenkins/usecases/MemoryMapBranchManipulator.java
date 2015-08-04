@@ -135,4 +135,18 @@ public class MemoryMapBranchManipulator {
     public void setWorkDir(File workDir) {
         this.workDir = workDir;
     }
+
+    /**
+     * @return the useCase
+     */
+    public MemoryMapCommitListForUseCase getUseCase() {
+        return useCase;
+    }
+
+    /**
+     * @param useCase the useCase to set
+     */
+    public void setUseCase(MemoryMapCommitListForUseCase useCase) {
+        this.useCase = useCase;
+    }
 }

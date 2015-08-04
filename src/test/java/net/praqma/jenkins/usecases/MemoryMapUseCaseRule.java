@@ -66,7 +66,7 @@ public class MemoryMapUseCaseRule extends ExternalResource {
             if(bareRepo != null && MemoryMapUseCaseRule.bareRepo.exists()) {
                 //If exits. Update
                 Git.open(bareRepo).fetch().call();
-                System.out.println("Repo for tests exists. Reuse but update: "+f.getAbsolutePath());
+                System.out.println("Repo for tests exists. Reuse but update: "+bareRepo.getAbsolutePath());
             } else {
                 f.mkdir();
                 bareRepo = f;

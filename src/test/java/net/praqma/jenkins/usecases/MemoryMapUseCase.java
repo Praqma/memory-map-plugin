@@ -68,6 +68,14 @@ public class MemoryMapUseCase {
             ObjectId current;
             while((current = manipulator.cherryPickNextForUseCase()) != null) {
                 System.out.printf("Cherry picker #%s %s%n", commitNumber, current.getName());
+                
+                /*
+                    INSERT TESTS HERE: 
+                        1. You can get the branch under test using manipulator.getUseCase().getBranchName()
+                        2. The repo remote is here: manipulator.getUseCase().getFileRemoteName()
+                        3. Profit
+                */
+                
                 commitNumber++;
             }
         }
