@@ -30,11 +30,21 @@ import hudson.FilePath;
 import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
 import hudson.model.Result;
+import hudson.model.Run;
+import hudson.plugins.git.BranchSpec;
+import hudson.plugins.git.GitSCM;
+import hudson.plugins.git.SubmoduleConfig;
+import hudson.plugins.git.UserRemoteConfig;
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import net.praqma.jenkins.memorymap.MemoryMapRecorder;
@@ -49,6 +59,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSSerializer;
+import org.xml.sax.SAXException;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
 
@@ -95,6 +106,17 @@ public class TestUtils {
         project.setAssignedNode(jenkins.createOnlineSlave());
         return project;
     }
+    
+    public static FreeStyleProject configureGit(FreeStyleProject project, String branchName, String repository) throws IOException {        
+        List<UserRemoteConfig> repos = Arrays.asList(new UserRemoteConfig(repository, null, null, null));        
+        GitSCM gitSCM = new GitSCM(repos,
+                Collections.singletonList(new BranchSpec(branchName)),
+                false, Collections.<SubmoduleConfig>emptyList(),
+                null, null, Collections.EMPTY_LIST);        
+        project.setScm(gitSCM);
+        
+        return project;
+    } 
 
     /**
      * Runs a build and asserts all the given usage values.
@@ -260,5 +282,34 @@ public class TestUtils {
             }
         };
         return new GsonXmlBuilder().setXmlParserCreator(parserCreator).create();
+    }
+    
+    public static boolean printAndReturnConsoleOfBuild(Run<?,?> build, JenkinsRule jenkinsRule) throws IOException, SAXException {
+        // this outputs loft of HTML garbage... so pretty printing after:
+        String console = jenkinsRule.createWebClient().getPage(build, "console").asXml();
+        System.out.println("************************************************************************");
+        System.out.println("* Relevant part of Jenkins build console (captured with regexp)");
+        System.out.println(String.format("Consle out for build #%s", build.number));
+
+        // the pattern we want to search for
+        Pattern p = Pattern.compile("<link rel=\"stylesheet\" type=\"text/css\" href=\"/jenkins/descriptor/hudson.console.ExpandableDetailsNote/style.css\"/>"
+                + ".*<pre.*>(.*)</pre>", Pattern.DOTALL);
+        Matcher m = p.matcher(console);
+        // if we find a match, get the group
+        if (m.find()) {
+            // get the matching group
+            String capturedText = m.group(1);
+
+            // print the group
+            System.out.format("%s%n", capturedText);
+            return true;
+        } else {
+            System.out.format("Didn't match any relevant part of the console%n");
+            System.out.format("Writing full log to trace%n");
+            System.out.format("************************************************************************%n");
+            System.out.format(console+"%n");
+            System.out.format("************************************************************************%n");           
+            return false;
+        }
     }
 }

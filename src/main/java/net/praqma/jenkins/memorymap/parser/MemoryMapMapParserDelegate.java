@@ -32,7 +32,6 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
 import net.praqma.jenkins.memorymap.util.FileFoundable;
-
 /**
  * Class to wrap the FileCallable method. Serves as a proxy to the parser method. 
  * @author Praqma

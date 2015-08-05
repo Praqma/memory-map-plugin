@@ -142,6 +142,10 @@ public class MemoryMapCommitListForUseCase implements Iterable<ObjectId>{
         return "file://"+bareRepo.getAbsolutePath();
     }
     
+    public String getDeliverBranchName() {
+        return "deliver_"+branchName;
+    }
+    
     public Repository getBareGitRepo() throws IOException {
        Repository repo = Git.open(bareRepo).getRepository();
        return repo;

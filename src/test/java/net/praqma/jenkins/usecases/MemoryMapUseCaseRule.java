@@ -25,6 +25,8 @@ package net.praqma.jenkins.usecases;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.io.FileUtils;
@@ -56,7 +58,18 @@ public class MemoryMapUseCaseRule extends ExternalResource {
     }
     
     public List<MemoryMapCommitListForUseCase> getCommitListForTest(String testName) throws IOException, GitAPIException {
-        return Arrays.asList(new MemoryMapCommitListForUseCase("arm-linux-gnueabi-gcc-4.7.4", bareRepo));
+        
+        System.out.printf("Fetching use cases for test %s%n", testName);
+        List<MemoryMapCommitListForUseCase> myList = new ArrayList<>();        
+        for(Method me : clazz.getMethods()) {
+            if(me.getName().equals(testName) && me.getAnnotation(MemoryMapUseCaseAnnotation.class) != null) {                
+                for(String useCase : me.getAnnotation(MemoryMapUseCaseAnnotation.class).useCases()) {
+                    System.out.printf("Found use case %s%n", useCase);
+                    myList.add(new MemoryMapCommitListForUseCase(useCase, bareRepo));
+                }                
+            }
+        }        
+        return myList;
     }
     
     @Override

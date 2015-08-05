@@ -23,13 +23,21 @@
  */
 package net.praqma.jenkins.usecases;
 
+import hudson.FilePath;
+import hudson.model.AbstractBuild;
+import hudson.model.Cause;
+import hudson.model.FreeStyleProject;
+import hudson.tasks.BatchFile;
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import net.praqma.jenkins.integration.TestUtils;
+import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.lib.ObjectId;
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
+import org.jvnet.hudson.test.JenkinsRule;
 
 /**
  *
@@ -37,18 +45,21 @@ import org.junit.rules.TestName;
  */
 public class MemoryMapUseCase {
     
-    public static final String PUBLIC_EXAMPLE_URL = "https://github.com/MadsNielsen/memory-map-examples";
+    public static final String PUBLIC_EXAMPLE_URL = "https://github.com/Praqma/memory-map-examples";
     
     @Rule 
-    public TestName rule = new TestName();
+    public TestName nameRule = new TestName();
     
     @Rule
-    public MemoryMapUseCaseRule rule2 = new MemoryMapUseCaseRule(PUBLIC_EXAMPLE_URL, this.getClass());
+    public MemoryMapUseCaseRule useCaseRule = new MemoryMapUseCaseRule(PUBLIC_EXAMPLE_URL, this.getClass());
+    
+    @Rule
+    public JenkinsRule jenkinsRule = new JenkinsRule();
     
     @Test
-    @MemoryMapUseCaseAnnotation(useCases = {"arm-linux-gnueabi-gcc-4.7.4"})
+    @MemoryMapUseCaseAnnotation(useCases = {"arm-none-eabi-gcc_4.8.4_hello_world"})
     public void testIterator() throws Exception {
-        List<MemoryMapCommitListForUseCase> useCases = rule2.getCommitListForTest(rule.getMethodName());
+        List<MemoryMapCommitListForUseCase> useCases = useCaseRule.getCommitListForTest(nameRule.getMethodName());
         int commitNumber = 1;
         for(MemoryMapCommitListForUseCase useCase : useCases) {
             //For each use case. We create a new repository. The repository must be bare since we'll be using jenkins to 
@@ -57,6 +68,16 @@ public class MemoryMapUseCase {
             //We use master as the target branch but pick commits from the use case branch
             MemoryMapBranchManipulator manipulator = new MemoryMapBranchManipulator(useCase);
             
+            FreeStyleProject project = TestUtils.createProject(jenkinsRule);
+            project = TestUtils.configureGit(project, manipulator.getUseCase().getDeliverBranchName(), manipulator.getUseCase().getFileRemoteName());
+            project.getBuildersList().add(new BatchFile("git branch -a"));
+            project.getBuildersList().add(new BatchFile("git log -n1"));
+            project.save();
+            
+            
+            
+            
+                    
             //Create the local bare repository (Which the jenkins job will use)
             File localBare = manipulator.initRepositoryForUseCase();            
                        
@@ -66,24 +87,21 @@ public class MemoryMapUseCase {
             
             //Cherry pick a sha and transplant a commmit
             ObjectId current;
+            
+            //Extract json from file
+            File expectedResults = new File(MemoryMapUseCase.class.getClassLoader().getResource("result_expect.json").getFile());
+            String json = FileUtils.readFileToString(expectedResults);
+            MemoryMapBuildResultValidator validator = new MemoryMapBuildResultValidator();
+            validator.expectResults(json);
+            
+            
             while((current = manipulator.cherryPickNextForUseCase()) != null) {
-                System.out.printf("Cherry picker #%s %s%n", commitNumber, current.getName());
-                
-                /*
-                    INSERT TESTS HERE: 
-                        1. You can get the branch under test using manipulator.getUseCase().getBranchName()
-                        2. The repo remote is here: manipulator.getUseCase().getFileRemoteName()
-                        3. Profit
-                */
-                
+                System.out.printf("%sCherry picker #%s %s%n",MemoryMapCommitListForUseCase.PREFIX, commitNumber, current.getName());
+                AbstractBuild<?,?> build = project.scheduleBuild2(0, new Cause.UserIdCause()).get(60, TimeUnit.SECONDS);
+                System.out.printf("%sBuild %s finished with status %s using sha %s%n", MemoryMapCommitListForUseCase.PREFIX, build.number, build.getResult(), current.getName());                
+                validator.validateBuild(build).validate();                
                 commitNumber++;
             }
         }
-    }
-    
-    @Test
-    @MemoryMapUseCaseAnnotation(useCases = {"arm-linux-gnueabi-gcc-4.7.4-2222"})
-    public void testIterator2() {
-        Assert.assertTrue(true);
     }
 }

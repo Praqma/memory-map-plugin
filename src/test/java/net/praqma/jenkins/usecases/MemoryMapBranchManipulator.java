@@ -23,7 +23,6 @@
  */
 package net.praqma.jenkins.usecases;
 
-import com.google.common.io.Files;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
@@ -31,15 +30,8 @@ import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.AnyObjectId;
-import org.eclipse.jgit.lib.MutableObjectId;
 import org.eclipse.jgit.lib.ObjectId;
-import org.eclipse.jgit.lib.Ref;
-import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.lib.RepositoryBuilder;
 import org.eclipse.jgit.lib.StoredConfig;
-import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.revwalk.RevCommitList;
-import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 
 /**
  *
@@ -90,7 +82,7 @@ public class MemoryMapBranchManipulator {
         Git.open(dir).fetch().setRemote("origin").call();
         
         String deliverBranchName = "deliver_"+useCase.getBranchName();        
-        Git.open(dir).branchCreate().setStartPoint("remotes/origin/master").setName(deliverBranchName).call();               
+        Git.open(dir).branchCreate().setStartPoint("refs/tags/first_"+useCase.getBranchName()).setName(deliverBranchName).call();               
         Git.open(dir).checkout().setName(deliverBranchName).call();
         Git.open(dir).push().setRemote("origin").add(deliverBranchName).call();       
         this.workDir = dir;

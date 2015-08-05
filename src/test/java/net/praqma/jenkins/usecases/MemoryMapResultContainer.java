@@ -23,14 +23,49 @@
  */
 package net.praqma.jenkins.usecases;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import java.util.HashMap;
 
 /**
  *
  * @author Mads
  */
-@Retention(RetentionPolicy.RUNTIME)
-@interface MemoryMapUseCaseAnnotation {
-    String[] useCases() default { };
+public class MemoryMapResultContainer  {
+    //The raw numeric values for each section
+    private HashMap<Integer,HashMap<String,String>> buildResults = new HashMap<>();
+    
+    //The graph values for each section
+    private HashMap<Integer,HashMap<String,String>> graphResults = new HashMap<>();
+    
+    public MemoryMapResultContainer(HashMap<Integer,HashMap<String,String>> buildResults) {        
+        this.buildResults = buildResults;
+    }
+
+    /**
+     * @return the resultPerBuild
+     */
+    public HashMap<Integer,HashMap<String,String>> getBuildResults() {
+        return buildResults;
+    }
+
+    /**
+     * @param buildResults
+     */
+    public void setBuildResults(HashMap<Integer,HashMap<String,String>> buildResults) {
+        this.buildResults = buildResults;
+    }
+
+    /**
+     * @return the graphResults
+     */
+    public HashMap<Integer,HashMap<String,String>> getGraphResults() {
+        return graphResults;
+    }
+
+    /**
+     * @param graphResults the graphResults to set
+     */
+    public void setGraphResults(HashMap<Integer,HashMap<String,String>> graphResults) {
+        this.graphResults = graphResults;
+    }
+    
 }
