@@ -31,6 +31,6 @@ public class JENKINS_29052_IT {
     }
 
     private GccMemoryMapParser createParser() {
-        return new GccMemoryMapParser(UUID.randomUUID().toString(), null, null, 8, true, null, null);
+        return new GccMemoryMapParser(UUID.randomUUID().toString(), null, null, 8, true, null);
     }
 }

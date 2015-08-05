@@ -21,7 +21,6 @@ import net.praqma.jenkins.memorymap.util.HexUtils;
 import net.praqma.jenkins.memorymap.util.HexUtils.HexifiableString;
 import net.praqma.jenkins.memorymap.util.MemoryMapMemorySelectionError;
 import net.sf.json.JSONObject;
-import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -32,12 +31,10 @@ public class GccMemoryMapParser extends AbstractMemoryMapParser implements Seria
 
     private static final Pattern MEM_SECTIONS = Pattern.compile("^\\s+(\\S+)( \\S+.*|\\(\\S+\\)| ):", Pattern.MULTILINE);
     private static final Logger LOG = Logger.getLogger(GccMemoryMapParser.class.getName());
-    private String script;
 
     @DataBoundConstructor
-    public GccMemoryMapParser(String parserUniqueName, String mapFile, String configurationFile, Integer wordSize, Boolean bytesOnGraph, List<MemoryMapGraphConfiguration> graphConfiguration, String script) {
+    public GccMemoryMapParser(String parserUniqueName, String mapFile, String configurationFile, Integer wordSize, Boolean bytesOnGraph, List<MemoryMapGraphConfiguration> graphConfiguration) {
         super(parserUniqueName, mapFile, configurationFile, wordSize, bytesOnGraph, graphConfiguration);
-        this.script = script;
     }
 
     /**
@@ -151,27 +148,6 @@ public class GccMemoryMapParser extends AbstractMemoryMapParser implements Seria
 
         configuration = guessLengthOfSections(configuration);
 
-        if (StringUtils.isNotBlank(getScript())) {
-            try {
-                ParserItemMixin mixin = new ParserItemMixin(getScript(), sequence.toString());
-                Object o = mixin.evaluate();
-
-                List<MemoryMapConfigMemoryItem> items;
-
-                try {
-                    items = (List<MemoryMapConfigMemoryItem>) o;
-
-                    System.out.println("Evaulation == " + items);
-
-                    configuration.addAll(items);
-                } catch (ClassCastException ex) {
-                    ex.printStackTrace(System.out);
-                }
-            } catch (Exception ex) {
-                LOG.log(Level.SEVERE, this.getClass().getName() + "#parseMapFile", ex);
-            }
-        }
-
         return configuration;
     }
 
@@ -185,12 +161,8 @@ public class GccMemoryMapParser extends AbstractMemoryMapParser implements Seria
             for (String gItem : g.itemizeGraphDataList()) {
                 for (String gSplitItem : gItem.split("\\+")) {
                     //We will fail if the name of the data section does not match any of the named items in the map file.
-                    if (!memconfig.containsSectionWithName(gSplitItem)) {
-                        if (StringUtils.isBlank(getScript())) {
-                            throw new MemoryMapMemorySelectionError(String.format("The memory section named %s not found in map file%nAvailable sections are:%n%s", gSplitItem, memconfig.getItemNames()));
-                        } else {
-                            LOG.info("Deferring judgement on section name %s because we have a mixin present");
-                        }
+                    if (!memconfig.containsSectionWithName(gSplitItem)) {                        
+                        throw new MemoryMapMemorySelectionError(String.format("The memory section named %s not found in map file%nAvailable sections are:%n%s", gSplitItem, memconfig.getItemNames()));                        
                     }
                 }
             }
@@ -201,20 +173,6 @@ public class GccMemoryMapParser extends AbstractMemoryMapParser implements Seria
     @Override
     public int getDefaultWordSize() {
         return 8;
-    }
-
-    /**
-     * @return the script
-     */
-    public String getScript() {
-        return script;
-    }
-
-    /**
-     * @param script the script to set
-     */
-    public void setScript(String script) {
-        this.script = script;
     }
 
     @Extension

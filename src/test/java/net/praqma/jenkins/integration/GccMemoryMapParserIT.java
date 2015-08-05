@@ -61,27 +61,6 @@ public class GccMemoryMapParserIT {
     }
 
     @Test
-    public void gcc432_testUsagevalues_withMixin() throws Exception {
-        FreeStyleProject project = TestUtils.createProject(jenkins);
-        TestUtils.prepareProjectWorkspace(project, "gcc432.zip");
-
-        MemoryMapGraphConfiguration graphConfiguration = new MemoryMapGraphConfiguration(".text+.rodata", "432", true);
-        GccMemoryMapParser parser = createParser(graphConfiguration);
-        parser.setMapFile("prom2_432.map");
-        parser.setConfigurationFile("prom432.ld");
-        URL groovyScript = this.getClass().getResource("mixin_groovy.groovy");
-        String groovy = new String(readAllBytes(get(groovyScript.toURI())));
-        parser.setScript(groovy);
-        TestUtils.setMemoryMapConfiguration(project, parser);
-
-        Map<String, String> expectedValues = new HashMap<String, String>();
-        expectedValues.put(".text", "0x10a008");
-        expectedValues.put(".rodata", "0x33fd7");
-
-        TestUtils.doBuildAssert(project, jenkins, expectedValues);
-    }
-
-    @Test
     public void gcc482_testUsageValues() throws Exception {
         MemoryMapGraphConfiguration graphConfiguration = new MemoryMapGraphConfiguration(".prom_text+.ram_data", "482", true);
         GccMemoryMapParser parser = createParser(graphConfiguration);
@@ -96,6 +75,6 @@ public class GccMemoryMapParserIT {
     }
 
     private GccMemoryMapParser createParser(MemoryMapGraphConfiguration... graphConfiguration) {
-        return new GccMemoryMapParser(UUID.randomUUID().toString(), null, null, 8, true, Arrays.asList(graphConfiguration), null);
+        return new GccMemoryMapParser(UUID.randomUUID().toString(), null, null, 8, true, Arrays.asList(graphConfiguration));
     }
 }
