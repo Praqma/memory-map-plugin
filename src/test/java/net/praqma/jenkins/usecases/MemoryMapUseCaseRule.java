@@ -44,34 +44,16 @@ import org.junit.runners.model.Statement;
 public class MemoryMapUseCaseRule extends ExternalResource {
 
     private String url;
-    private Class<?> clazz;
-    private TestName nameRule;
     private static File bareRepo;
     
-    public MemoryMapUseCaseRule(String url, Class<?> currentClass) {
+    public MemoryMapUseCaseRule(String url) {
         this.url = url;
-        this.clazz = currentClass;
     }
  
-    public static File getBareRepo() {
+    public File getBareRepo() {
         return MemoryMapUseCaseRule.bareRepo;
     }
-    
-    public List<MemoryMapCommitListForUseCase> getCommitListForTest(String testName) throws IOException, GitAPIException {
-        
-        System.out.printf("Fetching use cases for test %s%n", testName);
-        List<MemoryMapCommitListForUseCase> myList = new ArrayList<>();        
-        for(Method me : clazz.getMethods()) {
-            if(me.getName().equals(testName) && me.getAnnotation(MemoryMapUseCaseAnnotation.class) != null) {                
-                for(String useCase : me.getAnnotation(MemoryMapUseCaseAnnotation.class).useCases()) {
-                    System.out.printf("Found use case %s%n", useCase);
-                    myList.add(new MemoryMapCommitListForUseCase(useCase, bareRepo));
-                }                
-            }
-        }        
-        return myList;
-    }
-    
+
     @Override
     public Statement apply(Statement base, Description description) {
         try {
