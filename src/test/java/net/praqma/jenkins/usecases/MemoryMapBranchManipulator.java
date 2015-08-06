@@ -42,23 +42,10 @@ public class MemoryMapBranchManipulator {
     private MemoryMapCommitListForUseCase useCase;
     private File workDir;
     
-    //Create the repository for this use case. We create a bare repo and commit push each commit as required. 
-    //This is the bare repository that the jenkins project will poll on.
-    public File initRepositoryForUseCase() throws IOException, GitAPIException {
-        
-        File dir = new File(FileUtils.getTempDirectory(),"/"+useCase.getBranchName()+".git");
-        if(dir.exists()) {
-            FileUtils.deleteDirectory(dir);
-        }
-        dir.mkdir();
-        
-        Git.init().setBare(true).setDirectory(dir).call().close();
-        return dir;
-    }
-    
     //Create the repository where we can work and cherry pick our commits
     //When calling useCase.getBareRepo() we have the local master copy of the projects directory
-    public File createWorkRepo(File bareRepo) throws IOException, GitAPIException {
+    //This should return the intial configuration
+    public File initUseCase() throws IOException, GitAPIException {
         File dir = new File(FileUtils.getTempDirectory(),"/"+useCase.getBranchName());
         if(dir.exists()) {
             FileUtils.deleteDirectory(dir);

@@ -70,7 +70,7 @@ public class MemoryMapBuildResultValidator {
         return this;
     }
     
-    public MemoryMapBuildResultValidator expectResults(String json) {
+    public MemoryMapBuildResultValidator expectResults(String json) {       
         this.expectedResults = gson.fromJson(json, MemoryMapResultContainer.class);
         return this;
     }
