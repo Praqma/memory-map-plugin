@@ -46,12 +46,11 @@ public class MemoryMapCommitListForUseCase implements Iterable<ObjectId>{
 
     public final static String PREFIX = "[Memory Map Use Cases]";
     private final String branchName;
-    private final List<ObjectId> commits;
+    private final List<ObjectId> commits = new ArrayList<>();
     private final File bareRepo;
     
     public MemoryMapCommitListForUseCase(String branchName, File bareRepo) throws IOException, GitAPIException {
         this.branchName = branchName;
-        this.commits = new ArrayList<>();
         this.bareRepo = bareRepo;
         init();
     }
