@@ -22,6 +22,7 @@
  * THE SOFTWARE.
  */
 package net.praqma.jenkins.unit;
+import hudson.AbortException;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
@@ -30,12 +31,17 @@ import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfiguration;
 import net.praqma.jenkins.memorymap.parser.gcc.GccMemoryMapParser;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
 import static org.junit.Assert.*;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 /**
  *
  * @author mads
  */
 public class MemoryMapGccParserTest {
+        
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();    
     
     @Test
     public void testParsingOfMemorySegmentInLinkerCommandFile() throws IOException {
@@ -114,5 +120,32 @@ public class MemoryMapGccParserTest {
 
         String result = GccMemoryMapParser.stripComments(testDataWithLotsOfCrazyComments).toString();
         assertEquals("Testing successful stripping of lots of block comments", expectedResult, result);
+    }
+    
+
+    
+    @Test
+    public void testAssertCorrectExceptionThrown() throws Exception {
+        String illegaAmountOfMemory =
+            "MEMORY/*" +
+                    "" +
+                    "" +
+                    "*/\n" +
+            " {\n" +
+            "  /* start comment */\n" +
+            "  /* start line comment */ reserved1 (!A)  : ORIGIN = 0, LENGTH = 0xÅP\n" +
+            "  application (rx) : ORIGIN = 0x100000, LENGTH = 2M\n" +
+            "  reserved2 (!A)  : ORI/**/GIN = 0x03/* ***** */00000, LENGTH = 0x04ÅN /* COMMENT */\n" +
+            "  ram (w)     : ORIGIN = 0x0800000, LENGTH = 2M /* 0x04FFFFF */\n" +
+            "  /* more " +
+                    "comment */\n" +
+            " }";
+        
+        
+        thrown.expect(AbortException.class);
+        thrown.expectMessage("Unable to convert 0xÅP to a valid hex string.");  
+        
+        GccMemoryMapParser parser = new GccMemoryMapParser();
+        parser.getMemory(illegaAmountOfMemory);
     }
 }

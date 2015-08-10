@@ -1,5 +1,6 @@
 package net.praqma.jenkins.memorymap.parser.gcc;
 
+import hudson.AbortException;
 import hudson.Extension;
 import java.io.File;
 import java.io.IOException;
@@ -52,18 +53,26 @@ public class GccMemoryMapParser extends AbstractMemoryMapParser implements Seria
     }
 
     /**
+     * Parses the MEMORY section of the GCC file. Throws an abort exception which will be shown in the Jenkins console log. 
+     * 
      * @param seq The content of the map file
      * @return a list of the defined MEMORY in the map file
-     */
-    public MemoryMapConfigMemory getMemory(CharSequence seq) {
+     * @throws hudson.AbortException          
+     **/
+    public MemoryMapConfigMemory getMemory(CharSequence seq) throws AbortException {
 
         Pattern allMemory = Pattern.compile(".*?^(\\s+\\S+).*?[ORIGIN|org|o].*?=([^,]*).*?[LENGTH|len|l]\\s\\=\\s*([^\\s]*).*$", Pattern.MULTILINE);
         Matcher match = allMemory.matcher(seq);
         MemoryMapConfigMemory memory = new MemoryMapConfigMemory();
         while (match.find()) {
-            String hexLength = new HexUtils.HexifiableString(match.group(3)).toValidHexString().rawString;
-            MemoryMapConfigMemoryItem item = new MemoryMapConfigMemoryItem(match.group(1), match.group(2), hexLength);
-            memory.add(item);
+            try {
+                String hexLength = new HexUtils.HexifiableString(match.group(3)).toValidHexString().rawString;
+                MemoryMapConfigMemoryItem item = new MemoryMapConfigMemoryItem(match.group(1), match.group(2), hexLength);
+                memory.add(item);
+            } catch (Throwable ex) {
+                logger.log(Level.SEVERE, "Unable to convert %s to a valid hex string.", ex);
+                throw new AbortException( String.format( "Unable to convert %s to a valid hex string.", match.group(3) ) );
+            }
         }
         return memory;
     }
