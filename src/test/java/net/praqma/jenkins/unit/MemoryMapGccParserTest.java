@@ -52,4 +52,67 @@ public class MemoryMapGccParserTest {
         File f2 = new File(fileNameMap);
         mem = parser.parseMapFile(f2, mem);
     }
+
+    @Test
+    public void testStrippingNoComments() {
+        String testData = "This string contains a line-change" +
+                "but no comments";
+        String expected = testData;
+        String result = GccMemoryMapParser.stripComments(testData).toString();
+        assertEquals("Testing successful stripping of lots of block comments", expected, result);
+    }
+
+    @Test
+    public void testStrippingSimpleComment() {
+        String testData = "This string contains an inline /* block comment */ and more";
+        String expected = "This string contains an inline  and more";
+        String result = GccMemoryMapParser.stripComments(testData).toString();
+        assertEquals("Testing successful stripping of lots of block comments", expected, result);
+    }
+
+    @Test
+    public void testStrippingMultiLineBlockComment() {
+        String testData = "This string contains a " +
+                "/* multiline" +
+                " * block" +
+                " * comment */" +
+                " and more";
+        String expected = "This string contains a " +
+                "" +
+                " and more";
+        String result = GccMemoryMapParser.stripComments(testData).toString();
+        assertEquals("Testing successful stripping of lots of block comments", expected, result);
+    }
+
+    @Test
+    public void testStrippingLotsOfCrazyComments() {
+        String testDataWithLotsOfCrazyComments =
+                "MEMORY/*" +
+                        "" +
+                        "" +
+                        "*/\n" +
+                " {\n" +
+                "  /* start comment */\n" +
+                "  /* start line comment */ reserved1 (!A)  : ORIGIN = 0, LENGTH = 0x00FFFFF\n" +
+                "  application (rx) : ORIGIN = 0x100000, LENGTH = 2M\n" +
+                "  reserved2 (!A)  : ORI/**/GIN = 0x03/* ***** */00000, LENGTH = 0x04FFFFF /* COMMENT */\n" +
+                "  ram (w)     : ORIGIN = 0x0800000, LENGTH = 2M /* 0x04FFFFF */\n" +
+                "  /* more " +
+                        "comment */\n" +
+                " }";
+
+        String expectedResult =
+                "MEMORY\n" +
+                        " {\n" +
+                        "  \n" +
+                        "   reserved1 (!A)  : ORIGIN = 0, LENGTH = 0x00FFFFF\n" +
+                        "  application (rx) : ORIGIN = 0x100000, LENGTH = 2M\n" +
+                        "  reserved2 (!A)  : ORIGIN = 0x0300000, LENGTH = 0x04FFFFF \n" +
+                        "  ram (w)     : ORIGIN = 0x0800000, LENGTH = 2M \n" +
+                        "  \n" +
+                        " }";
+
+        String result = GccMemoryMapParser.stripComments(testDataWithLotsOfCrazyComments).toString();
+        assertEquals("Testing successful stripping of lots of block comments", expectedResult, result);
+    }
 }

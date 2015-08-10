@@ -2,10 +2,12 @@ OUTPUT_ARCH ( m68k )
 
 MEMORY
  {
-  reserved1 (!A)  : ORIGIN = 0, LENGTH = 0x00FFFFF
+  /* start comment */
+  /* start line comment */ reserved1 (!A)  : ORIGIN = 0, LENGTH = 0x00FFFFF
   application (rx) : ORIGIN = 0x100000, LENGTH = 2M
-  reserved2 (!A)  : ORIGIN = 0x0300000, LENGTH = 0x04FFFFF
-  ram (w)     : ORIGIN = 0x0800000, LENGTH = 2M
+  reserved2 (!A)  : ORI/**/GIN = 0x03/* ***/** */00000, LENGTH = 0x04FFFFF /* COMMENT */
+  ram (w)     : ORIGIN = 0x0800000, LENGTH = 2M /* 0x04FFFFF */
+  /* more comment */
  }
 
 SECTIONS {

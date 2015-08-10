@@ -30,6 +30,7 @@ import org.kohsuke.stapler.StaplerRequest;
 public class GccMemoryMapParser extends AbstractMemoryMapParser implements Serializable {
 
     private static final Pattern MEM_SECTIONS = Pattern.compile("^\\s+(\\S+)( \\S+.*|\\(\\S+\\)| ):", Pattern.MULTILINE);
+    private static final Pattern COMMENT_BLOCKS = Pattern.compile("/\\*(?:.|[\\n\\r])*?\\*/");
     private static final Logger LOG = Logger.getLogger(GccMemoryMapParser.class.getName());
 
     @DataBoundConstructor
@@ -38,15 +39,25 @@ public class GccMemoryMapParser extends AbstractMemoryMapParser implements Seria
     }
 
     /**
-     * @param f
-     * @throws java.io.IOException
+     * Strip any c-style block comments, e.g slash-star to star-slash.
+     * <b>Note:</b> this function down not correctly handle nested comment blocks.
+     * <b>Note:</b> this function is a bit greedy, and will incorrectly strip comments inside strings,
+     * but this shouldn't be a problem for memory config files.
+     * @param seq The content of a file that might contain c-style block-comments
+     * @return The same content, that has now had all block-comments stripped out.
+     */
+    public static CharSequence stripComments(CharSequence seq) {
+        Matcher commentMatcher = COMMENT_BLOCKS.matcher(seq);
+        return commentMatcher.replaceAll("");
+    }
+
+    /**
+     * @param seq The content of the map file
      * @return a list of the defined MEMORY in the map file
      */
-    public MemoryMapConfigMemory getMemory(File f) throws IOException {
+    public MemoryMapConfigMemory getMemory(CharSequence seq) {
 
-        Pattern allMemory = Pattern.compile(".*?^(\\s+\\S+).*?ORIGIN.*?=([^,]*).*?LENGTH\\s\\=(.*).*$", Pattern.MULTILINE);
-        CharSequence seq = createCharSequenceFromFile(f);
-
+        Pattern allMemory = Pattern.compile(".*?^(\\s+\\S+).*?[ORIGIN|org|o].*?=([^,]*).*?[LENGTH|len|l]\\s\\=\\s*([^\\s]*).*$", Pattern.MULTILINE);
         Matcher match = allMemory.matcher(seq);
         MemoryMapConfigMemory memory = new MemoryMapConfigMemory();
         while (match.find()) {
@@ -66,9 +77,8 @@ public class GccMemoryMapParser extends AbstractMemoryMapParser implements Seria
      }   
      * 
      */
-    public List<MemoryMapConfigMemoryItem> getSections(File f) throws IOException {
+    public List<MemoryMapConfigMemoryItem> getSections(CharSequence m) {
         List<MemoryMapConfigMemoryItem> items = new ArrayList<MemoryMapConfigMemoryItem>();
-        CharSequence m = createCharSequenceFromFile(f);
 
         Pattern section = Pattern.compile(".*SECTIONS\\s?\\r?\\n?\\{(.*)\\n\\}", Pattern.MULTILINE | Pattern.DOTALL);
 
@@ -154,9 +164,11 @@ public class GccMemoryMapParser extends AbstractMemoryMapParser implements Seria
     @Override
     public MemoryMapConfigMemory parseConfigFile(File f) throws IOException {
         //Collect sections from both the MEMORY and the SECTIONS areas from the command file.
-        //The memory are the top level components, sections belong to one of thsese sections
-        MemoryMapConfigMemory memconfig = getMemory(f);
-        memconfig.addAll(getSections(f));
+        //The memory are the top level components, sections belong to one of these sections
+        CharSequence stripped = stripComments(createCharSequenceFromFile(f));
+
+        MemoryMapConfigMemory memconfig = getMemory(stripped);
+        memconfig.addAll(getSections(stripped));
         for (MemoryMapGraphConfiguration g : getGraphConfiguration()) {
             for (String gItem : g.itemizeGraphDataList()) {
                 for (String gSplitItem : gItem.split("\\+")) {
