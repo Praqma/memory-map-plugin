@@ -16,7 +16,7 @@ public class JENKINS_29052_IT {
     public JenkinsRule jenkins = new JenkinsRule();
 
     @Test
-    public void failsWithoutGraphs() throws Exception {
+    public void succeedsWithoutGraphs() throws Exception {
         GccMemoryMapParser parser = createParser();
         parser.setMapFile("gcc482.map");
         parser.setConfigurationFile("prom482.ld");
@@ -27,7 +27,7 @@ public class JENKINS_29052_IT {
 
         FreeStyleBuild build = TestUtils.runNewBuild(project);
         TestUtils.printBuildConsoleLog(build, jenkins);
-        jenkins.assertBuildStatus(Result.FAILURE, build);
+        jenkins.assertBuildStatus(Result.SUCCESS, build);
     }
 
     private GccMemoryMapParser createParser() {
