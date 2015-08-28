@@ -2,7 +2,9 @@ package net.praqma.jenkins.memorymap;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javaposse.jobdsl.dsl.Context;
 import static javaposse.jobdsl.dsl.Preconditions.checkArgument;
 import static javaposse.jobdsl.plugin.ContextExtensionPoint.executeInContext;
@@ -18,38 +20,49 @@ public class MemoryMapDslContext implements Context {
     String scale;
     List<MemoryMapGraphConfiguration> graphs = new ArrayList<>();
     List<AbstractMemoryMapParser> parsers = new ArrayList<>();
-    List<String> scales = Arrays.asList("default", "kilo", "Mega", "Giga");
-    List<String> parserTypes = Arrays.asList("gcc", "ti");
+    Map<String, String> scales = new HashMap<String, String>() {
+        {
+            put("DEFAULT", "default");
+            put("KILO", "kilo");
+            put("MEGA", "Mega");
+            put("GIGA", "Giga");
+        }
+    };
+    List<String> parserTypes = Arrays.asList("GCC", "TI");
 
     public void wordSize(int value) {
         wordSize = value;
     }
 
+    public void showBytesOnGraphs() {
+        showBytesOnGraphs = true;
+    }
+    
     public void showBytesOnGraphs(boolean value) {
         showBytesOnGraphs = value;
     }
 
     public void scale(String value) {
-        checkArgument(scales.contains(value), "Scale must be one of " + scales);
-        scale = value;
+        checkArgument(scales.containsKey(value), "Scale must be one of " + scales);
+        scale = scales.get(value);
     }
 
-    public void parser(String parserType, Runnable closure) {
+    public void parser(String parserType, String parserUniqueName, String commandFile, String mapFile, Runnable closure) {
         checkArgument(parserTypes.contains(parserType), "Parser type must be one of " + parserTypes);
         MemoryMapParserDslContext context = new MemoryMapParserDslContext(showBytesOnGraphs);
         executeInContext(closure, context);
 
         AbstractMemoryMapParser parser = null;
         switch (parserType) {
-            case "gcc":
-                parser = new GccMemoryMapParser(context.parserUniqueName, context.mapFile, context.commandFile, wordSize, showBytesOnGraphs, context.graphConfigurations);
+            case "GCC":
+                parser = new GccMemoryMapParser(parserUniqueName, mapFile, commandFile, wordSize, showBytesOnGraphs, context.graphConfigurations);
                 break;
-            case "ti":
-                parser = new TexasInstrumentsMemoryMapParser(context.parserUniqueName, context.mapFile, context.commandFile, wordSize, context.graphConfigurations, showBytesOnGraphs);
+            case "TI":
+                parser = new TexasInstrumentsMemoryMapParser(parserUniqueName, mapFile, commandFile, wordSize, context.graphConfigurations, showBytesOnGraphs);
                 break;
         }
 
-        if(parser != null){
+        if (parser != null) {
             parser.setParserTitle(context.parserTitle);
             parsers.add(parser);
         }
