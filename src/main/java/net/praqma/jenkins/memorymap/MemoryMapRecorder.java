@@ -46,8 +46,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfiguration;
 import net.praqma.jenkins.memorymap.parser.*;
-import net.praqma.jenkins.memorymap.parser.TexasInstrumentsMemoryMapParser;
-import net.praqma.jenkins.memorymap.parser.ti.*;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
 import net.praqma.jenkins.memorymap.util.MemoryMapError;
 import net.sf.json.JSONObject;

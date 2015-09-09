@@ -11,8 +11,8 @@ import javaposse.jobdsl.plugin.DslExtensionMethod;
 job {
     publishers {
         memoryMap {
-            wordSize (Integer wordSize)
-            showBytesOnGraphs (boolean showBytesOnGraph = true) //defaults to false
+            wordSize (Integer wordSize) // Defaults to 8
+            showBytesOnGraphs (boolean showBytesOnGraph = true) // Defaults to false
             scale (String scale)
             parser(String parserType, String parserUniqueName, String commandFile, String mapFile) {
                 parserTitle (String parserTitle)
@@ -29,7 +29,7 @@ job {
 Valid values for `parserType` are `GCC` and `TI`. Valid values for `scale` are `DEFAULT`, `KILO`, `MEGA` and `GIGA`.
 
 ```
-job {
+job ('mmap_GEN'){
     publishers {
         memoryMap {
             wordSize 16
@@ -53,12 +53,12 @@ job {
 */
 
 @Extension(optional = true)
-public class MemoryMapDslExtension  extends ContextExtensionPoint {
+public class MemoryMapDslExtension extends ContextExtensionPoint {
     
     @RequiresPlugin(id = "memory-map", minimumVersion = "2.1.0")
     @DslExtensionMethod(context = PublisherContext.class)
     public Object memoryMap(Runnable closure){
-        MemoryMapDslContext context = new MemoryMapDslContext();
+        MemoryMapJobDslContext context = new MemoryMapJobDslContext();
         executeInContext(closure, context);
 
         return new MemoryMapRecorder(context.parsers, context.showBytesOnGraphs, String.valueOf(context.wordSize), context.scale, null);

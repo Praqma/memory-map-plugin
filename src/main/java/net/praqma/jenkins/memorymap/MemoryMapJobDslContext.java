@@ -8,18 +8,29 @@ import java.util.Map;
 import javaposse.jobdsl.dsl.Context;
 import static javaposse.jobdsl.dsl.Preconditions.checkArgument;
 import static javaposse.jobdsl.plugin.ContextExtensionPoint.executeInContext;
-import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfiguration;
 import net.praqma.jenkins.memorymap.parser.AbstractMemoryMapParser;
 import net.praqma.jenkins.memorymap.parser.gcc.GccMemoryMapParser;
 import net.praqma.jenkins.memorymap.parser.ti.TexasInstrumentsMemoryMapParser;
 
-public class MemoryMapDslContext implements Context {
+public class MemoryMapJobDslContext implements Context {
 
-    int wordSize;
-    boolean showBytesOnGraphs;
-    String scale;
-    List<MemoryMapGraphConfiguration> graphs = new ArrayList<>();
-    List<AbstractMemoryMapParser> parsers = new ArrayList<>();
+    int wordSize = 8;
+
+    public void wordSize(int value) {
+        wordSize = value;
+    }
+
+    boolean showBytesOnGraphs = false;
+
+    public void showBytesOnGraphs() {
+        showBytesOnGraphs = true;
+    }
+
+    public void showBytesOnGraphs(boolean value) {
+        showBytesOnGraphs = value;
+    }
+
+    String scale = "default";
     Map<String, String> scales = new HashMap<String, String>() {
         {
             put("DEFAULT", "default");
@@ -28,24 +39,14 @@ public class MemoryMapDslContext implements Context {
             put("GIGA", "Giga");
         }
     };
-    List<String> parserTypes = Arrays.asList("GCC", "TI");
-
-    public void wordSize(int value) {
-        wordSize = value;
-    }
-
-    public void showBytesOnGraphs() {
-        showBytesOnGraphs = true;
-    }
-    
-    public void showBytesOnGraphs(boolean value) {
-        showBytesOnGraphs = value;
-    }
 
     public void scale(String value) {
         checkArgument(scales.containsKey(value), "Scale must be one of " + scales);
         scale = scales.get(value);
     }
+
+    List<AbstractMemoryMapParser> parsers = new ArrayList<>();
+    List<String> parserTypes = Arrays.asList("GCC", "TI");
 
     public void parser(String parserType, String parserUniqueName, String commandFile, String mapFile, Runnable closure) {
         checkArgument(parserTypes.contains(parserType), "Parser type must be one of " + parserTypes);
