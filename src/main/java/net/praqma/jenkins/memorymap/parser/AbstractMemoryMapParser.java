@@ -23,6 +23,9 @@
  */
 package net.praqma.jenkins.memorymap.parser;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import hudson.DescriptorExtensionList;
 import hudson.ExtensionPoint;
 import hudson.model.Describable;
@@ -45,14 +48,18 @@ import java.util.regex.Pattern;
 import jenkins.model.Jenkins;
 import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfiguration;
 import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfigurationDescriptor;
+import net.praqma.jenkins.memorymap.parser.gcc.GccMemoryMapParser;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
 import org.apache.commons.collections.ListUtils;
 import org.kohsuke.stapler.DataBoundSetter;
 
-/**
- *
- * @author Praqma
- */
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.PROPERTY,
+    property = "type")
+@JsonSubTypes({
+    @Type(value = TexasInstrumentsMemoryMapParser.class, name = "TexasInstrumentsMemoryMapParser"),
+    @Type(value = GccMemoryMapParser.class, name = "GccMemoryMapParser") })
 public abstract class AbstractMemoryMapParser implements Describable<AbstractMemoryMapParser>, ExtensionPoint, Serializable {
 
     private static final String UTF_8_CHARSET = "UTF8";
@@ -77,7 +84,7 @@ public abstract class AbstractMemoryMapParser implements Describable<AbstractMem
     
     public AbstractMemoryMapParser () {  
         this.patterns = ListUtils.EMPTY_LIST;
-        this.graphConfiguration = new ArrayList<MemoryMapGraphConfiguration>();
+        this.graphConfiguration = new ArrayList<>();
         this.parserUniqueName = "Default";
     }
     

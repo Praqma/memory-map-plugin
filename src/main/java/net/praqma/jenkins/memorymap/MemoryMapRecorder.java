@@ -84,6 +84,11 @@ public class MemoryMapRecorder extends Recorder {
         return BuildStepMonitor.BUILD;
     }
     
+    public MemoryMapRecorder(){
+        scale = null;
+        graphConfiguration = null;
+    }
+
     @DataBoundConstructor
     public MemoryMapRecorder(List<AbstractMemoryMapParser> chosenParsers, boolean showBytesOnGraph, String wordSize, final String scale , final List<MemoryMapGraphConfiguration> graphConfiguration) {
         this.chosenParsers = chosenParsers;
@@ -115,7 +120,7 @@ public class MemoryMapRecorder extends Recorder {
                 }
             }
 
-            List<AbstractMemoryMapParser> parsers = new ArrayList<AbstractMemoryMapParser>();
+            List<AbstractMemoryMapParser> parsers = new ArrayList<>();
             parsers.add(getChosenParser());
             setChosenParsers(parsers);
         }
