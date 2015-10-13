@@ -26,7 +26,7 @@ package net.praqma.jenkins.unit;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.util.HashMap;
-import net.praqma.jenkins.usecases.MemoryMapResultContainer;
+import net.praqma.jenkins.usecases.ResultContainer;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -68,7 +68,7 @@ public class MemoryMapResultContainerSerialization {
         
         
         //MemoryMapResultContainer container = new MemoryMapResultContainer(results);
-        MemoryMapResultContainer container = null;
+        ResultContainer container = null;
         container.setGraphResults(resultsGraph);
         Gson gson = new GsonBuilder().create();
         String result = gson.toJson(container);

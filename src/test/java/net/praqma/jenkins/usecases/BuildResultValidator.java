@@ -12,7 +12,7 @@ import org.w3c.dom.NodeList;
 public class BuildResultValidator {
 
     private Run<?, ?> build;
-    private MemoryMapResultContainer expectedResults;
+    private ResultContainer expectedResults;
     private boolean validateGraphs = true;
     private boolean validateValues = true;
 
@@ -20,7 +20,7 @@ public class BuildResultValidator {
     }
 
     public BuildResultValidator expect(String json) {
-        this.expectedResults = JsonParser.gson.fromJson(json, MemoryMapResultContainer.class);
+        this.expectedResults = JsonParser.gson.fromJson(json, ResultContainer.class);
         return this;
     }
 
@@ -57,11 +57,10 @@ public class BuildResultValidator {
     }
 
     private HashMap<String, MemoryMapConfigMemoryItem> getMemoryItems(Run<?, ?> build) throws Exception {
-        File buildFile = new File(build.getLogFile().getParent() + "/build.xml");
-        Document document = JsonParser.parseXml(buildFile);
-
         HashMap<String, MemoryMapConfigMemoryItem> usageMap = new HashMap<>();
 
+        File buildFile = new File(build.getLogFile().getParent() + "/build.xml");
+        Document document = JsonParser.parseXml(buildFile);
         NodeList allNodes = document.getElementsByTagName("*");
         for (int i = 0; i < allNodes.getLength(); i++) {
             if (allNodes.item(i).getNodeName().equals("net.praqma.jenkins.memorymap.result.MemoryMapConfigMemoryItem")) {
@@ -70,6 +69,7 @@ public class BuildResultValidator {
                 usageMap.put(item.getName(), item);
             }
         }
+        
         return usageMap;
     }
 }
