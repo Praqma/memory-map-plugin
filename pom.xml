@@ -1,143 +1,149 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-   <modelVersion>4.0.0</modelVersion>
-   <parent>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>plugin</artifactId>
-      <version>1.580</version>
-   </parent>
-   <groupId>net.praqma</groupId>
-   <artifactId>memory-map</artifactId>
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.jenkins-ci.plugins</groupId>
+        <artifactId>plugin</artifactId>
+        <version>1.580</version>
+    </parent>
+    <groupId>net.praqma</groupId>
+    <artifactId>memory-map</artifactId>
     <version>2.1.0-SNAPSHOT</version>
-   <packaging>hpi</packaging>
-   <name>Memory Map Plugin</name>
-   <url>https://wiki.jenkins-ci.org/display/JENKINS/memory+map+plugin</url>
-   <description>Enables the parsing of memory map files and their linker scripts. Currently supports Gcc and TexasInstruments compilers</description>
-   <developers>
-      <developer>
-         <id>MadsNielsen</id>
-         <email>man@praqma.net</email>
-         <name>Mads Nielsen&gt;</name>
-         <organization>Prama</organization>
-         <organizationUrl>http://www.praqma.com</organizationUrl>
-         <roles>
-            <role>developer</role>
-         </roles>
-         <timezone>+1</timezone>
+    <packaging>hpi</packaging>
+    <name>Memory Map Plugin</name>
+    <url>https://wiki.jenkins-ci.org/display/JENKINS/memory+map+plugin</url>
+    <description>Enables the parsing of memory map files and their linker scripts. Currently supports Gcc and TexasInstruments compilers</description>
+    <developers>
+        <developer>
+            <id>MadsNielsen</id>
+            <email>man@praqma.net</email>
+            <name>Mads Nielsen&gt;</name>
+            <organization>Prama</organization>
+            <organizationUrl>http://www.praqma.com</organizationUrl>
+            <roles>
+                <role>developer</role>
+            </roles>
+            <timezone>+1</timezone>
         </developer>
-      <developer>
-         <id>jes-struck</id>
-         <email>jes@praqma.net</email>
-         <name>Jes Struck</name>
-         <organization>Praqma</organization>
-         <organizationUrl>http://www.praqma.com</organizationUrl>
-         <roles>
-            <role>developer</role>
-         </roles>
-         <timezone>+1</timezone>
-      </developer>
-      <developer>
-         <id>buep</id>
-         <name>Bue Petersen</name>
-         <email>bue@praqma.net</email>
-         <organization>Praqma</organization>
-         <organizationUrl>http://www.praqma.com</organizationUrl>
-         <roles>
-            <role>developer</role>
-         </roles>
-         <timezone>+1</timezone>
-      </developer>
-      <developer>
-         <id>hleote</id>
-         <name>Hugo Leote</name>
-         <email>hleote@praqma.net</email>
-         <organization>Praqma</organization>
-         <organizationUrl>http://www.praqma.com</organizationUrl>
-         <roles>
-            <role>intern/developer</role>
-         </roles>
-         <timezone>+1</timezone>
-      </developer>
-      <developer>
-         <id>mvgeorgiev</id>
-         <name>Martin Georgiev</name>
-         <email>mvgeorgiev@praqma.net</email>
-         <organization>Praqma</organization>
-         <organizationUrl>http://www.praqma.com</organizationUrl>
-         <roles>
-            <role>intern/developer</role>
-         </roles>
-         <timezone>+1</timezone>
-      </developer>
-   </developers>
-   <dependencies>
-      <dependency>
-         <groupId>net.praqma</groupId>
-         <artifactId>praqmajutils</artifactId>
-         <version>0.1.34</version>
-      </dependency>
-      <dependency>
-         <groupId>org.antlr</groupId>
-         <artifactId>antlr4</artifactId>
-         <version>4.1</version>
-      </dependency>
-      <dependency>
-         <groupId>com.stanfy</groupId>
-         <artifactId>gson-xml-java</artifactId>
-         <version>0.1.7</version>
-      </dependency>
-      <dependency>
-         <groupId>org.jenkins-ci.plugins</groupId>
-         <artifactId>git</artifactId>
-         <version>2.4.0</version>
-         <scope>test</scope>
-      </dependency>
-      <dependency>
-         <groupId>org.jenkins-ci.plugins</groupId>
-         <artifactId>multiple-scms</artifactId>
-         <version>0.3</version>
-         <optional>true</optional>
-      </dependency>
-      <dependency>
-         <groupId>junit</groupId>
-         <artifactId>junit</artifactId>
-         <version>4.11</version>
-         <scope>test</scope>
-      </dependency>
-      <dependency>
-         <groupId>org.mockito</groupId>
-         <artifactId>mockito-all</artifactId>
-         <version>1.9.5</version>
-         <scope>test</scope>
-      </dependency>
-      <dependency>
-         <groupId>org.jenkins-ci.main</groupId>
-         <artifactId>jenkins-test-harness</artifactId>
-         <version>1.532</version>
-         <scope>test</scope>
-      </dependency>
-      <dependency>
-         <groupId>commons-io</groupId>
-         <artifactId>commons-io</artifactId>
-         <version>2.4</version>
-      </dependency>
-      <dependency>
-         <groupId>com.fasterxml.jackson.core</groupId>
-         <artifactId>jackson-databind</artifactId>
-         <version>2.4.6</version>
-         <scope>test</scope>
-         <type>jar</type>
-      </dependency>
-      <dependency>
-         <groupId>com.fasterxml.jackson.core</groupId>
-         <artifactId>jackson-annotations</artifactId>
-         <version>2.4.6</version>
-         <type>jar</type>
-      </dependency>
-   </dependencies>
-   <build>
-      <plugins>
-         <!-- 
+        <developer>
+            <id>jes-struck</id>
+            <email>jes@praqma.net</email>
+            <name>Jes Struck</name>
+            <organization>Praqma</organization>
+            <organizationUrl>http://www.praqma.com</organizationUrl>
+            <roles>
+                <role>developer</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
+        <developer>
+            <id>buep</id>
+            <name>Bue Petersen</name>
+            <email>bue@praqma.net</email>
+            <organization>Praqma</organization>
+            <organizationUrl>http://www.praqma.com</organizationUrl>
+            <roles>
+                <role>developer</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
+        <developer>
+            <id>hleote</id>
+            <name>Hugo Leote</name>
+            <email>hleote@praqma.net</email>
+            <organization>Praqma</organization>
+            <organizationUrl>http://www.praqma.com</organizationUrl>
+            <roles>
+                <role>intern/developer</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
+        <developer>
+            <id>mvgeorgiev</id>
+            <name>Martin Georgiev</name>
+            <email>mvgeorgiev@praqma.net</email>
+            <organization>Praqma</organization>
+            <organizationUrl>http://www.praqma.com</organizationUrl>
+            <roles>
+                <role>intern/developer</role>
+            </roles>
+            <timezone>+1</timezone>
+        </developer>
+    </developers>
+    <dependencies>
+        <dependency>
+            <groupId>net.praqma</groupId>
+            <artifactId>praqmajutils</artifactId>
+            <version>0.1.34</version>
+        </dependency>
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr4</artifactId>
+            <version>4.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.stanfy</groupId>
+            <artifactId>gson-xml-java</artifactId>
+            <version>0.1.7</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>git</artifactId>
+            <version>2.4.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>multiple-scms</artifactId>
+            <version>0.3</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.9.5</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.main</groupId>
+            <artifactId>jenkins-test-harness</artifactId>
+            <version>1.532</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.4</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.4.6</version>
+            <scope>test</scope>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>2.4.6</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>job-dsl</artifactId>
+            <version>1.37</version>
+            <optional>true</optional>
+        </dependency>
+    </dependencies>
+    <build>
+        <plugins>
+            <!-- 
             Enabled us to use custom build numbers for the plugin and
             relate them to a git SHA. Very usefull for snapshots and non-releases
             that goes to manual validation.
@@ -146,84 +152,84 @@
             major.minor.patch-SNAPSHOT-gitSHA (dev builds)
             major.minor.patch-gitSHA (releases)
             -->
-         <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>buildnumber-maven-plugin</artifactId>
-            <version>1.3</version>
-            <!-- Need newest version to get bugfixes compared to parent pom -->
-            <executions>
-               <execution>
-                  <phase>validate</phase>
-                  <goals>
-                     <goal>create</goal>
-                  </goals>
-               </execution>
-            </executions>
-            <configuration>
-               <!-- Git SHA of 5 should be more than enough for uniqueness in combo with version number -->
-               <shortRevisionLength>5</shortRevisionLength>
-            </configuration>
-         </plugin>
-         <!-- 
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>buildnumber-maven-plugin</artifactId>
+                <version>1.3</version>
+                <!-- Need newest version to get bugfixes compared to parent pom -->
+                <executions>
+                    <execution>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>create</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <!-- Git SHA of 5 should be more than enough for uniqueness in combo with version number -->
+                    <shortRevisionLength>5</shortRevisionLength>
+                </configuration>
+            </plugin>
+            <!-- 
             This produces the hpi file for Jenkins plugins. 
             We reconfigure it here to add version information and a newer version
             It would have been nice if we could signal dirty workspaces on the version
             but buildnumber-maven-plugin does not support it. Neither does one like it:
             https://github.com/code54/buildversion-plugin
             -->
-         <plugin>
-            <groupId>org.jenkins-ci.tools</groupId>
-            <artifactId>maven-hpi-plugin</artifactId>
-            <version>1.109</version>
-            <!-- Older version have some problems with writing the manifest file -->
-            <configuration>
-               <pluginVersionDescription>${buildNumber}</pluginVersionDescription>
-               <compatibleSinceVersion>2.0</compatibleSinceVersion>
-            </configuration>
-         </plugin>
-         <!--
+            <plugin>
+                <groupId>org.jenkins-ci.tools</groupId>
+                <artifactId>maven-hpi-plugin</artifactId>
+                <version>1.109</version>
+                <!-- Older version have some problems with writing the manifest file -->
+                <configuration>
+                    <pluginVersionDescription>${buildNumber}</pluginVersionDescription>
+                    <compatibleSinceVersion>2.0</compatibleSinceVersion>
+                </configuration>
+            </plugin>
+            <!--
                 Use java 1.7. We need this for our testing environment. Java 6 was EOL last year
                 and i was starting to get some wierd errors with FindBugs plugin. Plugins also require
                 Java 7 with the version of Jenkins we're using so i decided to move to Java 7 which also soon
                 is EOL.                  
             -->
-         <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <configuration>
-               <source>1.7</source>
-               <target>1.7</target>
-            </configuration>
-         </plugin>
-         <!-- 
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                </configuration>
+            </plugin>
+            <!-- 
             Allows integration tests to clean test environment before build fails 
             use 'mvn verify' to run integration tests to allow 'post-integration-test' phase
             to run so it can tear down integration test environment
             -->
-         <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <version>2.17</version>
-            <executions>
-               <execution>
-                  <goals>
-                     <goal>integration-test</goal>
-                     <goal>verify</goal>
-                  </goals>
-               </execution>
-            </executions>
-         </plugin>
-         <!-- 
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.17</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- 
             Binds automatically surefire:test goal to the test phase and generates
             .txt and .xml reports for test results.
             Reports can later be converted to html reports by the 'maven-surefire-report-plugin' 
             -->
-         <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <version>2.17</version>
-         </plugin>
-         <!-- 
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.17</version>
+            </plugin>
+            <!-- 
             Generate coverate reports based on instrumented tests.
             It does not get automatically executed, but invokes the execution of the 
             lifecycle phase test prior to executing itself.
@@ -232,18 +238,18 @@
             It is considered a Maven report and outputs to site-directory, but plugin needs
             mention in the report section as well to include it in the site report.
             -->
-         <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>cobertura-maven-plugin</artifactId>
-            <version>2.6</version>
-            <configuration>
-               <formats>
-                  <format>xml</format>
-                  <!-- Jenkins uses the xml format -->
-               </formats>
-            </configuration>
-         </plugin>
-         <!-- 
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>cobertura-maven-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <formats>
+                        <format>xml</format>
+                        <!-- Jenkins uses the xml format -->
+                    </formats>
+                </configuration>
+            </plugin>
+            <!-- 
             Enables the site phase and site goal 'mvn site' to generate nice
             project site documentation, including project summary and all reports from other
             plugins that creates interesting reports (PMD, Findbugs, Checkstyle, test and coverage 
@@ -251,34 +257,34 @@
             http://dougchang333.blogspot.dk/2013/11/hadoop-build-error-javalangnoclassdeffo.html
             https://issues.apache.org/jira/browse/HADOOP-10092
             -->
-         <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-site-plugin</artifactId>
-            <version>3.4</version>
-         </plugin>
-         <!--
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.4</version>
+            </plugin>
+            <!--
             javadoc plugin is also added here (also found in reporting) to enable 'mvn javadoc:javadoc' as
             individual goal for some build in the build pipeline 
             In the reporting section javadoc plugin is mentioned as well to enable javadoc as part of the 'mvn site'
             lifecycle 
             -->
-         <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <version>2.9.1</version>
-         </plugin>
-         <!-- 
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9.1</version>
+            </plugin>
+            <!-- 
             Run pmd:pmd and pmd:cpd goals directly without being part of 'mvn site' lifecycle
             PMD and CPD scans java code for possible problems and copy-pasted code 
             The two goals create output for the Jenkins build pipeline jobs 
             It will not create output for the site lifecycle, so we add the plugin to reporting-section also. 
             -->
-         <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-pmd-plugin</artifactId>
-            <version>3.2</version>
-         </plugin>
-         <!-- 
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>3.2</version>
+            </plugin>
+            <!-- 
             Use findbugs:findbugs goal to produce xml report for Jenkins
             build pipeline setup.
             Requires compile goal in default phase to be executed prior to findbugs
@@ -287,15 +293,15 @@
             Can't use version 3.x as it requires Java runtime 1.7 - we are using
             1.6 on our build slaves.
             -->
-         <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>findbugs-maven-plugin</artifactId>
-            <version>2.5.5</version>
-            <configuration>
-               <xmlOutput>true</xmlOutput>
-            </configuration>
-         </plugin>
-         <!-- 
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>findbugs-maven-plugin</artifactId>
+                <version>2.5.5</version>
+                <configuration>
+                    <xmlOutput>true</xmlOutput>
+                </configuration>
+            </plugin>
+            <!-- 
             Enables checkstyle:checkstyle goal to be used manually 
             but does not hook checkstyle up on any phases in the default
             lifecycle. We want to run it manually in specific part of the 
@@ -304,194 +310,194 @@
             Plugin included in reporting section as well to hook it into the site
             report 
             -->
-         <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-checkstyle-plugin</artifactId>
-            <version>2.12.1</version>
-            <configuration>
-               <formats>
-                  <format>xml</format>
-               </formats>
-            </configuration>
-         </plugin>
-         <!-- 
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>2.12.1</version>
+                <configuration>
+                    <formats>
+                        <format>xml</format>
+                    </formats>
+                </configuration>
+            </plugin>
+            <!-- 
             Java source code complexity analysis, use javancss:check to get result
             Included in reporting below to also include it in the site reports.            
             -->
-         <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>javancss-maven-plugin</artifactId>
-            <version>2.1</version>
-            <configuration>
-               <failOnViolation>false</failOnViolation>
-            </configuration>
-         </plugin>
-         <!-- 
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>javancss-maven-plugin</artifactId>
+                <version>2.1</version>
+                <configuration>
+                    <failOnViolation>false</failOnViolation>
+                </configuration>
+            </plugin>
+            <!-- 
             Another Java code metric reporting tool. Included in the site report
             as a plugin under reporting.
             use  'mvn jdepend:generate' to generate jdepende report in xml (and html) reports
             to also use in the build pipeline for trending.      
             -->
-         <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>jdepend-maven-plugin</artifactId>
-            <version>2.0</version>
-         </plugin>
-      </plugins>
-   </build>
-   <reporting>
-      <plugins>
-         <!-- 
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jdepend-maven-plugin</artifactId>
+                <version>2.0</version>
+            </plugin>
+        </plugins>
+    </build>
+    <reporting>
+        <plugins>
+            <!-- 
             Converts maven-surefire-plugin test reports to html reports, for the site report from 'mvn site' 
             lifecycle. The maven-surefire-plugin creates output for the Jenkins build pipeline
             and don't need this reporting conversion. 
             The same goes for the fail-safe-pluing, for integration test reports.
             -->
-         <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-report-plugin</artifactId>
-            <version>2.17</version>
-         </plugin>
-         <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-failsafe-plugin</artifactId>
-            <version>2.17</version>
-         </plugin>
-         <!-- Will include cobertura report in the site report -->
-         <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>cobertura-maven-plugin</artifactId>
-            <version>2.6</version>
-         </plugin>
-         <!-- 
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+                <version>2.17</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.17</version>
+            </plugin>
+            <!-- Will include cobertura report in the site report -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>cobertura-maven-plugin</artifactId>
+                <version>2.6</version>
+            </plugin>
+            <!-- 
             To generate the FindBugs xdoc report as part of the Project Reports
             and will be the format used by Jenkins.
             Can't use version 3.x as it requires Java runtime 1.7 - we are using
             1.6 on our build slaves.
             -->
-         <!-- Include findbugs result in the site report -->
-         <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>findbugs-maven-plugin</artifactId>
-            <version>2.5.5</version>
-         </plugin>
-         <!-- 
+            <!-- Include findbugs result in the site report -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>findbugs-maven-plugin</artifactId>
+                <version>2.5.5</version>
+            </plugin>
+            <!-- 
             Also adding javadoc plugin to reporting section so it automatically runs a part of
             'mvn site' lifecycle.
             javadoc plugin is also added in build/plugins-section to enable 'mvn javadoc:javadoc' as
             individual goal for some build in the build pipeline 
             -->
-         <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <version>2.9.1</version>
-         </plugin>
-         <!-- 
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9.1</version>
+            </plugin>
+            <!-- 
             Includes the PMD/CPD reports in the mvn site reports
             Plugin is also mentioned in build/plugin-section to enable to use the 
             individual goals for the build pipeline reporting, without running
             the site lifecycle 
             -->
-         <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-pmd-plugin</artifactId>
-            <version>3.2</version>
-         </plugin>
-         <!-- 
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-pmd-plugin</artifactId>
+                <version>3.2</version>
+            </plugin>
+            <!-- 
             Includes checkstyle report into site report. Plugin is also enabled in build/plugin
             for developers to use the checkstyle goal and use the goal isolated in specific build pipeline steps (not mvn site)
             -->
-         <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-checkstyle-plugin</artifactId>
-            <version>2.12.1</version>
-            <reportSets>
-               <reportSet>
-                  <reports>
-                     <report>checkstyle</report>
-                  </reports>
-               </reportSet>
-            </reportSets>
-         </plugin>
-         <!-- 
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>2.12.1</version>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>checkstyle</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+            <!-- 
             Include java complexity metrics in the site report.
             Also used in build/plugin as a goal to manually use for developers
             or in the build pipeline.        
             -->
-         <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>javancss-maven-plugin</artifactId>
-            <version>2.0</version>
-         </plugin>
-         <!-- 
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>javancss-maven-plugin</artifactId>
+                <version>2.0</version>
+            </plugin>
+            <!-- 
             Generates cross-reference of the project's source as part of project's reports which other
             plugins default links to.
             -->
-         <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-jxr-plugin</artifactId>
-            <version>2.1</version>
-         </plugin>
-         <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>taglist-maven-plugin</artifactId>
-            <version>2.4</version>
-            <configuration>
-               <tagListOptions>
-                  <tagClasses>
-                     <tagClass>
-                        <displayName>Todo Work</displayName>
-                        <tags>
-                           <tag>
-                              <matchString>todo</matchString>
-                              <matchType>ignoreCase</matchType>
-                           </tag>
-                           <tag>
-                              <matchString>fixme</matchString>
-                              <matchType>ignoreCase</matchType>
-                           </tag>
-                        </tags>
-                     </tagClass>
-                  </tagClasses>
-               </tagListOptions>
-            </configuration>
-         </plugin>
-         <!-- 
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jxr-plugin</artifactId>
+                <version>2.1</version>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>taglist-maven-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <tagListOptions>
+                        <tagClasses>
+                            <tagClass>
+                                <displayName>Todo Work</displayName>
+                                <tags>
+                                    <tag>
+                                        <matchString>todo</matchString>
+                                        <matchType>ignoreCase</matchType>
+                                    </tag>
+                                    <tag>
+                                        <matchString>fixme</matchString>
+                                        <matchType>ignoreCase</matchType>
+                                    </tag>
+                                </tags>
+                            </tagClass>
+                        </tagClasses>
+                    </tagListOptions>
+                </configuration>
+            </plugin>
+            <!-- 
             Another Java code metric reporting tool, nice to have in the site report
             as well. Included in build/plugin section as well. 
             -->
-         <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>jdepend-maven-plugin</artifactId>
-            <version>2.0</version>
-         </plugin>
-      </plugins>
-   </reporting>
-   <repositories>
-      <repository>
-         <id>repo.jenkins-ci.org</id>
-         <url>http://repo.jenkins-ci.org/public/</url>
-      </repository>
-      <repository>
-         <id>praqma</id>
-         <url>http://code.praqma.net/repo/maven</url>
-      </repository>
-   </repositories>
-   <pluginRepositories>
-      <pluginRepository>
-         <id>repo.jenkins-ci.org</id>
-         <url>http://repo.jenkins-ci.org/public/</url>
-      </pluginRepository>
-   </pluginRepositories>
-   <licenses>
-      <license>
-         <name>MIT</name>
-         <url>http://www.opensource.org/licenses/mit-license.php</url>
-      </license>
-   </licenses>
-   <scm>
-      <connection>scm:git:http://github.com/Praqma/memory-map-plugin.git</connection>
-      <developerConnection>scm:git:ssh://git@github.com/Praqma/memory-map-plugin.git</developerConnection>
-      <url>https://github.com/Praqma/memory-map-plugin.git</url>
-   </scm>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jdepend-maven-plugin</artifactId>
+                <version>2.0</version>
+            </plugin>
+        </plugins>
+    </reporting>
+    <repositories>
+        <repository>
+            <id>repo.jenkins-ci.org</id>
+            <url>http://repo.jenkins-ci.org/public/</url>
+        </repository>
+        <repository>
+            <id>praqma</id>
+            <url>http://code.praqma.net/repo/maven</url>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>repo.jenkins-ci.org</id>
+            <url>http://repo.jenkins-ci.org/public/</url>
+        </pluginRepository>
+    </pluginRepositories>
+    <licenses>
+        <license>
+            <name>MIT</name>
+            <url>http://www.opensource.org/licenses/mit-license.php</url>
+        </license>
+    </licenses>
+    <scm>
+        <connection>scm:git:http://github.com/Praqma/memory-map-plugin.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/Praqma/memory-map-plugin.git</developerConnection>
+        <url>https://github.com/Praqma/memory-map-plugin.git</url>
+    </scm>
 </project>

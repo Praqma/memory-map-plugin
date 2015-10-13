@@ -21,15 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package net.praqma.jenkins.memorymap.parser; //Remains in the parser package for backwards compatibility
+package net.praqma.jenkins.memorymap.parser.ti; //Remains in the parser package for backwards compatibility
 
 import hudson.Extension;
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfiguration;
 import net.praqma.jenkins.memorymap.parser.AbstractMemoryMapParser;
 import net.praqma.jenkins.memorymap.parser.MemoryMapConfigFileParserDelegate;
@@ -42,11 +36,17 @@ import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
- * @deprecated Moved to another package. The MemoryMapRecorder will replace all instances of this with the new one.
+ *
  * @author Praqma
  */
-@Deprecated
 public class TexasInstrumentsMemoryMapParser extends AbstractMemoryMapParser {
 
     /*
@@ -74,7 +74,7 @@ public class TexasInstrumentsMemoryMapParser extends AbstractMemoryMapParser {
     private static final Pattern DATA = Pattern.compile("^\\.data\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
 
     @DataBoundConstructor
-    public TexasInstrumentsMemoryMapParser(String parserUniqueName, String mapFile, String configurationFile, Integer wordSize, List<MemoryMapGraphConfiguration> graphConfiguration,  Boolean bytesOnGraph) {
+    public TexasInstrumentsMemoryMapParser(String parserUniqueName, String mapFile, String configurationFile, Integer wordSize, List<MemoryMapGraphConfiguration> graphConfiguration, Boolean bytesOnGraph) {
         super(parserUniqueName,mapFile, configurationFile, wordSize, bytesOnGraph, graphConfiguration, TEXT_DOT, CONST_DOT, ECONST_DOT, PINIT, SWITCH, CINIT_DOT, STACK_DOT, BSS_DOT, EBSS_DOT, SYSMEM, ESYSMEM, CIO, DATA);
     }
 
@@ -139,7 +139,7 @@ public class TexasInstrumentsMemoryMapParser extends AbstractMemoryMapParser {
 
         @Override
         public String getDisplayName() {
-            return "Texas Instruments (Deprecated)";
+            return "Texas Instruments";
         }
 
         @Override

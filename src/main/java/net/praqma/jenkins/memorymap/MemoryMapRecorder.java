@@ -45,10 +45,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfiguration;
-import net.praqma.jenkins.memorymap.parser.AbstractMemoryMapParser;
-import net.praqma.jenkins.memorymap.parser.MemoryMapConfigFileParserDelegate;
-import net.praqma.jenkins.memorymap.parser.MemoryMapMapParserDelegate;
-import net.praqma.jenkins.memorymap.parser.MemoryMapParserDescriptor;
+import net.praqma.jenkins.memorymap.parser.*;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
 import net.praqma.jenkins.memorymap.util.MemoryMapError;
 import net.sf.json.JSONObject;
@@ -124,6 +121,26 @@ public class MemoryMapRecorder extends Recorder {
             parsers.add(getChosenParser());
             setChosenParsers(parsers);
         }
+
+        ArrayList<AbstractMemoryMapParser> deprecatedParsers = new ArrayList<>();
+        ArrayList<AbstractMemoryMapParser> newParsers = new ArrayList<>();
+        for(AbstractMemoryMapParser oldParser  : chosenParsers){
+            if(oldParser.getClass().equals(net.praqma.jenkins.memorymap.parser.TexasInstrumentsMemoryMapParser.class)){
+                logger.log(Level.FINE, "Entering Texas Instruments deprecation block, swapping old TI parser with the new one.");
+                net.praqma.jenkins.memorymap.parser.ti.TexasInstrumentsMemoryMapParser newParser = new net.praqma.jenkins.memorymap.parser.ti.TexasInstrumentsMemoryMapParser();
+                newParser.setBytesOnGraph(oldParser.getBytesOnGraph());
+                newParser.setConfigurationFile(oldParser.getConfigurationFile());
+                newParser.setMapFile(oldParser.getMapFile());
+                newParser.setWordSize(oldParser.getWordSize());
+                newParser.setParserTitle(oldParser.getParserTitle());
+                newParser.setParserUniqueName(oldParser.getParserUniqueName());
+                newParser.setGraphConfiguration(oldParser.getGraphConfiguration());
+                deprecatedParsers.add(oldParser);
+                newParsers.add(newParser);
+            }
+        }
+        chosenParsers.removeAll(deprecatedParsers);
+        chosenParsers.addAll(newParsers);
 
         return this;
     }

@@ -172,7 +172,7 @@ public class TestUtils {
      * @return the build
      * @throws Exception
      */
-    private static FreeStyleBuild runNewBuild(FreeStyleProject project) throws Exception {
+    public static FreeStyleBuild runNewBuild(FreeStyleProject project) throws Exception {
         return project.scheduleBuild2(0).get();
     }
 
@@ -182,7 +182,7 @@ public class TestUtils {
      * @param build the build of which to print the console log
      * @param jenkins an jenkinsRule instance
      */
-    private static void printBuildConsoleLog(FreeStyleBuild build, JenkinsRule jenkins) throws Exception {
+    public static void printBuildConsoleLog(FreeStyleBuild build, JenkinsRule jenkins) throws Exception {
         System.out.println(jenkins.createWebClient().getPage(build, "console").asText());
     }
 

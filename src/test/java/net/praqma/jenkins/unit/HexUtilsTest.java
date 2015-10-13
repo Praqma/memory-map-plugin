@@ -30,12 +30,17 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
 
 /**
  *
  * @author jes
  */
 public class HexUtilsTest {
+    
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     public HexUtilsTest() {
     }
@@ -143,4 +148,5 @@ public class HexUtilsTest {
         HexUtils.HexifiableString metricToHex = new HexUtils.HexifiableString("2m");
         HexUtils.HexifiableString hexified = metricToHex.toValidHexString();       
     }
+   
 }

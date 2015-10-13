@@ -1,5 +1,6 @@
 package net.praqma.jenkins.memorymap.parser.gcc;
 
+import hudson.AbortException;
 import hudson.Extension;
 import java.io.File;
 import java.io.IOException;
@@ -21,7 +22,6 @@ import net.praqma.jenkins.memorymap.util.HexUtils;
 import net.praqma.jenkins.memorymap.util.HexUtils.HexifiableString;
 import net.praqma.jenkins.memorymap.util.MemoryMapMemorySelectionError;
 import net.sf.json.JSONObject;
-import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -31,31 +31,48 @@ import org.kohsuke.stapler.StaplerRequest;
 public class GccMemoryMapParser extends AbstractMemoryMapParser implements Serializable {
 
     private static final Pattern MEM_SECTIONS = Pattern.compile("^\\s+(\\S+)( \\S+.*|\\(\\S+\\)| ):", Pattern.MULTILINE);
+    private static final Pattern COMMENT_BLOCKS = Pattern.compile("/\\*(?:.|[\\n\\r])*?\\*/");
     private static final Logger LOG = Logger.getLogger(GccMemoryMapParser.class.getName());
-    private String script;
 
     @DataBoundConstructor
-    public GccMemoryMapParser(String parserUniqueName, String mapFile, String configurationFile, Integer wordSize, Boolean bytesOnGraph, List<MemoryMapGraphConfiguration> graphConfiguration, String script) {
+    public GccMemoryMapParser(String parserUniqueName, String mapFile, String configurationFile, Integer wordSize, Boolean bytesOnGraph, List<MemoryMapGraphConfiguration> graphConfiguration) {
         super(parserUniqueName, mapFile, configurationFile, wordSize, bytesOnGraph, graphConfiguration);
-        this.script = script;
     }
 
     /**
-     * @param f
-     * @throws java.io.IOException
-     * @return a list of the defined MEMORY in the map file
+     * Strip any c-style block comments, e.g slash-star to star-slash.
+     * <b>Note:</b> this function down not correctly handle nested comment blocks.
+     * <b>Note:</b> this function is a bit greedy, and will incorrectly strip comments inside strings,
+     * but this shouldn't be a problem for memory config files.
+     * @param seq The content of a file that might contain c-style block-comments
+     * @return The same content, that has now had all block-comments stripped out.
      */
-    public MemoryMapConfigMemory getMemory(File f) throws IOException {
+    public static CharSequence stripComments(CharSequence seq) {
+        Matcher commentMatcher = COMMENT_BLOCKS.matcher(seq);
+        return commentMatcher.replaceAll("");
+    }
 
-        Pattern allMemory = Pattern.compile(".*?^(\\s+\\S+).*?ORIGIN.*?=([^,]*).*?LENGTH\\s\\=(.*).*$", Pattern.MULTILINE);
-        CharSequence seq = createCharSequenceFromFile(f);
+    /**
+     * Parses the MEMORY section of the GCC file. Throws an abort exception which will be shown in the Jenkins console log. 
+     * 
+     * @param seq The content of the map file
+     * @return a list of the defined MEMORY in the map file
+     * @throws hudson.AbortException          
+     **/
+    public MemoryMapConfigMemory getMemory(CharSequence seq) throws AbortException {
 
+        Pattern allMemory = Pattern.compile(".*?^(\\s+\\S+).*?[ORIGIN|org|o].*?=([^,]*).*?[LENGTH|len|l]\\s\\=\\s*([^\\s]*).*$", Pattern.MULTILINE);
         Matcher match = allMemory.matcher(seq);
         MemoryMapConfigMemory memory = new MemoryMapConfigMemory();
         while (match.find()) {
-            String hexLength = new HexUtils.HexifiableString(match.group(3)).toValidHexString().rawString;
-            MemoryMapConfigMemoryItem item = new MemoryMapConfigMemoryItem(match.group(1), match.group(2), hexLength);
-            memory.add(item);
+            try {
+                String hexLength = new HexUtils.HexifiableString(match.group(3)).toValidHexString().rawString;
+                MemoryMapConfigMemoryItem item = new MemoryMapConfigMemoryItem(match.group(1), match.group(2), hexLength);
+                memory.add(item);
+            } catch (Throwable ex) {
+                logger.log(Level.SEVERE, "Unable to convert %s to a valid hex string.", ex);
+                throw new AbortException( String.format( "Unable to convert %s to a valid hex string.", match.group(3) ) );
+            }
         }
         return memory;
     }
@@ -69,9 +86,8 @@ public class GccMemoryMapParser extends AbstractMemoryMapParser implements Seria
      }   
      * 
      */
-    public List<MemoryMapConfigMemoryItem> getSections(File f) throws IOException {
+    public List<MemoryMapConfigMemoryItem> getSections(CharSequence m) {
         List<MemoryMapConfigMemoryItem> items = new ArrayList<MemoryMapConfigMemoryItem>();
-        CharSequence m = createCharSequenceFromFile(f);
 
         Pattern section = Pattern.compile(".*SECTIONS\\s?\\r?\\n?\\{(.*)\\n\\}", Pattern.MULTILINE | Pattern.DOTALL);
 
@@ -151,46 +167,23 @@ public class GccMemoryMapParser extends AbstractMemoryMapParser implements Seria
 
         configuration = guessLengthOfSections(configuration);
 
-        if (StringUtils.isNotBlank(getScript())) {
-            try {
-                ParserItemMixin mixin = new ParserItemMixin(getScript(), sequence.toString());
-                Object o = mixin.evaluate();
-
-                List<MemoryMapConfigMemoryItem> items;
-
-                try {
-                    items = (List<MemoryMapConfigMemoryItem>) o;
-
-                    System.out.println("Evaulation == " + items);
-
-                    configuration.addAll(items);
-                } catch (ClassCastException ex) {
-                    ex.printStackTrace(System.out);
-                }
-            } catch (Exception ex) {
-                LOG.log(Level.SEVERE, this.getClass().getName() + "#parseMapFile", ex);
-            }
-        }
-
         return configuration;
     }
 
     @Override
     public MemoryMapConfigMemory parseConfigFile(File f) throws IOException {
         //Collect sections from both the MEMORY and the SECTIONS areas from the command file.
-        //The memory are the top level components, sections belong to one of thsese sections
-        MemoryMapConfigMemory memconfig = getMemory(f);
-        memconfig.addAll(getSections(f));
+        //The memory are the top level components, sections belong to one of these sections
+        CharSequence stripped = stripComments(createCharSequenceFromFile(f));
+
+        MemoryMapConfigMemory memconfig = getMemory(stripped);
+        memconfig.addAll(getSections(stripped));
         for (MemoryMapGraphConfiguration g : getGraphConfiguration()) {
             for (String gItem : g.itemizeGraphDataList()) {
                 for (String gSplitItem : gItem.split("\\+")) {
                     //We will fail if the name of the data section does not match any of the named items in the map file.
-                    if (!memconfig.containsSectionWithName(gSplitItem)) {
-                        if (StringUtils.isBlank(getScript())) {
-                            throw new MemoryMapMemorySelectionError(String.format("The memory section named %s not found in map file%nAvailable sections are:%n%s", gSplitItem, memconfig.getItemNames()));
-                        } else {
-                            LOG.info("Deferring judgement on section name %s because we have a mixin present");
-                        }
+                    if (!memconfig.containsSectionWithName(gSplitItem)) {                        
+                        throw new MemoryMapMemorySelectionError(String.format("The memory section named %s not found in map file%nAvailable sections are:%n%s", gSplitItem, memconfig.getItemNames()));                        
                     }
                 }
             }
@@ -201,20 +194,6 @@ public class GccMemoryMapParser extends AbstractMemoryMapParser implements Seria
     @Override
     public int getDefaultWordSize() {
         return 8;
-    }
-
-    /**
-     * @return the script
-     */
-    public String getScript() {
-        return script;
-    }
-
-    /**
-     * @param script the script to set
-     */
-    public void setScript(String script) {
-        this.script = script;
     }
 
     @Extension

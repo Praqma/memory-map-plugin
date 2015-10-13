@@ -99,6 +99,7 @@ public abstract class AbstractMemoryMapParser implements Describable<AbstractMem
     }
     
     public Object readResolve(){
+        if (graphConfiguration == null) graphConfiguration = new ArrayList<>();
         if(getParserUniqueName() == null || getParserUniqueName() == null){
             logger.log(Level.FINE, "Entering 1.x compatibility block, assigning name: Default");
             setParserUniqueName("Default");
