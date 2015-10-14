@@ -23,13 +23,8 @@
  */
 package net.praqma.jenkins.integration;
 
-import hudson.model.FreeStyleProject;
-import java.net.URL;
-import static java.nio.file.Files.readAllBytes;
-import static java.nio.file.Paths.get;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfiguration;
 import net.praqma.jenkins.memorymap.parser.gcc.GccMemoryMapParser;
@@ -72,6 +67,19 @@ public class GccMemoryMapParserIT {
         expectedValues.put(".ram_data", "0x20c4");
 
         TestUtils.testUsageValues(jenkins, parser, "gcc482.zip", expectedValues);
+    }
+
+    @Test
+    public void gcc484_testUsageValues() throws Exception {
+        MemoryMapGraphConfiguration graphConfiguration = new MemoryMapGraphConfiguration("rom", "484", true);
+        GccMemoryMapParser parser = createParser(graphConfiguration);
+        parser.setMapFile("map.map");
+        parser.setConfigurationFile("link.ld");
+
+        HashMap<String, String> expectedValues = new HashMap<>();
+        expectedValues.put("rom", "0x01000000");
+
+        TestUtils.testUsageValues(jenkins, parser, "gcc484.zip", expectedValues);
     }
 
     private GccMemoryMapParser createParser(MemoryMapGraphConfiguration... graphConfiguration) {

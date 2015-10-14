@@ -24,7 +24,7 @@ import org.jvnet.hudson.test.JenkinsRule;
 @RunWith(Parameterized.class)
 public class UseCase {
 
-    static final String PUBLIC_EXAMPLE_URL = "https://github.com/praqma/memory-map-examples";
+    static final String PUBLIC_EXAMPLE_URL = "/home/thi/Projects/memory-map-examples";
     final String useCase;
 
     @Rule

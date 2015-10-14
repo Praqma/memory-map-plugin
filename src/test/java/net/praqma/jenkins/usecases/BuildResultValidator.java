@@ -3,7 +3,9 @@ package net.praqma.jenkins.usecases;
 import hudson.model.Run;
 import java.io.File;
 import java.util.HashMap;
+import java.util.Map;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemoryItem;
+import org.apache.commons.lang.reflect.FieldUtils;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import org.w3c.dom.Document;
@@ -15,9 +17,6 @@ public class BuildResultValidator {
     private ResultContainer expectedResults;
     private boolean validateGraphs = true;
     private boolean validateValues = true;
-
-    public BuildResultValidator() {
-    }
 
     public BuildResultValidator expect(String json) {
         this.expectedResults = JsonParser.gson.fromJson(json, ResultContainer.class);
@@ -42,18 +41,58 @@ public class BuildResultValidator {
     public void validate() throws Exception {
         HashMap<String, HashMap<String, String>> expectedValues = expectedResults.getBuildResults().get(build.number);
         HashMap<String, MemoryMapConfigMemoryItem> actualValues = getMemoryItems(build);
+
+        System.out.println("¤¤¤¤¤ VALIDATING BUILD " + build.number + " ¤¤¤¤¤");
+        printExpected(expectedValues);
+        printActual(actualValues);
+
         if (validateValues) {
-            for (String key : expectedValues.keySet()) {
-                assertNotNull(String.format("Expected value for key '%s' not found in build result for build #%s", key, build.number), actualValues.get(key));
-                String expectedValue = expectedValues.get(key).get("used");
-                String actualValue = actualValues.get(key).getUsed();
-                assertEquals(String.format("Expected %s, was %s for key '%s' for build #%s", expectedValue, actualValue, key, build.number), expectedValue, actualValue);
+            for (Map.Entry<String, HashMap<String, String>> expectedSection : expectedValues.entrySet()) {
+                String expectedSectionName = expectedSection.getKey();
+                MemoryMapConfigMemoryItem actualSection = actualValues.get(expectedSectionName);
+                assertNotNull(String.format("Expected value for key '%s' not found in build result for build #%s", expectedSectionName, build.number), actualSection);
+
+                for (Map.Entry<String, String> x : expectedSection.getValue().entrySet()) {
+                    String expectedField = x.getKey();
+                    String expectedValue = x.getValue();
+
+                    Object value = FieldUtils.readField(actualSection, expectedField, true);
+                    String actualValue = value == null ? "N/A" : value.toString();
+
+                    assertEquals(String.format("Expected %s, was %s for key '%s' for build #%s", expectedValue, actualValue, expectedSection, build.number), expectedValue, actualValue);
+                }
             }
         }
 
         if (validateGraphs) {
             //TODO: Implement me
         }
+    }
+
+    public void printExpected(HashMap<String, HashMap<String, String>> expectedValues) {
+        System.out.println("¤¤¤ EXPECTED ¤¤¤");
+        for (Map.Entry<String, HashMap<String, String>> section : expectedValues.entrySet()) {
+            System.out.println("----------");
+            System.out.println(section.getKey());
+            System.out.println("----------");
+            for (Map.Entry<String, String> entry : section.getValue().entrySet()) {
+                System.out.println(entry.getKey() + ": " + entry.getValue());
+            }
+        }
+        System.out.println("¤ ¤ ¤ ¤ ¤ ¤ ¤ ¤ ¤ ¤");
+    }
+
+    public void printActual(HashMap<String, MemoryMapConfigMemoryItem> actualValues) {
+        System.out.println("¤¤¤¤ ACTUAL ¤¤¤");
+        for (Map.Entry<String, MemoryMapConfigMemoryItem> section : actualValues.entrySet()) {
+            System.out.println("----------");
+            System.out.println(section.getKey());
+            System.out.println("----------");
+            System.out.println("origin: " + section.getValue().getOrigin());
+            System.out.println("length: " + section.getValue().getLength());
+            System.out.println("used:" + section.getValue().getUsed());
+        }
+        System.out.println("¤ ¤ ¤ ¤ ¤ ¤ ¤ ¤ ¤ ¤");
     }
 
     private HashMap<String, MemoryMapConfigMemoryItem> getMemoryItems(Run<?, ?> build) throws Exception {
@@ -69,7 +108,7 @@ public class BuildResultValidator {
                 usageMap.put(item.getName(), item);
             }
         }
-        
+
         return usageMap;
     }
 }
