@@ -23,7 +23,6 @@
  */
 package net.praqma.jenkins.unit;
 
-import java.util.HashMap;
 import net.praqma.jenkins.memorymap.util.HexUtils;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -31,12 +30,17 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
 
 /**
  *
  * @author jes
  */
 public class HexUtilsTest {
+    
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     public HexUtilsTest() {
     }
@@ -113,7 +117,7 @@ public class HexUtilsTest {
     }
 
     /**
-     * Test aorund the conversion of the number 1024 to GBytes 
+     * Test arund the conversion of the number 1024 to GBytes 
      */
     @Test
     public void byteCountTestGiga() {
@@ -122,4 +126,27 @@ public class HexUtilsTest {
         assertEquals((1025d / 1024 / 1024 / 1024) * (16 / 8), HexUtils.byteCount("401", 16, "Giga"), 0);
 
     }
+    
+    @Test
+    public void testValidHexStrings() {
+        HexUtils.HexifiableString valid = new HexUtils.HexifiableString("0xffA");
+        HexUtils.HexifiableString valid2 = new HexUtils.HexifiableString("ff");
+        assertTrue(valid.isValidHexString());
+        assertTrue(valid2.isValidHexString());
+        
+        HexUtils.HexifiableString notValid = new HexUtils.HexifiableString("2M");
+        assertFalse(notValid.isValidHexString());
+        HexUtils.HexifiableString notValid2 = new HexUtils.HexifiableString("0x");
+        assertFalse(notValid2.isValidHexString());
+        
+        HexUtils.HexifiableString validMetricValue = new HexUtils.HexifiableString("2M");
+        assertTrue(validMetricValue.isValidMetricValue());
+        
+        HexUtils.HexifiableString invalidMetricValue = new HexUtils.HexifiableString("2");
+        assertFalse(invalidMetricValue.isValidMetricValue());
+        
+        HexUtils.HexifiableString metricToHex = new HexUtils.HexifiableString("2m");
+        HexUtils.HexifiableString hexified = metricToHex.toValidHexString();       
+    }
+   
 }

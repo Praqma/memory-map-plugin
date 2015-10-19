@@ -6,11 +6,7 @@
         td.setting-name {
             vertical-align:middle;
         }             
-    </style>
-     
-    <f:entry title="${%Linker command file}" field="configurationFile" name="configurationFile">            
-        <f:textbox/>
-    </f:entry>        
+    </style>        
     <f:entry title="${%Word size}" field="wordSize" name="wordSize">            
         <f:textbox/>
     </f:entry>
@@ -21,31 +17,10 @@
     <f:entry field="scale" title="Choose Scale Type">
         <f:select />
     </f:entry>
+    <f:entry field="chosenParsers" title="Configured parsers">
+        <f:hetero-list name="chosenParsers" oneEach="false" items="${instance.chosenParsers}" addCaption="Add parser" deleteCaption="Remove parser" descriptors="${descriptor.getParsers()}"/>
+    </f:entry>
+    
 
-    <f:dropdownDescriptorSelector title="${%Parser selection}" descriptors="${descriptor.getParsers()}" field="chosenParser" />
 
-    <f:entry title="List of configured graphs">
-        <f:repeatable varStatus="instStatus" var="inst" items="${instance.graphConfiguration}">
-            <table style="width:100%">
-                <tr> 
-                    <td style="width:15%;">
-                            Graph name
-                    </td>
-                    <td style="width:85%;">
-                        <f:textbox name="graph.config.graphCaption" value="${inst.graphCaption}"/>
-                    </td>
-                </tr>
-                <tr style="width:100%">
-                    <td style="width:15%;">
-                            Program memory selection
-                    </td>
-                    <td style="width:85%;">
-                        <f:textbox name="graph.config.graphDataList" value="${inst.graphDataList}"/>
-                    </td>
-                </tr>                    
-            </table>
-            <f:repeatableDeleteButton/>
-        </f:repeatable>
-            
-    </f:entry>   
 </j:jelly>

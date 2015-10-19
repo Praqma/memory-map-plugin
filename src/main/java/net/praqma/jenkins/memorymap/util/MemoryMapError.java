@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2012 Praqma.
+ * Copyright 2013 mads.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,20 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package net.praqma.jenkins.integration;
-
-import org.junit.Test;
-import static org.junit.Assert.*;
+package net.praqma.jenkins.memorymap.util;
 
 /**
  *
- * @author Praqma
+ * @author mads
  */
-public class MemoryMapBuildActionTest {
+public interface MemoryMapError {
     
-    //TODO: implement me
-    @Test
-    public void test_buildActionAdded() {
-        assertTrue(true);
-    }
 }

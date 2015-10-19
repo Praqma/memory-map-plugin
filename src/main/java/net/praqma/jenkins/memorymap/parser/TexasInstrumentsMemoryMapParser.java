@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package net.praqma.jenkins.memorymap.parser;
+package net.praqma.jenkins.memorymap.parser; //Remains in the parser package for backwards compatibility
 
 import hudson.Extension;
 import java.io.File;
@@ -31,16 +31,22 @@ import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfiguration;
+import net.praqma.jenkins.memorymap.parser.AbstractMemoryMapParser;
+import net.praqma.jenkins.memorymap.parser.MemoryMapConfigFileParserDelegate;
+import net.praqma.jenkins.memorymap.parser.MemoryMapMapParserDelegate;
+import net.praqma.jenkins.memorymap.parser.MemoryMapParserDescriptor;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemoryItem;
+import net.praqma.jenkins.memorymap.util.MemoryMapMemorySelectionError;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
 /**
- *
+ * @deprecated Moved to another package. The MemoryMapRecorder will replace all instances of this with the new one.
  * @author Praqma
  */
+@Deprecated
 public class TexasInstrumentsMemoryMapParser extends AbstractMemoryMapParser {
 
     /*
@@ -68,8 +74,8 @@ public class TexasInstrumentsMemoryMapParser extends AbstractMemoryMapParser {
     private static final Pattern DATA = Pattern.compile("^\\.data\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
 
     @DataBoundConstructor
-    public TexasInstrumentsMemoryMapParser(String mapFile, String configurationFile, Integer wordSize, Boolean bytesOnGraph) {
-        super(mapFile, configurationFile, wordSize, bytesOnGraph, TEXT_DOT, CONST_DOT, ECONST_DOT, PINIT, SWITCH, CINIT_DOT, STACK_DOT, BSS_DOT, EBSS_DOT, SYSMEM, ESYSMEM, CIO, DATA);
+    public TexasInstrumentsMemoryMapParser(String parserUniqueName, String mapFile, String configurationFile, Integer wordSize, List<MemoryMapGraphConfiguration> graphConfiguration,  Boolean bytesOnGraph) {
+        super(parserUniqueName,mapFile, configurationFile, wordSize, bytesOnGraph, graphConfiguration, TEXT_DOT, CONST_DOT, ECONST_DOT, PINIT, SWITCH, CINIT_DOT, STACK_DOT, BSS_DOT, EBSS_DOT, SYSMEM, ESYSMEM, CIO, DATA);
     }
 
     public TexasInstrumentsMemoryMapParser() {
@@ -77,14 +83,13 @@ public class TexasInstrumentsMemoryMapParser extends AbstractMemoryMapParser {
     }
 
     @Override
-    public MemoryMapConfigMemory parseConfigFile(List<MemoryMapGraphConfiguration> graphConfig, File f) throws IOException {
+    public MemoryMapConfigMemory parseConfigFile(File f) throws IOException {
         MemoryMapConfigMemory config = new MemoryMapConfigMemory();
         CharSequence sequence = createCharSequenceFromFile(f);
-        for (MemoryMapGraphConfiguration graph : graphConfig) {
+        for (MemoryMapGraphConfiguration graph : getGraphConfiguration()) {
             String[] split = graph.getGraphDataList().split(",");
             for (String s : split) {
-                s.trim();
-                String[] multiSections = s.split("\\+");
+                String[] multiSections = s.trim().split("\\+");
                 for (String ms : multiSections) {
                     Matcher m = MemoryMapConfigFileParserDelegate.getPatternForMemoryLayout(ms.replace(" ", "")).matcher(sequence);
                     MemoryMapConfigMemoryItem item = null;
@@ -95,7 +100,7 @@ public class TexasInstrumentsMemoryMapParser extends AbstractMemoryMapParser {
 
                     if (item == null) {
                         logger.logp(Level.WARNING, "parseConfigFile", AbstractMemoryMapParser.class.getName(), String.format("parseConfigFile(List<MemoryMapGraphConfiguration> graphConfig, File f) non existing item: %s", s));
-                        throw new IOException(String.format("No match found for program memory named %s", s));
+                        throw new MemoryMapMemorySelectionError(String.format("No match found for program memory named %s", s));
                     }
                 }
 
@@ -106,7 +111,27 @@ public class TexasInstrumentsMemoryMapParser extends AbstractMemoryMapParser {
 
     @Override
     public MemoryMapConfigMemory parseMapFile(File f, MemoryMapConfigMemory config) throws IOException {
-        return super.parseMapFile(f, config);
+        CharSequence sequence = createCharSequenceFromFile(f);
+        
+        for(MemoryMapConfigMemoryItem item : config) {            
+            Matcher matcher = MemoryMapMapParserDelegate.getPatternForMemorySection(item.getName()).matcher(sequence);
+            boolean found = false;
+            while(matcher.find()) {
+                item.setUsed(matcher.group(8));
+                item.setUnused(matcher.group(10));
+                found = true;
+            }
+            if(!found) {
+                logger.logp(Level.WARNING, "parseMapFile", AbstractMemoryMapParser.class.getName(), String.format("parseMapFile(File f, MemoryMapConfigMemory configuration) non existing item: %s",item));                
+                throw new MemoryMapMemorySelectionError(String.format("Linker command element %s not found in .map file", item));
+            }
+        }
+        return config;
+    }
+
+    @Override
+    public int getDefaultWordSize() {
+        return 16;
     }
 
     @Extension
@@ -114,7 +139,7 @@ public class TexasInstrumentsMemoryMapParser extends AbstractMemoryMapParser {
 
         @Override
         public String getDisplayName() {
-            return "Texas Instruments";
+            return "Texas Instruments (Deprecated)";
         }
 
         @Override

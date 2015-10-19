@@ -23,30 +23,39 @@
  */
 package net.praqma.jenkins.memorymap.graph;
 
+import hudson.DescriptorExtensionList;
+import hudson.Extension;
+import hudson.ExtensionPoint;
+import hudson.model.Describable;
+import hudson.model.Descriptor;
+import hudson.model.Descriptor.FormException;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import jenkins.model.Jenkins;
+import static net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfiguration.all;
+import net.sf.json.JSONObject;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.StaplerRequest;
 
 /**
- *
  * @author Praqma
  */
+public class MemoryMapGraphConfiguration implements Describable<MemoryMapGraphConfiguration>, ExtensionPoint, Serializable {
 
-/**
- * FIXME:
- * 
- * This class should be a databound class, see FB case 8235 for references.
- * 
- * @author Praqma
- */
-public class MemoryMapGraphConfiguration implements Serializable {
-    
     private String graphCaption = "Specify graph caption";
-    private String graphDataList ="Specify graph datasets for graph";
+    private String graphDataList = "Specify graph datasets for graph";
     
-    public MemoryMapGraphConfiguration() { }
-    
+    @DataBoundConstructor
     public MemoryMapGraphConfiguration(String graphDataList, String graphCaption, Boolean displayUsageInBytes) {
         this.graphDataList = graphDataList;
         this.graphCaption = graphCaption;
+    }
+    
+    public MemoryMapGraphConfiguration() { }
+    
+    public String[] itemizeGraphDataList() {
+        return graphDataList.split(",");
     }
     /**
      * @return the graphCaption
@@ -74,5 +83,45 @@ public class MemoryMapGraphConfiguration implements Serializable {
      */
     public void setGraphDataList(String graphDataList) {
         this.graphDataList = graphDataList;
-    }    
+    }
+
+    @Override
+    public Descriptor<MemoryMapGraphConfiguration> getDescriptor() {
+        return (Descriptor<MemoryMapGraphConfiguration>) Jenkins.getInstance().getDescriptorOrDie(getClass());
+    }
+
+    @Extension
+    public static final class DescriptorImpl extends MemoryMapGraphConfigurationDescriptor<MemoryMapGraphConfiguration> {
+
+        @Override
+        public String getDisplayName() {
+            return "MemoryMap bar graph";
+        }
+
+        @Override
+        public MemoryMapGraphConfiguration newInstance(StaplerRequest req, JSONObject formData, MemoryMapGraphConfiguration instance) throws FormException {
+            MemoryMapGraphConfiguration graph = (MemoryMapGraphConfiguration) instance;
+            save();
+            return graph;
+        }
+    }
+
+    public static DescriptorExtensionList<MemoryMapGraphConfiguration, MemoryMapGraphConfigurationDescriptor<MemoryMapGraphConfiguration>> all() {
+        return Jenkins.getInstance().<MemoryMapGraphConfiguration, MemoryMapGraphConfigurationDescriptor<MemoryMapGraphConfiguration>>getDescriptorList(MemoryMapGraphConfiguration.class);
+    }
+
+    public static List<MemoryMapGraphConfigurationDescriptor<?>> getDescriptors() {
+        List<MemoryMapGraphConfigurationDescriptor<?>> list = new ArrayList<MemoryMapGraphConfigurationDescriptor<?>>();
+        for (MemoryMapGraphConfigurationDescriptor<?> d : all()) {
+            list.add(d);
+        }
+        return list;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("[%s] %s", getGraphCaption(), getGraphDataList());
+    }
+    
+    
 }

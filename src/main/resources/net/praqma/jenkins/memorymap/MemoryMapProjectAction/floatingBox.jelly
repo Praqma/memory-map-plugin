@@ -3,8 +3,17 @@
 
     <j:choose>
         <j:when test="${from.getLastApplicableMemoryMapResult() != null}">
-            <j:forEach var="graphTitle" items="${from.getGraphTitles()}">        
-                <img src="${from.urlName}/drawMemoryMapUsageGraph?categories=${from.getAssociatedProgramMemoryAreas(graphTitle)}&amp;title=${graphTitle}&amp;width=400&amp;height=300"/>
+            
+            <j:forEach var="pc" items="${from.parsersChosen()}">
+                <div style="max-width:450px;text-align:center;border-style:solid;border-width:1px;margin:5px;padding:5px">
+                <h3>${pc.parserTitle}</h3>
+                <j:set var="uuid" value="${pc.parserUniqueName}"/>
+                <j:set var="t" value="${from.getGraphTitles(uuid)}"/>
+ 
+                <j:forEach var="gTitle" items="${t}">              
+                    <img src="${from.urlName}/drawMemoryMapUsageGraph?categories=${from.getAssociatedMemoryAreas(gTitle,uuid)}&amp;title=${gTitle}&amp;width=400&amp;height=300&amp;dataset=${uuid}"/>
+                </j:forEach>
+                </div>
             </j:forEach>
         </j:when>
     </j:choose>

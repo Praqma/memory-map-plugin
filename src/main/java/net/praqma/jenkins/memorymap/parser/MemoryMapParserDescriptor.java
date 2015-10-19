@@ -24,7 +24,12 @@
 package net.praqma.jenkins.memorymap.parser;
 
 import hudson.model.Descriptor;
+import hudson.util.FormValidation;
+import java.util.List;
+import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfiguration;
+import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfigurationDescriptor;
 import net.sf.json.JSONObject;
+import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
 /**
@@ -35,4 +40,28 @@ public abstract class MemoryMapParserDescriptor<T extends AbstractMemoryMapParse
     public AbstractMemoryMapParser newInstance( StaplerRequest req, JSONObject formData, AbstractMemoryMapParser instance ) throws FormException { 
         return super.newInstance( req, formData );
     }
+    
+    public List<MemoryMapGraphConfigurationDescriptor<?>> getGraphOptions() {
+        return MemoryMapGraphConfiguration.getDescriptors();
+    }
+    
+    /**
+     * This field is required 
+     * @param mapFile
+     * @return 
+     */
+    public FormValidation doCheckMapFile(@QueryParameter String mapFile) {
+        return FormValidation.validateRequired(mapFile);
+    }
+    
+    public FormValidation doCheckParserUniqueName(@QueryParameter String parserUniqueName) {
+        return FormValidation.validateRequired(parserUniqueName);
+    }
+    
+    public FormValidation doCheckConfigurationFile(@QueryParameter String configurationFile) {
+        return FormValidation.validateRequired(configurationFile);
+    }
+    
 }
+
+    

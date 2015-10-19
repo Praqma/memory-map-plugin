@@ -23,10 +23,7 @@
  */
 package net.praqma.jenkins.unit;
 
-import java.util.Arrays;
-import java.util.List;
 import net.praqma.jenkins.memorymap.MemoryMapBuildAction;
-import net.praqma.jenkins.memorymap.result.MemoryMapParsingResult;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -45,53 +42,5 @@ public class MemoryMapBuildActionSimpleTest {
         assertNull(memoryMapBuildAction.getUrlName());
         assertEquals("Memory map", memoryMapBuildAction.getDisplayName());
     }
-    
-    /*@Test
-    public void memoryMapBuildAction_intialization_compare_test() throws Exception {
-        
-        String ebss = ".ebss";
-        String bss = ".bss";
-        MemoryMapBuildAction mmba = new MemoryMapBuildAction(null, null);
-        //mmba.setResults(new LinkedList<MemoryMapParsingResult>());        
-        
-        int sum = 0;
-        
-        assertEquals(sum, mmba.sumOfValues("dummy","non-existant"));
-        //assertNotNull(mmba.getResults());
-        //assertEquals(0, mmba.getResults().size());
-        
-        MemoryMapParsingResult mmpa = new MemoryMapParsingResult();
-        mmpa.setName(".ebss");
-        mmpa.setValue(1000);
-        
-        //Add a result with .ebss
-        //mmba.getResults().add(mmpa);
-        
-        assertEquals(1000, mmba.sumOfValues(".ebss"));
-        
-        MemoryMapParsingResult mmpa2 = new MemoryMapParsingResult();
-        mmpa2.setName(".bss");
-        mmpa2.setValue(1000);
-        
-        //Add a result with .bss
-        //mmba.getResults().add(mmpa2);
-        assertEquals(1000, mmba.sumOfValues(".ebss"));
-        assertEquals(2000, mmba.sumOfValues(".ebss",".bss"));
-        
-        List<String> list = Arrays.asList(ebss,bss);
-        List<String> list2 = Arrays.asList(ebss);
-        
-        assertEquals(1000, mmba.sumOfValues(list2));
-        assertEquals(2000, mmba.sumOfValues(list));
-        
-        assertTrue(mmba.validateThreshold(1000, list2));
-        assertFalse(mmba.validateThreshold(500, list2));
-        assertTrue(mmba.validateThreshold(1001, list2));
-        
-        assertTrue(mmba.validateThreshold(1000, ebss));
-        assertFalse(mmba.validateThreshold(500, ebss));
-        assertTrue(mmba.validateThreshold(1001, ebss));
-        
-    }*/
-            
+
 }
