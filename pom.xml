@@ -413,7 +413,7 @@
          <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>javancss-maven-plugin</artifactId>
-            <version>2.0</version>
+            <version>2.1</version>
          </plugin>
          <!-- 
             Generates cross-reference of the project's source as part of project's reports which other
