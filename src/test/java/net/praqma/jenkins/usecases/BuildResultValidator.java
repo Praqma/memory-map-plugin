@@ -5,6 +5,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemoryItem;
+import net.praqma.jenkins.memorymap.util.HexUtils;
 import org.apache.commons.lang.reflect.FieldUtils;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -54,10 +55,14 @@ public class BuildResultValidator {
 
                 for (Map.Entry<String, String> x : expectedSection.getValue().entrySet()) {
                     String expectedField = x.getKey();
-                    String expectedValue = x.getValue();
+                    String expectedValue = x.getValue() == null || x.getValue().equals("N/A")
+                            ? "N/A"
+                            : new HexUtils.HexifiableString(x.getValue()).toFormattedHexString().rawString;
 
-                    Object value = FieldUtils.readField(actualSection, expectedField, true);
-                    String actualValue = value == null ? "N/A" : value.toString();
+                    Object fieldValue = FieldUtils.readField(actualSection, expectedField, true);
+                    String actualValue = fieldValue == null
+                            ? "N/A"
+                            : new HexUtils.HexifiableString(fieldValue.toString()).toFormattedHexString().rawString;
 
                     assertEquals(String.format("Expected %s, was %s for key '%s' for build #%s", expectedValue, actualValue, expectedSection, build.number), expectedValue, actualValue);
                 }
