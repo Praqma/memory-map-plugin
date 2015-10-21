@@ -229,7 +229,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.17</version>
             </plugin>
-            <!-- 
+            <!--
             Generate coverate reports based on instrumented tests.
             It does not get automatically executed, but invokes the execution of the 
             lifecycle phase test prior to executing itself.
@@ -249,7 +249,7 @@
                     </formats>
                 </configuration>
             </plugin>
-            <!-- 
+            <!--
             Enables the site phase and site goal 'mvn site' to generate nice
             project site documentation, including project summary and all reports from other
             plugins that creates interesting reports (PMD, Findbugs, Checkstyle, test and coverage 
@@ -273,7 +273,7 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>2.9.1</version>
             </plugin>
-            <!-- 
+            <!--
             Run pmd:pmd and pmd:cpd goals directly without being part of 'mvn site' lifecycle
             PMD and CPD scans java code for possible problems and copy-pasted code 
             The two goals create output for the Jenkins build pipeline jobs 
@@ -284,7 +284,7 @@
                 <artifactId>maven-pmd-plugin</artifactId>
                 <version>3.2</version>
             </plugin>
-            <!-- 
+            <!--
             Use findbugs:findbugs goal to produce xml report for Jenkins
             build pipeline setup.
             Requires compile goal in default phase to be executed prior to findbugs
@@ -301,7 +301,7 @@
                     <xmlOutput>true</xmlOutput>
                 </configuration>
             </plugin>
-            <!-- 
+            <!--
             Enables checkstyle:checkstyle goal to be used manually 
             but does not hook checkstyle up on any phases in the default
             lifecycle. We want to run it manually in specific part of the 
@@ -332,7 +332,7 @@
                     <failOnViolation>false</failOnViolation>
                 </configuration>
             </plugin>
-            <!-- 
+            <!--
             Another Java code metric reporting tool. Included in the site report
             as a plugin under reporting.
             use  'mvn jdepend:generate' to generate jdepende report in xml (and html) reports
@@ -347,7 +347,7 @@
     </build>
     <reporting>
         <plugins>
-            <!-- 
+            <!--
             Converts maven-surefire-plugin test reports to html reports, for the site report from 'mvn site' 
             lifecycle. The maven-surefire-plugin creates output for the Jenkins build pipeline
             and don't need this reporting conversion. 
@@ -369,7 +369,7 @@
                 <artifactId>cobertura-maven-plugin</artifactId>
                 <version>2.6</version>
             </plugin>
-            <!-- 
+            <!--
             To generate the FindBugs xdoc report as part of the Project Reports
             and will be the format used by Jenkins.
             Can't use version 3.x as it requires Java runtime 1.7 - we are using
@@ -381,7 +381,7 @@
                 <artifactId>findbugs-maven-plugin</artifactId>
                 <version>2.5.5</version>
             </plugin>
-            <!-- 
+            <!--
             Also adding javadoc plugin to reporting section so it automatically runs a part of
             'mvn site' lifecycle.
             javadoc plugin is also added in build/plugins-section to enable 'mvn javadoc:javadoc' as
@@ -392,7 +392,7 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>2.9.1</version>
             </plugin>
-            <!-- 
+            <!--
             Includes the PMD/CPD reports in the mvn site reports
             Plugin is also mentioned in build/plugin-section to enable to use the 
             individual goals for the build pipeline reporting, without running
@@ -419,7 +419,7 @@
                     </reportSet>
                 </reportSets>
             </plugin>
-            <!-- 
+            <!--
             Include java complexity metrics in the site report.
             Also used in build/plugin as a goal to manually use for developers
             or in the build pipeline.        

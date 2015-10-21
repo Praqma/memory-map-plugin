@@ -51,10 +51,10 @@ public class MemoryMapGccParserTest {
         
         String fileNameLinker = MemoryMapGccParserTest.class.getResource("prom.ld").getFile();
         String fileNameMap = MemoryMapGccParserTest.class.getResource("prom.map").getFile();
-        
+
         assertNotNull(fileNameLinker);
         assertNotNull(fileNameMap);
-        
+
         File f = new File(fileNameLinker);
         MemoryMapConfigMemory mem = parser.parseConfigFile(f);
         

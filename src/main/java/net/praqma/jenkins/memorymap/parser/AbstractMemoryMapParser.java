@@ -60,6 +60,7 @@ import org.kohsuke.stapler.DataBoundSetter;
 @JsonSubTypes({
     @Type(value = TexasInstrumentsMemoryMapParser.class, name = "TexasInstrumentsMemoryMapParser"),
     @Type(value = GccMemoryMapParser.class, name = "GccMemoryMapParser") })
+
 public abstract class AbstractMemoryMapParser implements Describable<AbstractMemoryMapParser>, ExtensionPoint, Serializable {
 
     private static final String UTF_8_CHARSET = "UTF8";

@@ -23,6 +23,8 @@
  */
 package net.praqma.jenkins.unit;
 
+import java.util.HashMap;
+import java.util.Map;
 import net.praqma.jenkins.memorymap.util.HexUtils;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -148,5 +150,29 @@ public class HexUtilsTest {
         HexUtils.HexifiableString metricToHex = new HexUtils.HexifiableString("2m");
         HexUtils.HexifiableString hexified = metricToHex.toValidHexString();       
     }
-   
+
+    @Test
+    public void testFormatting() {
+        Map<String, String> stringTests = new HashMap<String,String>(){{
+            put("0x00123456", "0x00123456");
+            put("7fc3", "0x00007fc3");
+            put("64M", "0x04000000");
+        }};
+        for (Map.Entry<String, String> test : stringTests.entrySet()) {
+            HexUtils.HexifiableString hexString = new HexUtils.HexifiableString(test.getKey()).toValidHexString();
+            assertTrue("Failure for test '" + test.getKey() + "': Not a valid hex string.", hexString.isValidHexString());
+            assertEquals("Failure for test '" + test.getKey() + "': Expected formatted hex string.", test.getValue(), hexString.toFormattedHexString().rawString);
+        }
+
+        Map<Integer, String> intTests = new HashMap<Integer,String>(){{
+            put(1,"0x00000001");
+            put(316, "0x0000013c");
+            put(2000000000, "0x77359400");
+        }};
+        for (Map.Entry<Integer, String> test : intTests.entrySet()) {
+            HexUtils.HexifiableString hexString = new HexUtils.HexifiableString(test.getKey()).toValidHexString();
+            assertTrue("Failure for test '" + test.getKey() + "': Not a valid hex string.", hexString.isValidHexString());
+            assertEquals("Failure for test '" + test.getKey() + "': Expected formatted hex string.", test.getValue(), hexString.toFormattedHexString().rawString);
+        }
+    }
 }

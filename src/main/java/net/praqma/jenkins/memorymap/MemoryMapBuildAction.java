@@ -475,8 +475,6 @@ public class MemoryMapBuildAction implements Action {
                             logger.log(Level.FINEST, "found {0}", key);
                         }
                     }
-                    
-
                     ChartUtil.NumberOnlyBuildLabel label = new ChartUtil.NumberOnlyBuildLabel((Run<?,?>)membuild.build);                    
                     if (result != null) {
                         //Do something we have a result                        
@@ -513,7 +511,7 @@ public class MemoryMapBuildAction implements Action {
     public Object readResolve() {
         if (getMemoryMapConfig() != null) {
             logger.log(Level.FINE, "Entering 1.x compatibility block, assigning memory map to Default parser");
-            HashMap<String, MemoryMapConfigMemory> configs = new HashMap<String, MemoryMapConfigMemory>();
+            HashMap<String, MemoryMapConfigMemory> configs = new HashMap<>();
             configs.put("Default", getMemoryMapConfig());
             setMemoryMapConfigs(configs);
         }

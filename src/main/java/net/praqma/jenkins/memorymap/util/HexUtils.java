@@ -26,6 +26,7 @@ package net.praqma.jenkins.memorymap.util;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * @author Praqma
@@ -40,7 +41,7 @@ public class HexUtils {
     private static final double MEGA = KILO*1024;
     private static final double GIGA = MEGA*1024;
         
-    private static final Map<String, Double> scale = new HashMap<String, Double>();
+    private static final Map<String, Double> scale = new HashMap<>();
     private static final Pattern VALID_HEX = Pattern.compile("^[0xX]*[0-9a-fA-F]+$");
     private static final Pattern VALID_NUMERICAL = Pattern.compile("^\\d+[mMgGkK]+$");
     
@@ -136,6 +137,21 @@ public class HexUtils {
             } else {
                 return 0;
             }            
+        }
+
+        /**
+         * Returns a new HexifiableString with a formatted rawString.
+         * Format: 0x\d{8}
+         * @return A HexifiableString with a formatted rawString.
+         */
+        public HexifiableString toFormattedHexString() {
+            HexifiableString hexString = toValidHexString();
+            String baseString = hexString.rawString.replace("0x", "");
+
+            int targetLength = ((baseString.length() - 1) | 7) + 1; // Next multiple of 8.
+            String formattedRawString = "0x" + StringUtils.leftPad(baseString, targetLength, "0");
+
+            return new HexifiableString(formattedRawString);
         }
     }
 }
