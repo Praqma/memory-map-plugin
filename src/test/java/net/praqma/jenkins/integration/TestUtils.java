@@ -50,6 +50,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import net.praqma.jenkins.memorymap.MemoryMapRecorder;
 import net.praqma.jenkins.memorymap.parser.AbstractMemoryMapParser;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemoryItem;
+import net.praqma.jenkins.memorymap.util.HexUtils;
 import org.apache.commons.io.FileUtils;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -135,7 +136,9 @@ public class TestUtils {
         HashMap<String, MemoryMapConfigMemoryItem> usage = TestUtils.getMemoryItems(build);
         for (String key : expectedValues.keySet()) {
             assertTrue(String.format("Key '%s' not found.", key), usage.containsKey(key));
-            assertEquals(String.format("Value for key '%s' did not match expectations.", key), expectedValues.get(key), usage.get(key).getUsed());
+            String expectedValue = new HexUtils.HexifiableString(expectedValues.get(key)).toFormattedHexString().rawString;
+            String actualValue = new HexUtils.HexifiableString(usage.get(key).getUsed()).toFormattedHexString().rawString;
+            assertEquals(String.format("Value for key '%s' did not match expectations.", key), expectedValue, actualValue);
         }
     }
 

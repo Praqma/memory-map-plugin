@@ -30,8 +30,8 @@ import org.kohsuke.stapler.StaplerRequest;
  */
 public class GccMemoryMapParser extends AbstractMemoryMapParser implements Serializable {
 
-    private static final Pattern MEM_SECTIONS = Pattern.compile("^\\s+(\\S+)( \\S+.*|\\(\\S+\\)| ):", Pattern.MULTILINE);
-    private static final Pattern COMMENT_BLOCKS = Pattern.compile("/\\*(?:.|[\\n\\r])*?\\*/");
+    private static final Pattern MEM_SECTIONS = Pattern.compile("^\\s*(\\S+)(?=.*:)", Pattern.MULTILINE);
+    private static final Pattern COMMENT_BLOCKS = Pattern.compile("\\/\\*[\\s\\S]*?\\*\\/");
     private static final Logger LOG = Logger.getLogger(GccMemoryMapParser.class.getName());
 
     @DataBoundConstructor
@@ -61,7 +61,7 @@ public class GccMemoryMapParser extends AbstractMemoryMapParser implements Seria
      **/
     public MemoryMapConfigMemory getMemory(CharSequence seq) throws AbortException {
 
-        Pattern allMemory = Pattern.compile(".*?^(\\s+\\S+).*?[ORIGIN|org|o].*?=([^,]*).*?[LENGTH|len|l]\\s\\=\\s*([^\\s]*).*$", Pattern.MULTILINE);
+        Pattern allMemory = Pattern.compile("^\\s*(\\S+).*?(?:ORIGIN|org|o)\\s*=\\s*([^,]*).*?(?:LENGTH|len|l)\\s*\\=\\s*([^\\s]*)", Pattern.MULTILINE);
         Matcher match = allMemory.matcher(seq);
         MemoryMapConfigMemory memory = new MemoryMapConfigMemory();
         while (match.find()) {
@@ -89,7 +89,7 @@ public class GccMemoryMapParser extends AbstractMemoryMapParser implements Seria
     public List<MemoryMapConfigMemoryItem> getSections(CharSequence m) {
         List<MemoryMapConfigMemoryItem> items = new ArrayList<MemoryMapConfigMemoryItem>();
 
-        Pattern section = Pattern.compile(".*SECTIONS\\s?\\r?\\n?\\{(.*)\\n\\}", Pattern.MULTILINE | Pattern.DOTALL);
+        Pattern section = Pattern.compile("SECTIONS\\s?\\r?\\n?\\{([\\s\\S]*)\\n\\}", Pattern.MULTILINE);
 
         Matcher sectionMatched = section.matcher(m);
         String sectionString = null;

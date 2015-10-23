@@ -9,7 +9,6 @@ import hudson.tasks.Shell;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.concurrent.TimeUnit;
 import net.praqma.jenkins.integration.TestUtils;
 import net.praqma.jenkins.memorymap.MemoryMapRecorder;
 import org.apache.commons.io.FileUtils;
@@ -69,7 +68,7 @@ public class UseCase {
         int commitNumber = 1;
         while ((current = manipulator.nextCommit()) != null) {
             System.out.printf("%sCherry picked #%s %s%n", UseCaseCommits.PREFIX, commitNumber, current.getName());
-            AbstractBuild<?, ?> build = project.scheduleBuild2(0, new Cause.UserIdCause()).get(240, TimeUnit.SECONDS);
+            AbstractBuild<?, ?> build = project.scheduleBuild2(0, new Cause.UserIdCause()).get();
             assert build.getResult() == Result.SUCCESS;
             System.out.printf("%sBuild %s finished with status %s using sha %s%n", UseCaseCommits.PREFIX, build.number, build.getResult(), current.getName());
             validator.forBuild(build).validate();

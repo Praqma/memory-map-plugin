@@ -78,6 +78,10 @@ public class GccMemoryMapParserIT {
 
         HashMap<String, String> expectedValues = new HashMap<>();
         expectedValues.put("rom", "0x01000000");
+        expectedValues.put("ram", "0x04000000");
+        expectedValues.put(".data", "0x00000000");
+        expectedValues.put(".bss", "0x00000000");
+        expectedValues.put(".text", "0x0000013c");
 
         TestUtils.testUsageValues(jenkins, parser, "gcc484.zip", expectedValues);
     }

@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>1.580</version>
+        <version>1.580</version> <!-- Don't forget to up the test harness dependency as well!!-->
     </parent>
     <groupId>net.praqma</groupId>
     <artifactId>memory-map</artifactId>
@@ -113,7 +113,7 @@
         <dependency>
             <groupId>org.jenkins-ci.main</groupId>
             <artifactId>jenkins-test-harness</artifactId>
-            <version>1.532</version>
+            <version>1.580</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -141,6 +141,64 @@
             <optional>true</optional>
         </dependency>
     </dependencies>
+    <profiles>
+        <profile>
+            <id>default</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <version>2.17</version>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/UseCase.java</exclude>
+                            </excludes>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                    <goal>verify</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>usecaseTesting</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <version>2.17</version>
+                        <configuration>
+                            <includes>
+                                <include>**/UseCase.java</include>
+                            </includes>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                    <goal>verify</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
     <build>
         <plugins>
             <!-- 
@@ -202,24 +260,6 @@
                 </configuration>
             </plugin>
             <!-- 
-            Allows integration tests to clean test environment before build fails 
-            use 'mvn verify' to run integration tests to allow 'post-integration-test' phase
-            to run so it can tear down integration test environment
-            -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <version>2.17</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <!-- 
             Binds automatically surefire:test goal to the test phase and generates
             .txt and .xml reports for test results.
             Reports can later be converted to html reports by the 'maven-surefire-report-plugin' 
@@ -272,6 +312,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>2.9.1</version>
+                <configuration>
+                    <additionalparam>-Xdoclint:none</additionalparam>   <!--Fix for java 8. http://stackoverflow.com/questions/15886209-->
+                </configuration>
             </plugin>
             <!--
             Run pmd:pmd and pmd:cpd goals directly without being part of 'mvn site' lifecycle
@@ -296,7 +339,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>findbugs-maven-plugin</artifactId>
-                <version>2.5.5</version>
+                <version>3.0.2</version>
                 <configuration>
                     <xmlOutput>true</xmlOutput>
                 </configuration>
@@ -379,7 +422,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>findbugs-maven-plugin</artifactId>
-                <version>2.5.5</version>
+                <version>3.0.2</version>
             </plugin>
             <!--
             Also adding javadoc plugin to reporting section so it automatically runs a part of
@@ -391,6 +434,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>2.9.1</version>
+                <configuration>
+                    <additionalparam>-Xdoclint:none</additionalparam>   <!--Fix for java 8. http://stackoverflow.com/questions/15886209-->
+                </configuration>
             </plugin>
             <!--
             Includes the PMD/CPD reports in the mvn site reports
@@ -427,7 +473,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>javancss-maven-plugin</artifactId>
-                <version>2.0</version>
+                <version>2.1</version>
             </plugin>
             <!-- 
             Generates cross-reference of the project's source as part of project's reports which other
