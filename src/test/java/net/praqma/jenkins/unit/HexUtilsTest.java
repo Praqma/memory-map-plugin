@@ -164,12 +164,14 @@ public class HexUtilsTest {
             assertEquals("Failure for test '" + test.getKey() + "': Expected formatted hex string.", test.getValue(), hexString.toFormattedHexString().rawString);
         }
 
-        Map<Integer, String> intTests = new HashMap<Integer,String>(){{
-            put(1,"0x00000001");
-            put(316, "0x0000013c");
-            put(2000000000, "0x77359400");
+        Map<Long, String> nrTests = new HashMap<Long,String>(){{
+            put(1L,"0x00000001");
+            put(316L, "0x0000013c");
+            put(2000000000L, "0x77359400");
+            put(1095216660480L, "0x000000ff00000000"); //JENKINS-31200
+
         }};
-        for (Map.Entry<Integer, String> test : intTests.entrySet()) {
+        for (Map.Entry<Long, String> test : nrTests.entrySet()) {
             HexUtils.HexifiableString hexString = new HexUtils.HexifiableString(test.getKey()).toValidHexString();
             assertTrue("Failure for test '" + test.getKey() + "': Not a valid hex string.", hexString.isValidHexString());
             assertEquals("Failure for test '" + test.getKey() + "': Expected formatted hex string.", test.getValue(), hexString.toFormattedHexString().rawString);

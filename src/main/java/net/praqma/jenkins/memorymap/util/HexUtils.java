@@ -36,12 +36,12 @@ public class HexUtils {
     private static final int HEXA_RADIX = 16;
     private static final int BITS_PER_BYTE = 8;
     
-    private static final double DEFAULT = 1d;
-    private static final double KILO = 1024;
-    private static final double MEGA = KILO*1024;
-    private static final double GIGA = MEGA*1024;
+    private static final long DEFAULT = 1;
+    private static final long KILO = 1024;
+    private static final long MEGA = KILO*1024;
+    private static final long GIGA = MEGA*1024;
         
-    private static final Map<String, Double> scale = new HashMap<>();
+    private static final Map<String, Long> scale = new HashMap<>();
     private static final Pattern VALID_HEX = Pattern.compile("^[0xX]*[0-9a-fA-F]+$");
     private static final Pattern VALID_NUMERICAL = Pattern.compile("^\\d+[mMgGkK]+$");
     
@@ -61,7 +61,7 @@ public class HexUtils {
     }
      
     private static double getRadix(String hexString, int radix) {
-        Double i = (double)(Integer.parseInt(hexString.replace("0x","").replaceAll("\\s", ""), radix));
+        Double i = (double)(Long.parseLong(hexString.replace("0x","").replaceAll("\\s", ""), radix));
         return i;
     }
     
@@ -73,12 +73,12 @@ public class HexUtils {
             this.rawString = rawString.replaceAll("\\s", "");
         }
         
-        public HexifiableString(Integer value) {
-            this.rawString = Integer.toHexString(value);
+        public HexifiableString(Long value) {
+            this.rawString = Long.toHexString(value);
         }
         
-        public Integer getIntegerValue() {
-            return Integer.parseInt(rawString.replace("0x",""), 16);
+        public Long getLongValue() {
+            return Long.parseLong(rawString.replace("0x",""), 16);
         }
         
         public boolean isValidMetricValue() {
@@ -100,11 +100,11 @@ public class HexUtils {
             } else {
                 HexifiableString newString = null;
                 if (rawString.contains("M") || rawString.contains("m")) {
-                    newString = new HexifiableString(Integer.parseInt(rawString.replaceAll("[mM]", ""))*(int)MEGA);
+                    newString = new HexifiableString(Long.parseLong(rawString.replaceAll("[mM]", "")) * MEGA);
                 } else if (rawString.contains("G") || rawString.contains("g")) {
-                    newString = new HexifiableString(Integer.parseInt(rawString.replaceAll("[gG]", ""))*(int)GIGA);
+                    newString = new HexifiableString(Long.parseLong(rawString.replaceAll("[gG]", ""))* GIGA);
                 } else if (rawString.contains("K") || rawString.contains("k")) {
-                    newString = new HexifiableString(Integer.parseInt(rawString.replaceAll("[kK]", ""))*(int)KILO);
+                    newString = new HexifiableString(Long.parseLong(rawString.replaceAll("[kK]", ""))* KILO);
                 } else {
                     throw new UnsupportedOperationException(String.format("The string %s contains invalid metric symbols", rawString));
                 }
@@ -121,14 +121,14 @@ public class HexUtils {
         }
         
         public HexUtils.HexifiableString getLengthAsHex(HexifiableString other) {
-           int diff = Math.abs(getIntegerValue() - other.getIntegerValue());
+           long diff = Math.abs(getLongValue() - other.getLongValue());
            return new HexUtils.HexifiableString(diff);
         }
 
         @Override
         public int compareTo(HexifiableString t) {
-            int current = Integer.parseInt(rawString.trim().replace("0x",""), 16);
-            int other = Integer.parseInt(t.rawString.trim().replace("0x",""), 16);
+            long current = Long.parseLong(rawString.trim().replace("0x",""), 16);
+            long other = Long.parseLong(t.rawString.trim().replace("0x",""), 16);
             
             if (other > current) {
                 return 1;

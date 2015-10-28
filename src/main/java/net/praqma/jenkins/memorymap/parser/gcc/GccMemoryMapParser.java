@@ -121,8 +121,8 @@ public class GccMemoryMapParser extends AbstractMemoryMapParser implements Seria
 
         @Override
         public int compare(MemoryMapConfigMemoryItem t, MemoryMapConfigMemoryItem t1) {
-            int vt = new HexifiableString(t.getOrigin()).getIntegerValue();
-            int vt1 = new HexifiableString(t1.getOrigin()).getIntegerValue();
+            long vt = new HexifiableString(t.getOrigin()).getLongValue();
+            long vt1 = new HexifiableString(t1.getOrigin()).getLongValue();
             return (vt < vt1 ? -1 : (vt == vt1 ? 1 : 0));
         }
 

@@ -93,50 +93,6 @@ public class MemoryMapBuildAction implements Action {
     }
 
     /**
-     * Returns an indication whether as to the requirements are met. You do one
-     * check per set of values you wish to compare.
-     *
-     * @param threshold
-     * @param valuenames
-     * @return
-     */
-    public boolean validateThreshold(int threshold, String... valuenames) {
-        return sumOfValues(valuenames) <= threshold;
-    }
-
-    public boolean validateThreshold(int threshold, List<String> valuenames) {
-        return sumOfValues(valuenames) <= threshold;
-    }
-
-    public int sumOfValues(String... valuenames) {
-        int sum = 0;
-        /*
-         for(MemoryMapParsingResult res : getResults()) {
-         for(String s : valuenames) {
-         if(res.getName().equals(s)) {
-         sum+=res.getValue();
-         }
-         }
-         }
-         */
-        return sum;
-    }
-
-    public int sumOfValues(List<String> values) {
-        int sum = 0;
-        /*
-         for(MemoryMapParsingResult res : getResults()) {
-         for(String s : values) {
-         if(res.getName().equals(s)) {
-         sum+=res.getValue();
-         }
-         }
-         }
-         */
-        return sum;
-    }
-
-    /**
      * Fetches the previous MemoryMap build. Takes all successful, but failed
      * builds.
      *
@@ -186,15 +142,13 @@ public class MemoryMapBuildAction implements Action {
      * remove the marker, and concatenate the label.
      */
     private void filterMarkers(HashMap<String, ValueMarker> markers) {
-
-        HashMap<Integer, String> maxLabel = new HashMap<Integer, String>();
+        HashMap<Long, String> maxLabel = new HashMap<>();
 
         for (String markerLabel : markers.keySet()) {
-            int max = (int) markers.get(markerLabel).getValue();
+            long max = (long) markers.get(markerLabel).getValue();
             if (maxLabel.containsKey(max)) {
                 //If the label already is contained. Store the Original value. And add the new one.
                 String current = maxLabel.get(max);
-
                 maxLabel.put(max, current + " " + markerLabel);
             } else {
                 maxLabel.put(max, markerLabel);
@@ -202,14 +156,14 @@ public class MemoryMapBuildAction implements Action {
         }
 
         markers.clear();
-        for (Integer key : maxLabel.keySet()) {
+        for (Long key : maxLabel.keySet()) {
             makeMarker(maxLabel.get(key), (double) key, markers);
         }
 
     }
 
     public void doDrawMemoryMapUsageGraph(StaplerRequest req, StaplerResponse rsp) throws IOException {
-        DataSetBuilder<String, ChartUtil.NumberOnlyBuildLabel> dataset = new DataSetBuilder<String, ChartUtil.NumberOnlyBuildLabel>();
+        DataSetBuilder<String, ChartUtil.NumberOnlyBuildLabel> dataset = new DataSetBuilder<>();
 
         String members = req.getParameter("categories");
         String graphTitle = req.getParameter("title");
@@ -220,7 +174,7 @@ public class MemoryMapBuildAction implements Action {
 
         List<String> memberList = Arrays.asList(members.split(","));
 
-        HashMap<String, ValueMarker> markers = new HashMap<String, ValueMarker>();
+        HashMap<String, ValueMarker> markers = new HashMap<>();
 
         String scale = getRecorder().scale;
 
