@@ -15,9 +15,14 @@
     <description>Enables the parsing of memory map files and their linker scripts. Currently supports Gcc and TexasInstruments compilers</description>
     <developers>
         <developer>
+            <id>praqma_josra</id>
+            <name>Praqma Josra</name>
+            <email>josra@praqma.net</email>
+        </developer>
+        <developer>
             <id>MadsNielsen</id>
             <email>man@praqma.net</email>
-            <name>Mads Nielsen&gt;</name>
+            <name>Mads Nielsen</name>
             <organization>Prama</organization>
             <organizationUrl>http://www.praqma.com</organizationUrl>
             <roles>
