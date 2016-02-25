@@ -24,40 +24,38 @@
 package net.praqma.jenkins.memorymap.util;
 
 import hudson.FilePath;
-import java.io.File;
-import java.io.IOException;
 import org.apache.commons.lang.StringUtils;
 import org.apache.tools.ant.types.FileSet;
 
+import java.io.File;
+import java.io.IOException;
+
 /**
- *
  * Small class that wraps the file callable interface, to wrap functionality to find a file given a pattern on a remote machine.
- * 
- * @author Praqma
  */
-public abstract class FileFoundable<T> implements FilePath.FileCallable<T>  {
-    
-    public File findFile(File file, String pattern) throws IOException {
-        if(StringUtils.isBlank(pattern)) {
-            throw new MemoryMapFileNotFoundError(String.format("Empty file pattern provided, this is not legal. Workspace was %s", file.getAbsolutePath()), file);            
+public abstract class FileFoundable<T> implements FilePath.FileCallable<T> {
+
+    public File findFile(File dir, String pattern) throws IOException {
+        if (StringUtils.isBlank(pattern)) {
+            throw new MemoryMapFileNotFoundError(String.format("Failed to find files as an empty file pattern was provided. Workspace was '%s'", dir.getAbsolutePath()), dir);
         }
-        
+
         FileSet fileSet = new FileSet();
         org.apache.tools.ant.Project project = new org.apache.tools.ant.Project();
         fileSet.setProject(project);
-        fileSet.setDir(file);
+        fileSet.setDir(dir);
         fileSet.setIncludes(pattern);
-        
-        int numberOfFoundFiles = fileSet.getDirectoryScanner(project).getIncludedFiles().length;
-        if(numberOfFoundFiles == 0) {
-            throw new MemoryMapFileNotFoundError(String.format("Filematcher found no files using pattern %s in folder %s", pattern, file.getAbsolutePath()), file);
-        } 
-        
-        File f = new File(file.getAbsoluteFile() + System.getProperty("file.separator") + fileSet.getDirectoryScanner(project).getIncludedFiles()[0]);
 
-        if(!f.exists()) {
-            throw new MemoryMapFileNotFoundError(String.format("File %s not found workspace was %s scanner found %s files.", f.getAbsolutePath(),file.getAbsolutePath(),numberOfFoundFiles), file);            
+        int numberOfFoundFiles = fileSet.getDirectoryScanner(project).getIncludedFiles().length;
+        if (numberOfFoundFiles == 0) {
+            throw new MemoryMapFileNotFoundError(String.format("Found no files matching '%s' in directory '%s'", pattern, dir.getAbsolutePath()), dir);
         }
-        return f;
-    } 
+
+        File file = new File(dir.getAbsoluteFile() + System.getProperty("file.separator") + fileSet.getDirectoryScanner(project).getIncludedFiles()[0]);
+
+        if (!file.exists()) {
+            throw new MemoryMapFileNotFoundError(String.format("Couldn't find file '%s' in workspace '%s'. Scanner matched '%s' files.", file.getAbsolutePath(), dir.getAbsolutePath(), numberOfFoundFiles), dir);
+        }
+        return file;
+    }
 }
