@@ -27,7 +27,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.UUID;
 import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfiguration;
-import net.praqma.jenkins.memorymap.parser.TexasInstrumentsMemoryMapParser;
+import net.praqma.jenkins.memorymap.parser.ti.TexasInstrumentsMemoryMapParser;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;

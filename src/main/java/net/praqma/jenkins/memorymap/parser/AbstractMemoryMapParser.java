@@ -49,6 +49,7 @@ import jenkins.model.Jenkins;
 import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfiguration;
 import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfigurationDescriptor;
 import net.praqma.jenkins.memorymap.parser.gcc.GccMemoryMapParser;
+import net.praqma.jenkins.memorymap.parser.ti.TexasInstrumentsMemoryMapParser;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
 import org.apache.commons.collections.ListUtils;
 import org.kohsuke.stapler.DataBoundSetter;
@@ -64,9 +65,9 @@ import org.kohsuke.stapler.DataBoundSetter;
 public abstract class AbstractMemoryMapParser implements Describable<AbstractMemoryMapParser>, ExtensionPoint, Serializable {
 
     private static final String UTF_8_CHARSET = "UTF8";
-   
+
     protected static final Logger logger = Logger.getLogger(AbstractMemoryMapParser.class.toString());
-    
+
     protected List<Pattern> patterns;
     private List<MemoryMapGraphConfiguration> graphConfiguration;
     private String parserUniqueName;
@@ -77,18 +78,18 @@ public abstract class AbstractMemoryMapParser implements Describable<AbstractMem
     private String parserTitle;
 
     /**
-     * 
+     *
      * @return  The default word size. If the map files contains usages in decimal value of bytes (say 1 200 bytes used). Use a word size of 8.
-     * else use what your compiler prefers. 
+     * else use what your compiler prefers.
      */
     public abstract int getDefaultWordSize();
-    
-    public AbstractMemoryMapParser () {  
+
+    public AbstractMemoryMapParser () {
         this.patterns = ListUtils.EMPTY_LIST;
         this.graphConfiguration = new ArrayList<>();
         this.parserUniqueName = "Default";
     }
-    
+
     public AbstractMemoryMapParser(String parserUniqueName, String mapFile, String configurationFile, Integer wordSize, Boolean bytesOnGraph, List<MemoryMapGraphConfiguration> graphConfiguration, Pattern... pattern) {
         this.patterns = Arrays.asList(pattern);
         this.mapFile = mapFile;
@@ -98,7 +99,7 @@ public abstract class AbstractMemoryMapParser implements Describable<AbstractMem
         this.graphConfiguration = graphConfiguration;
         this.parserUniqueName = parserUniqueName;
     }
-    
+
     public Object readResolve(){
         if (graphConfiguration == null) graphConfiguration = new ArrayList<>();
         if(getParserUniqueName() == null || getParserUniqueName() == null){
@@ -110,19 +111,19 @@ public abstract class AbstractMemoryMapParser implements Describable<AbstractMem
 
     /**
      * Implemented in order to get a unique name for the chosen parser
-     * @return 
+     * @return
      */
     public String getUniqueName() {
         return String.format("%s_%s_%s", this.getClass().getSimpleName().replace(".class", ""), mapFile, configurationFile);
     }
-     
+
     protected CharSequence createCharSequenceFromFile(File f) throws IOException {
         return createCharSequenceFromFile(UTF_8_CHARSET, f);
     }
-     
+
     protected CharSequence createCharSequenceFromFile(String charset, File f) throws IOException {
         String chosenCharset = charset;
-        
+
         CharBuffer cbuf = null;
         FileInputStream fis = null;
         try {
@@ -130,16 +131,16 @@ public abstract class AbstractMemoryMapParser implements Describable<AbstractMem
             logger.log(java.util.logging.Level.FINE, String.format("Parser %s created input stream for file.", getParserUniqueName()));
             FileChannel fc = fis.getChannel();
             ByteBuffer bbuf = fc.map(FileChannel.MapMode.READ_ONLY, 0, (int)fc.size());
-            
+
             if(!Charset.isSupported(chosenCharset)) {
                 logger.warning(String.format("The charset %s is not supported", charset));
                 cbuf = Charset.defaultCharset().newDecoder().decode(bbuf);
             } else {
                 cbuf = Charset.forName(charset).newDecoder().decode(bbuf);
-            }            
+            }
         } catch (FileNotFoundException ex){
             logger.log(java.util.logging.Level.FINE, String.format("Parser %s reported exception of type FileNotFoundException.", getParserUniqueName()));
-             throw ex;  
+             throw ex;
         } catch (IOException ex) {
             logger.log(java.util.logging.Level.FINE, String.format("Parser %s reported exception of type IOException.", getParserUniqueName()));
             throw ex;
@@ -150,8 +151,8 @@ public abstract class AbstractMemoryMapParser implements Describable<AbstractMem
             }
         }
         return cbuf;
-    }    
-    
+    }
+
     public abstract MemoryMapConfigMemory parseConfigFile(File f) throws IOException;
     public abstract MemoryMapConfigMemory parseMapFile(File f, MemoryMapConfigMemory configuration) throws IOException;
 
@@ -169,12 +170,12 @@ public abstract class AbstractMemoryMapParser implements Describable<AbstractMem
     public void setMapFile(String mapFile) {
         this.mapFile = mapFile;
     }
-    
+
     @Override
     public Descriptor<AbstractMemoryMapParser> getDescriptor() {
             return (Descriptor<AbstractMemoryMapParser>) Jenkins.getInstance().getDescriptorOrDie( getClass() );
     }
-    
+
     /**
     * All registered {@link AbstractConfigurationRotatorSCM}s.
     */
@@ -230,8 +231,8 @@ public abstract class AbstractMemoryMapParser implements Describable<AbstractMem
      */
     public void setConfigurationFile(String configurationFile) {
         this.configurationFile = configurationFile;
-    } 
-   
+    }
+
     public List<MemoryMapGraphConfigurationDescriptor<?>> getGraphOptions() {
         return MemoryMapGraphConfiguration.getDescriptors();
     }
@@ -257,7 +258,7 @@ public abstract class AbstractMemoryMapParser implements Describable<AbstractMem
 
     /**
      * @return the parserTitle
-     */    
+     */
     public String getParserTitle() {
         return parserTitle;
     }

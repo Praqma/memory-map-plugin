@@ -69,10 +69,10 @@ public class MemoryMapBuildAction implements Action {
 
     private static final double labelOffset = 1.2d;
     private HashMap<String, MemoryMapConfigMemory> memoryMapConfigs;
-    private AbstractBuild<?, ?> build;
+    private Run<?, ?> build;
     private MemoryMapRecorder recorder;
 
-    public MemoryMapBuildAction(AbstractBuild<?, ?> build, HashMap<String, MemoryMapConfigMemory> memoryMapConfig) {
+    public MemoryMapBuildAction(Run<?, ?> build, HashMap<String, MemoryMapConfigMemory> memoryMapConfig) {
         this.build = build;
         this.memoryMapConfigs = memoryMapConfig;
     }
@@ -100,10 +100,10 @@ public class MemoryMapBuildAction implements Action {
      * @param base
      * @return The previous MemoryMap build.
      */
-    public MemoryMapBuildAction getPreviousAction(AbstractBuild<?, ?> base) {
+    public MemoryMapBuildAction getPreviousAction(Run<?, ?> base) {
         logger.log(Level.FINER, "Entering getPreviousAction(base).");
         MemoryMapBuildAction action;
-        AbstractBuild<?, ?> start = base;
+        Run<?, ?> start = base;
         while (true) {
             start = start.getPreviousCompletedBuild();
             if (start == null) {
@@ -121,7 +121,7 @@ public class MemoryMapBuildAction implements Action {
     public MemoryMapBuildAction getPreviousAction() {
         logger.log(Level.FINER, "Entering getPreviousAction.");
         MemoryMapBuildAction action;
-        AbstractBuild<?, ?> start = build;
+        Run<?, ?> start = build;
         while (true) {
             start = start.getPreviousCompletedBuild();
             if (start == null) {
@@ -398,7 +398,7 @@ public class MemoryMapBuildAction implements Action {
                         for(String key :membuild.getMemoryMapConfigs().keySet()){
                             logger.log(Level.FINEST, "found {0}", key);
                         }
-                    }                        
+                    }
                     ChartUtil.NumberOnlyBuildLabel label = new ChartUtil.NumberOnlyBuildLabel((Run<?,?>)membuild.build);
                     if (result != null) {
                         List<MemoryMapConfigMemoryItem> ourItems = result.getItemByNames(parts);
@@ -429,9 +429,9 @@ public class MemoryMapBuildAction implements Action {
                             logger.log(Level.FINEST, "found {0}", key);
                         }
                     }
-                    ChartUtil.NumberOnlyBuildLabel label = new ChartUtil.NumberOnlyBuildLabel((Run<?,?>)membuild.build);                    
+                    ChartUtil.NumberOnlyBuildLabel label = new ChartUtil.NumberOnlyBuildLabel((Run<?,?>)membuild.build);
                     if (result != null) {
-                        //Do something we have a result                        
+                        //Do something we have a result
 
                         for (MemoryMapConfigMemoryItem item : result) {
                             //The name of the item matches the configured grap item

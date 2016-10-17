@@ -23,10 +23,7 @@
  */
 package net.praqma.jenkins.memorymap;
 
-import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
-import hudson.model.Actionable;
-import hudson.model.ProminentProjectAction;
+import hudson.model.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,11 +40,11 @@ import org.kohsuke.stapler.StaplerResponse;
 public class MemoryMapProjectAction extends Actionable implements ProminentProjectAction {
     public static final String ICON_NAME="/plugin/memory-map/images/64x64/memory.png";
     private AbstractProject<?,?> project;
-    
+
     public MemoryMapProjectAction(AbstractProject<?,?> project) {
         this.project = project;
     }
-    
+
     @Override
     public String getDisplayName() {
         return "Memory Map Publisher";
@@ -67,17 +64,17 @@ public class MemoryMapProjectAction extends Actionable implements ProminentProje
     public String getUrlName() {
         return "memory-map";
     }
-    
-    public MemoryMapBuildAction getLatestActionInProject() {       
+
+    public MemoryMapBuildAction getLatestActionInProject() {
         if(project.getLastCompletedBuild() != null) {
             return project.getLastCompletedBuild().getAction(MemoryMapBuildAction.class);
         }
         return null;
     }
-    
+
     //Gets the last 'applicable' build action from project. That is a bui
     public MemoryMapBuildAction getLastApplicableMemoryMapResult() {
-        AbstractBuild<?,?> build = project.getLastCompletedBuild();
+        Run<?,?> build = project.getLastCompletedBuild();
         while(build != null) {
             MemoryMapBuildAction mmba = build.getAction(MemoryMapBuildAction.class);
             if(mmba != null && mmba.isValidConfigurationWithData()) {
@@ -85,32 +82,32 @@ public class MemoryMapProjectAction extends Actionable implements ProminentProje
             }
             build = build.getPreviousBuild();
         }
-        
+
         return null;
     }
-        
-    
+
+
     public void doDrawMemoryMapUsageGraph(StaplerRequest req, StaplerResponse rsp) throws IOException {
         if(getLastApplicableMemoryMapResult() != null) {
             getLastApplicableMemoryMapResult().doDrawMemoryMapUsageGraph(req, rsp);
         }
     }
-    
+
     public List<AbstractMemoryMapParser> parsersChosen() {
-        List<AbstractMemoryMapParser> parsers =  project.getPublishersList().get(MemoryMapRecorder.class).getChosenParsers();       
+        List<AbstractMemoryMapParser> parsers =  project.getPublishersList().get(MemoryMapRecorder.class).getChosenParsers();
         return parsers;
     }
-    
+
     public HashMap<String,MemoryMapGraphConfiguration> getConfiguration() {
         HashMap<String,MemoryMapGraphConfiguration> map = new HashMap<String, MemoryMapGraphConfiguration>();
         return map;
     }
-    
+
     public List<String> getGraphTitles(String parserId) {
         List<String> graphTitles = new ArrayList<String>();
         List<AbstractMemoryMapParser> parsers =  project.getPublishersList().get(MemoryMapRecorder.class).getChosenParsers();
         for(AbstractMemoryMapParser parser : parsers) {
-            if(parser.getParserUniqueName().equals(parserId)) {                
+            if(parser.getParserUniqueName().equals(parserId)) {
                 for(MemoryMapGraphConfiguration conf : parser.getGraphConfiguration()) {
                     graphTitles.add(conf.getGraphCaption());
                 }
@@ -123,28 +120,27 @@ public class MemoryMapProjectAction extends Actionable implements ProminentProje
         String result = null;
         List<AbstractMemoryMapParser> parsers =  project.getPublishersList().get(MemoryMapRecorder.class).getChosenParsers();
         for(AbstractMemoryMapParser parser : parsers) {
-            if(parser.getParserUniqueName().equals(id)) {                
+            if(parser.getParserUniqueName().equals(id)) {
                 for(MemoryMapGraphConfiguration conf : parser.getGraphConfiguration()) {
                     if(conf.getGraphCaption().equals(graphTitle)) {
                         result = conf.getGraphDataList();
                     }
                 }
             }
-            
+
         }
         return result;
     }
-    
+
     public List<String> getGraphTitles() {
-        ArrayList<String> titles = new ArrayList<String>();        
-        List<AbstractMemoryMapParser> parsers =  project.getPublishersList().get(MemoryMapRecorder.class).getChosenParsers();        
+        ArrayList<String> titles = new ArrayList<String>();
+        List<AbstractMemoryMapParser> parsers =  project.getPublishersList().get(MemoryMapRecorder.class).getChosenParsers();
         for(AbstractMemoryMapParser parser : parsers) {
             List<MemoryMapGraphConfiguration> graphConfigurations = parser.getGraphConfiguration();
             for(MemoryMapGraphConfiguration gc : graphConfigurations) {
                 titles.add(gc.getGraphCaption());
-            }            
-        }       
+            }
+        }
         return titles;
     }
 }
-
