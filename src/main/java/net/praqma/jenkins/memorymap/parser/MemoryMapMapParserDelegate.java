@@ -30,13 +30,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import jenkins.security.SlaveToMasterCallable;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
 import net.praqma.jenkins.memorymap.util.FileFoundable;
+import org.jenkinsci.remoting.RoleChecker;
 /**
  * Class to wrap the FileCallable method. Serves as a proxy to the parser method. 
  * @author Praqma
  */
-public class MemoryMapMapParserDelegate extends FileFoundable<HashMap<String,MemoryMapConfigMemory>> 
+public class MemoryMapMapParserDelegate extends FileFoundable<HashMap<String,MemoryMapConfigMemory>>
 {
     private static final Logger log = Logger.getLogger(MemoryMapMapParserDelegate.class.getName());
     private List<AbstractMemoryMapParser> parsers;
@@ -56,9 +58,17 @@ public class MemoryMapMapParserDelegate extends FileFoundable<HashMap<String,Mem
     }
 
     @Override
-    public HashMap<String, MemoryMapConfigMemory> invoke(File file, VirtualChannel vc) throws IOException, InterruptedException {        
-        for(AbstractMemoryMapParser parser : parsers) {
-            MemoryMapConfigMemory mem = parser.parseMapFile(findFile(file, parser.mapFile), config.get(parser.getParserUniqueName()));
+    public HashMap<String, MemoryMapConfigMemory> invoke(File file, VirtualChannel vc) throws IOException, InterruptedException {   
+        final File fileForCall = file;  
+        for(AbstractMemoryMapParser tempParser : parsers) {
+            final AbstractMemoryMapParser parser = tempParser;
+            vc.call(new SlaveToMasterCallable<String,IOException>() {
+                @Override
+                public String call() throws IOException {
+                    MemoryMapConfigMemory mem = parser.parseMapFile(findFile(fileForCall, parser.mapFile), config.get(parser.getParserUniqueName()));
+                    return fileForCall.getAbsolutePath();
+                }
+        });
         }
         return config;
     }
@@ -90,5 +100,11 @@ public class MemoryMapMapParserDelegate extends FileFoundable<HashMap<String,Mem
             return memsection;
         }
       
+    }
+
+    @Override
+    public void checkRoles(RoleChecker rc) throws SecurityException {
+        // no-op
+        // throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

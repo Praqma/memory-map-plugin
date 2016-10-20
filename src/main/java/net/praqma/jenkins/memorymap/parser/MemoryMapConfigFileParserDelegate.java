@@ -32,6 +32,7 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
 import net.praqma.jenkins.memorymap.util.FileFoundable;
+import org.jenkinsci.remoting.RoleChecker;
 
 /**
  *
@@ -81,6 +82,12 @@ public class MemoryMapConfigFileParserDelegate extends FileFoundable<HashMap<Str
             patternRegistry.put(sectionName, memsection);
             return memsection;
         }
+    }
+
+    @Override
+    public void checkRoles(RoleChecker rc) throws SecurityException {
+        // no-op
+        // throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
 }

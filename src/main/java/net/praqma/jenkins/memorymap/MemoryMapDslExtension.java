@@ -61,6 +61,6 @@ public class MemoryMapDslExtension extends ContextExtensionPoint {
         MemoryMapJobDslContext context = new MemoryMapJobDslContext();
         executeInContext(closure, context);
 
-        return new MemoryMapRecorder(context.parsers, context.showBytesOnGraphs, String.valueOf(context.wordSize), context.scale, null);
+        return new MemoryMapRecorder(context.parsers, context.showBytesOnGraphs, context.wordSize, context.scale, null);
     }
 }

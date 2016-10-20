@@ -59,7 +59,7 @@ import org.kohsuke.stapler.QueryParameter;
 public class MemoryMapRecorder extends Recorder implements SimpleBuildStep {
 
     private String mapFile;
-    private Integer wordSize;
+    private int wordSize;
     private boolean showBytesOnGraph;
 
     @Deprecated
@@ -86,11 +86,15 @@ public class MemoryMapRecorder extends Recorder implements SimpleBuildStep {
     }
 
     @DataBoundConstructor
-    public MemoryMapRecorder(List<AbstractMemoryMapParser> chosenParsers, boolean showBytesOnGraph, String wordSize, final String scale , final List<MemoryMapGraphConfiguration> graphConfiguration) {
+    public MemoryMapRecorder(List<AbstractMemoryMapParser> chosenParsers, boolean showBytesOnGraph, int wordSize, final String scale , final List<MemoryMapGraphConfiguration> graphConfiguration) {
         this.chosenParsers = chosenParsers;
         this.showBytesOnGraph = showBytesOnGraph;
         //TODO: This should be chose at parse-time. The 8 that is...
-        this.wordSize = StringUtils.isBlank(wordSize) ? 8 : Integer.parseInt(wordSize);
+        if (wordSize == 0) {
+            this.wordSize = 8;
+        } else {
+            this.wordSize = wordSize;
+        }
         this.scale = scale;
         this.graphConfiguration = graphConfiguration;
     }

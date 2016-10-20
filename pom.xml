@@ -4,7 +4,7 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>1.580</version> <!-- Don't forget to up the test harness dependency as well!!-->
+        <version>1.580.1</version> <!-- Don't forget to up the test harness dependency as well!!-->
     </parent>
     <groupId>net.praqma</groupId>
     <artifactId>memory-map</artifactId>
@@ -118,7 +118,7 @@
         <dependency>
             <groupId>org.jenkins-ci.main</groupId>
             <artifactId>jenkins-test-harness</artifactId>
-            <version>1.580</version>
+            <version>1.580.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>

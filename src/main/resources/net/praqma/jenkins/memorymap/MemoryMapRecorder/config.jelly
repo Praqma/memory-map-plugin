@@ -7,7 +7,7 @@
             vertical-align:middle;
         }             
     </style>        
-    <f:entry title="${%Word size}" field="wordSize" name="wordSize">            
+    <f:entry title="${%Word size}" field="wordSize" name="wordSize" default="8">            
         <f:textbox/>
     </f:entry>
     <f:entry title="${%Show bytes on graphs}" field="showBytesOnGraph" name="showBytesOnGraph">            
