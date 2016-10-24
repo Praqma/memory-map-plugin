@@ -147,12 +147,12 @@ public class TestUtils {
      * workspace.
      *
      * @param project the project for which to do the setup
-     * @param archvieName the archive you want to extract to the workspace
+     * @param archiveName the archive you want to extract to the workspace
      */
-    public static void prepareProjectWorkspace(FreeStyleProject project, String archvieName) throws Exception {
+    public static void prepareProjectWorkspace(FreeStyleProject project, String archiveName) throws Exception {
         TestUtils.runNewBuild(project);
-        if (archvieName != null) {
-            TestUtils.unzipArchiveToProjectWorkspace(project, archvieName);
+        if (archiveName != null) {
+            TestUtils.unzipArchiveToProjectWorkspace(project, archiveName);
         }
     }
 
@@ -192,7 +192,7 @@ public class TestUtils {
     }
 
     /**
-     * Extracts given archive into the project's workspace. Note: archvie file is
+     * Extracts given archive into the project's workspace. Note: archive file is
      * retrieved from TestUtils's resources.
      *
      * @param archiveName Archive to extract.
