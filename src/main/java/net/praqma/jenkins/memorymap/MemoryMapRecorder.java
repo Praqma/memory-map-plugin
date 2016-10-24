@@ -43,13 +43,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfiguration;
+import jenkins.model.Jenkins;
 import net.praqma.jenkins.memorymap.parser.*;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
 import net.praqma.jenkins.memorymap.util.MemoryMapError;
 import net.sf.json.JSONObject;
-import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.QueryParameter;
 /**
@@ -59,19 +59,10 @@ import org.kohsuke.stapler.QueryParameter;
 public class MemoryMapRecorder extends Recorder implements SimpleBuildStep {
 
     private String mapFile;
-    private int wordSize;
-    private boolean showBytesOnGraph;
+    private int wordSize = 8;
+    private boolean showBytesOnGraph = false;
 
-    @Deprecated
-    private transient AbstractMemoryMapParser chosenParser;
-
-    @Deprecated
-    private transient String configurationFile;
-
-    @Deprecated
-    public final List<MemoryMapGraphConfiguration> graphConfiguration;
-
-    public final String scale;
+    private String scale = "default";
     private List<AbstractMemoryMapParser> chosenParsers;
     private static final Logger logger = Logger.getLogger(MemoryMapRecorder.class.getName());
 
@@ -81,51 +72,11 @@ public class MemoryMapRecorder extends Recorder implements SimpleBuildStep {
     }
 
     public MemoryMapRecorder(){
-        scale = null;
-        graphConfiguration = null;
     }
 
     @DataBoundConstructor
-    public MemoryMapRecorder(List<AbstractMemoryMapParser> chosenParsers, boolean showBytesOnGraph, int wordSize, final String scale , final List<MemoryMapGraphConfiguration> graphConfiguration) {
+    public MemoryMapRecorder(List<AbstractMemoryMapParser> chosenParsers) {
         this.chosenParsers = chosenParsers;
-        this.showBytesOnGraph = showBytesOnGraph;
-        //TODO: This should be chose at parse-time. The 8 that is...
-        if (wordSize == 0) {
-            this.wordSize = 8;
-        } else {
-            this.wordSize = wordSize;
-        }
-        this.scale = scale;
-        this.graphConfiguration = graphConfiguration;
-    }
-
-    public Object readResolve()
-    {
-        if (getChosenParser() != null) {
-            logger.log(Level.FINE, "Entering 1.x compatibility block, adding legacy parser to parser list.");
-
-            //Set the config file, this was moved from the recorder to the parser
-            if(getConfigurationFile() != null && getChosenParser().getConfigurationFile() == null){
-                getChosenParser().setConfigurationFile(configurationFile);
-            }
-
-            //The graphs were also moved to the parser
-            if(graphConfiguration != null){
-                if(getChosenParser().getGraphConfiguration() == null){
-                    getChosenParser().setGraphConfiguration(new ArrayList<MemoryMapGraphConfiguration>());
-                }
-
-                for(MemoryMapGraphConfiguration graphConfig : graphConfiguration) {
-                    getChosenParser().getGraphConfiguration().add(graphConfig);
-                }
-            }
-
-            List<AbstractMemoryMapParser> parsers = new ArrayList<>();
-            parsers.add(getChosenParser());
-            setChosenParsers(parsers);
-        }
-
-        return this;
     }
 
     @Override
@@ -136,7 +87,7 @@ public class MemoryMapRecorder extends Recorder implements SimpleBuildStep {
 
         HashMap<String, MemoryMapConfigMemory> config = null;
 
-        String version = Hudson.getInstance().getPlugin( "memory-map" ).getWrapper().getVersion();
+        String version = Jenkins.getInstance().getPlugin( "memory-map" ).getWrapper().getVersion();
         out.println( "Memory Map Plugin version " + version );
 
         try {
@@ -165,8 +116,6 @@ public class MemoryMapRecorder extends Recorder implements SimpleBuildStep {
         mmba.setRecorder(this);
         mmba.setMemoryMapConfigs(config);
         build.addAction(mmba);
-
-        return;
     }
 
     /**
@@ -193,6 +142,7 @@ public class MemoryMapRecorder extends Recorder implements SimpleBuildStep {
     /**
      * @param showBytesOnGraph the showBytesOnGraph to set
      */
+    @DataBoundSetter
     public void setShowBytesOnGraph(Boolean showBytesOnGraph) {
         this.showBytesOnGraph = showBytesOnGraph;
     }
@@ -207,44 +157,24 @@ public class MemoryMapRecorder extends Recorder implements SimpleBuildStep {
     /**
      * @param wordSize the wordSize to set
      */
-    public void setWordSize(Integer wordSize) {
+    @DataBoundSetter
+    public void setWordSize(int wordSize) {
         this.wordSize = wordSize;
     }
-
+    
     /**
-     * @return the chosenParser
-     * @deprecated use chosenParsers instead
+     * @return the scale
      */
-    @Deprecated
-    public AbstractMemoryMapParser getChosenParser() {
-        return chosenParser;
+    public String getScale() {
+        return scale;
     }
-
-    /**
-     * @param chosenParser the chosenParser to set
-     * @deprecated use chosenParsers instead
+    
+     /**
+     * @param scale the scale to set
      */
-    @Deprecated
-    public void setChosenParser(AbstractMemoryMapParser chosenParser) {
-        this.chosenParser = chosenParser;
-    }
-
-    /**
-     * @return the configurationFile
-     * @deprecated moved to parser level
-     */
-    @Deprecated
-    public String getConfigurationFile() {
-        return configurationFile;
-    }
-
-    /**
-     * @param configurationFile the configurationFile to set
-     * @deprecated moved to parser level
-     */
-    @Deprecated
-    public void setConfigurationFile(String configurationFile) {
-        this.configurationFile = configurationFile;
+    @DataBoundSetter
+    public void setScale(String scale) {
+        this.scale = scale;
     }
 
     /**
@@ -294,7 +224,7 @@ public class MemoryMapRecorder extends Recorder implements SimpleBuildStep {
         }
 
         private List<String> getScales(){
-            List<String> scales = new ArrayList<String>();
+            List<String> scales = new ArrayList<>();
             scales.add("default");
             scales.add("kilo");
             scales.add("Mega");

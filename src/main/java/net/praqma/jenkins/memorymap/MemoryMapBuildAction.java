@@ -176,7 +176,7 @@ public class MemoryMapBuildAction implements Action {
 
         HashMap<String, ValueMarker> markers = new HashMap<>();
 
-        String scale = getRecorder().scale;
+        String scale = getRecorder().getScale();
 
         double max = buildDataSet(memberList, uniqueDataSet, dataset, markers);
         filterMarkers(markers);
@@ -298,7 +298,7 @@ public class MemoryMapBuildAction implements Action {
      */
     private double extractValue(MemoryMapConfigMemoryItem... item) {
         double value = 0d;
-        String scale = getRecorder().scale;
+        String scale = getRecorder().getScale();
         for (MemoryMapConfigMemoryItem it : item) {
             if (!StringUtils.isBlank(it.getUsed())) {
                 if (getRecorder().getShowBytesOnGraph()) {
@@ -313,7 +313,7 @@ public class MemoryMapBuildAction implements Action {
 
     private double extractMaxNonZeroValue(MemoryMapConfigMemoryItem... item) {
         double value = 0d;
-        String scale = getRecorder().scale;
+        String scale = getRecorder().getScale();
         for (MemoryMapConfigMemoryItem it : item) {
 
             if (getRecorder().getShowBytesOnGraph()) {
@@ -337,7 +337,7 @@ public class MemoryMapBuildAction implements Action {
 
     private double extractMaxValue(MemoryMapConfigMemoryItem... item) {
         double value = 0d;
-        String scale = getRecorder().scale;
+        String scale = getRecorder().getScale();
         for (MemoryMapConfigMemoryItem it : item) {
 
             if (getRecorder().getShowBytesOnGraph()) {
