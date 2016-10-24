@@ -43,7 +43,7 @@ public class TexasInstrumentsMemoryMapParserIT {
 
     @Test
     public void testUsageValues() throws Exception {
-        MemoryMapGraphConfiguration graphConfiguration = new MemoryMapGraphConfiguration("RAMM0+RAML0_L3", "432", true);
+        MemoryMapGraphConfiguration graphConfiguration = new MemoryMapGraphConfiguration("RAMM0+RAML0_L3", "432");
         TexasInstrumentsMemoryMapParser parser = createParser(graphConfiguration);
         parser.setMapFile("TexasInstrumentsMapFile.txt");
         parser.setConfigurationFile("28069_RAM_lnk.cmd");
