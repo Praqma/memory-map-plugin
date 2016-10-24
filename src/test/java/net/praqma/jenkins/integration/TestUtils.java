@@ -163,7 +163,9 @@ public class TestUtils {
      * @param parser the parser whose configuration must be added
      */
     public static void setMemoryMapConfiguration(FreeStyleProject project, AbstractMemoryMapParser parser) {
-        MemoryMapRecorder recorder = new MemoryMapRecorder(Arrays.asList((AbstractMemoryMapParser) parser), true, 8, null);
+        MemoryMapRecorder recorder = new MemoryMapRecorder(Arrays.asList((AbstractMemoryMapParser) parser));
+        recorder.setShowBytesOnGraph(true);
+        recorder.setWordSize(8);
         project.getPublishersList().clear(); //remove any old recorders
         project.getPublishersList().add(recorder);
     }

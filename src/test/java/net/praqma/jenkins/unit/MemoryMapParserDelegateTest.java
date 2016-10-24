@@ -70,7 +70,7 @@ public class MemoryMapParserDelegateTest {
 
         MemoryMapMapParserDelegate delegate = new MemoryMapMapParserDelegate();
 
-        MemoryMapGraphConfiguration mmgc = new MemoryMapGraphConfiguration(null, null, true);
+        MemoryMapGraphConfiguration mmgc = new MemoryMapGraphConfiguration(null, null);
         mmgc.setGraphDataList("CODE,DATA,CONST");
         mmgc.setGraphCaption("Config Memory Graph");
         List<MemoryMapGraphConfiguration> graphConfig = Collections.singletonList(mmgc);

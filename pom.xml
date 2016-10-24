@@ -4,10 +4,10 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>2.13</version> <!-- Don't forget to up the test harness dependency as well!!-->
+        <version>2.13</version> 
     </parent>
     <properties>
-        <jenkins.version>1.580.1</jenkins.version><!-- 1.545+ for JENKINS-18410 -->
+        <jenkins.version>1.580.1</jenkins.version> <!-- Don't forget to up the test harness dependency as well!!-->
         <java.level>8</java.level>
     </properties>
     <groupId>net.praqma</groupId>
