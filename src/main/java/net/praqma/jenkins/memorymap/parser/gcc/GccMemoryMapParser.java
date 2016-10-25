@@ -22,6 +22,7 @@ import net.praqma.jenkins.memorymap.util.HexUtils;
 import net.praqma.jenkins.memorymap.util.HexUtils.HexifiableString;
 import net.praqma.jenkins.memorymap.util.MemoryMapMemorySelectionError;
 import net.sf.json.JSONObject;
+import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -196,6 +197,7 @@ public class GccMemoryMapParser extends AbstractMemoryMapParser implements Seria
         return 8;
     }
 
+    @Symbol("GccMemoryMapParser")
     @Extension
     public static final class DescriptorImpl extends MemoryMapParserDescriptor<GccMemoryMapParser> {
 

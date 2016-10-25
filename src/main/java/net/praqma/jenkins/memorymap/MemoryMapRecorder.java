@@ -48,6 +48,7 @@ import net.praqma.jenkins.memorymap.parser.*;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
 import net.praqma.jenkins.memorymap.util.MemoryMapError;
 import net.sf.json.JSONObject;
+import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.StaplerRequest;
@@ -191,6 +192,7 @@ public class MemoryMapRecorder extends Recorder implements SimpleBuildStep {
         this.chosenParsers = chosenParsers;
     }
 
+    @Symbol("MemoryMapRecorder")
     @Extension
     public static final class DescriptorImpl extends BuildStepDescriptor<Publisher> {
 

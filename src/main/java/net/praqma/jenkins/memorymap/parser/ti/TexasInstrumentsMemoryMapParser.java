@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.jenkinsci.Symbol;
 
 /**
  *
@@ -134,6 +135,7 @@ public class TexasInstrumentsMemoryMapParser extends AbstractMemoryMapParser {
         return 16;
     }
 
+    @Symbol("TexasInstrumentsMemoryMapParser")
     @Extension
     public static final class DescriptorImpl extends MemoryMapParserDescriptor<TexasInstrumentsMemoryMapParser> {
 
