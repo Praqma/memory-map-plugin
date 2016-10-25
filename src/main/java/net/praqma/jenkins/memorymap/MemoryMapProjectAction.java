@@ -38,10 +38,11 @@ import org.kohsuke.stapler.StaplerResponse;
  * @author Praqma
  */
 public class MemoryMapProjectAction extends Actionable implements Action {
-    public static final String ICON_NAME="/plugin/memory-map/images/64x64/memory.png";
-    private Job<?,?> project;
 
-    public MemoryMapProjectAction(Job<?,?> project) {
+    public static final String ICON_NAME = "/plugin/memory-map/images/64x64/memory.png";
+    private final Job<?, ?> project;
+
+    public MemoryMapProjectAction(Job<?, ?> project) {
         this.project = project;
     }
 
@@ -65,19 +66,23 @@ public class MemoryMapProjectAction extends Actionable implements Action {
         return "memory-map";
     }
 
+    public Job<?, ?> getProject() {
+        return project;
+    }
+
     public MemoryMapBuildAction getLatestActionInProject() {
-        if(project.getLastCompletedBuild() != null) {
-            return project.getLastCompletedBuild().getAction(MemoryMapBuildAction.class);
+        if (getProject().getLastCompletedBuild() != null) {
+            return getProject().getLastCompletedBuild().getAction(MemoryMapBuildAction.class);
         }
         return null;
     }
 
     //Gets the last 'applicable' build action from project. That is a bui
     public MemoryMapBuildAction getLastApplicableMemoryMapResult() {
-        Run<?,?> build = project.getLastCompletedBuild();
-        while(build != null) {
+        Run<?, ?> build = getProject().getLastCompletedBuild();
+        while (build != null) {
             MemoryMapBuildAction mmba = build.getAction(MemoryMapBuildAction.class);
-            if(mmba != null && mmba.isValidConfigurationWithData()) {
+            if (mmba != null && mmba.isValidConfigurationWithData()) {
                 return mmba;
             }
             build = build.getPreviousBuild();
@@ -86,9 +91,8 @@ public class MemoryMapProjectAction extends Actionable implements Action {
         return null;
     }
 
-
     public void doDrawMemoryMapUsageGraph(StaplerRequest req, StaplerResponse rsp) throws IOException {
-        if(getLastApplicableMemoryMapResult() != null) {
+        if (getLastApplicableMemoryMapResult() != null) {
             getLastApplicableMemoryMapResult().doDrawMemoryMapUsageGraph(req, rsp);
         }
     }
@@ -97,17 +101,17 @@ public class MemoryMapProjectAction extends Actionable implements Action {
         return getLatestActionInProject().getChosenParsers();
     }
 
-    public HashMap<String,MemoryMapGraphConfiguration> getConfiguration() {
-        HashMap<String,MemoryMapGraphConfiguration> map = new HashMap<>();
+    public HashMap<String, MemoryMapGraphConfiguration> getConfiguration() {
+        HashMap<String, MemoryMapGraphConfiguration> map = new HashMap<>();
         return map;
     }
 
     public List<String> getGraphTitles(String parserId) {
         List<String> graphTitles = new ArrayList<>();
         List<AbstractMemoryMapParser> parsers = parsersChosen();
-        for(AbstractMemoryMapParser parser : parsers) {
-            if(parser.getParserUniqueName().equals(parserId)) {
-                for(MemoryMapGraphConfiguration conf : parser.getGraphConfiguration()) {
+        for (AbstractMemoryMapParser parser : parsers) {
+            if (parser.getParserUniqueName().equals(parserId)) {
+                for (MemoryMapGraphConfiguration conf : parser.getGraphConfiguration()) {
                     graphTitles.add(conf.getGraphCaption());
                 }
             }
@@ -118,10 +122,10 @@ public class MemoryMapProjectAction extends Actionable implements Action {
     public String getAssociatedMemoryAreas(String graphTitle, String id) {
         String result = null;
         List<AbstractMemoryMapParser> parsers = parsersChosen();
-        for(AbstractMemoryMapParser parser : parsers) {
-            if(parser.getParserUniqueName().equals(id)) {
-                for(MemoryMapGraphConfiguration conf : parser.getGraphConfiguration()) {
-                    if(conf.getGraphCaption().equals(graphTitle)) {
+        for (AbstractMemoryMapParser parser : parsers) {
+            if (parser.getParserUniqueName().equals(id)) {
+                for (MemoryMapGraphConfiguration conf : parser.getGraphConfiguration()) {
+                    if (conf.getGraphCaption().equals(graphTitle)) {
                         result = conf.getGraphDataList();
                     }
                 }
@@ -134,9 +138,9 @@ public class MemoryMapProjectAction extends Actionable implements Action {
     public List<String> getGraphTitles() {
         ArrayList<String> titles = new ArrayList<>();
         List<AbstractMemoryMapParser> parsers = parsersChosen();
-        for(AbstractMemoryMapParser parser : parsers) {
+        for (AbstractMemoryMapParser parser : parsers) {
             List<MemoryMapGraphConfiguration> graphConfigurations = parser.getGraphConfiguration();
-            for(MemoryMapGraphConfiguration gc : graphConfigurations) {
+            for (MemoryMapGraphConfiguration gc : graphConfigurations) {
                 titles.add(gc.getGraphCaption());
             }
         }

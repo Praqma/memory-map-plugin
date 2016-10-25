@@ -64,6 +64,7 @@ import org.kohsuke.stapler.StaplerResponse;
  * @author Praqma
  */
 public class MemoryMapBuildAction implements Action, SimpleBuildStep.LastBuildAction {
+
     private static final Logger logger = Logger.getLogger(MemoryMapBuildAction.class.getName());
 
     @Deprecated
@@ -74,16 +75,10 @@ public class MemoryMapBuildAction implements Action, SimpleBuildStep.LastBuildAc
     private Run<?, ?> build;
     private MemoryMapRecorder recorder;
     private List<AbstractMemoryMapParser> parsers;
-    
-    private final List<MemoryMapProjectAction> projectActions;
 
     public MemoryMapBuildAction(Run<?, ?> build, HashMap<String, MemoryMapConfigMemory> memoryMapConfig) {
         this.build = build;
         this.memoryMapConfigs = memoryMapConfig;
-        
-        List<MemoryMapProjectAction> projectActions = new ArrayList<>();
-        projectActions.add(new MemoryMapProjectAction(build.getParent()));
-        this.projectActions = projectActions;
     }
 
     @Override
@@ -106,6 +101,7 @@ public class MemoryMapBuildAction implements Action, SimpleBuildStep.LastBuildAc
      * builds.
      *
      * Goes to the end of list.
+     *
      * @param base
      * @return The previous MemoryMap build.
      */
@@ -251,7 +247,7 @@ public class MemoryMapBuildAction implements Action, SimpleBuildStep.LastBuildAc
     public void setRecorder(MemoryMapRecorder recorder) {
         this.recorder = recorder;
     }
-    
+
     /**
      * @return the chosen parsers
      */
@@ -416,13 +412,13 @@ public class MemoryMapBuildAction implements Action, SimpleBuildStep.LastBuildAc
                     logger.log(Level.FINE, "Building graph dataset for build #{0}", membuild.build.number);
                     MemoryMapConfigMemory result = membuild.getMemoryMapConfigs().get(dataset);
                     logger.log(Level.FINE, "Building MemoryMapConfig: {0}", result);
-                    if(result == null){
+                    if (result == null) {
                         logger.log(Level.FINEST, "Dataset {0} not found", dataset);
-                        for(String key :membuild.getMemoryMapConfigs().keySet()){
+                        for (String key : membuild.getMemoryMapConfigs().keySet()) {
                             logger.log(Level.FINEST, "found {0}", key);
                         }
                     }
-                    ChartUtil.NumberOnlyBuildLabel label = new ChartUtil.NumberOnlyBuildLabel((Run<?,?>)membuild.build);
+                    ChartUtil.NumberOnlyBuildLabel label = new ChartUtil.NumberOnlyBuildLabel((Run<?, ?>) membuild.build);
                     if (result != null) {
                         List<MemoryMapConfigMemoryItem> ourItems = result.getItemByNames(parts);
                         MemoryMapConfigMemoryItem[] ourItemsArray = ourItems.toArray(new MemoryMapConfigMemoryItem[ourItems.size()]);
@@ -446,13 +442,13 @@ public class MemoryMapBuildAction implements Action, SimpleBuildStep.LastBuildAc
                     logger.log(Level.FINE, "Building graph dataset for build #{0}", membuild.build.number);
                     MemoryMapConfigMemory result = membuild.getMemoryMapConfigs().get(dataset);
                     logger.log(Level.FINE, "Building MemoryMapConfig: {0}", result);
-                    if(result == null){
+                    if (result == null) {
                         logger.log(Level.FINEST, "Dataset {0} not found", dataset);
-                        for(String key :membuild.getMemoryMapConfigs().keySet()){
+                        for (String key : membuild.getMemoryMapConfigs().keySet()) {
                             logger.log(Level.FINEST, "found {0}", key);
                         }
                     }
-                    ChartUtil.NumberOnlyBuildLabel label = new ChartUtil.NumberOnlyBuildLabel((Run<?,?>)membuild.build);
+                    ChartUtil.NumberOnlyBuildLabel label = new ChartUtil.NumberOnlyBuildLabel((Run<?, ?>) membuild.build);
                     if (result != null) {
                         //Do something we have a result
 
@@ -515,6 +511,8 @@ public class MemoryMapBuildAction implements Action, SimpleBuildStep.LastBuildAc
 
     @Override
     public Collection<? extends Action> getProjectActions() {
-        return this.projectActions;
+        List<MemoryMapProjectAction> projectActions = new ArrayList<>();
+        projectActions.add(new MemoryMapProjectAction(build.getParent()));
+        return projectActions;
     }
 }
