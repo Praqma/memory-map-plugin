@@ -37,11 +37,11 @@ import org.kohsuke.stapler.StaplerResponse;
  *
  * @author Praqma
  */
-public class MemoryMapProjectAction extends Actionable implements ProminentProjectAction {
+public class MemoryMapProjectAction extends Actionable implements Action {
     public static final String ICON_NAME="/plugin/memory-map/images/64x64/memory.png";
-    private AbstractProject<?,?> project;
+    private Job<?,?> project;
 
-    public MemoryMapProjectAction(AbstractProject<?,?> project) {
+    public MemoryMapProjectAction(Job<?,?> project) {
         this.project = project;
     }
 
@@ -94,18 +94,17 @@ public class MemoryMapProjectAction extends Actionable implements ProminentProje
     }
 
     public List<AbstractMemoryMapParser> parsersChosen() {
-        List<AbstractMemoryMapParser> parsers =  project.getPublishersList().get(MemoryMapRecorder.class).getChosenParsers();
-        return parsers;
+        return getLatestActionInProject().getChosenParsers();
     }
 
     public HashMap<String,MemoryMapGraphConfiguration> getConfiguration() {
-        HashMap<String,MemoryMapGraphConfiguration> map = new HashMap<String, MemoryMapGraphConfiguration>();
+        HashMap<String,MemoryMapGraphConfiguration> map = new HashMap<>();
         return map;
     }
 
     public List<String> getGraphTitles(String parserId) {
-        List<String> graphTitles = new ArrayList<String>();
-        List<AbstractMemoryMapParser> parsers =  project.getPublishersList().get(MemoryMapRecorder.class).getChosenParsers();
+        List<String> graphTitles = new ArrayList<>();
+        List<AbstractMemoryMapParser> parsers = parsersChosen();
         for(AbstractMemoryMapParser parser : parsers) {
             if(parser.getParserUniqueName().equals(parserId)) {
                 for(MemoryMapGraphConfiguration conf : parser.getGraphConfiguration()) {
@@ -118,7 +117,7 @@ public class MemoryMapProjectAction extends Actionable implements ProminentProje
 
     public String getAssociatedMemoryAreas(String graphTitle, String id) {
         String result = null;
-        List<AbstractMemoryMapParser> parsers =  project.getPublishersList().get(MemoryMapRecorder.class).getChosenParsers();
+        List<AbstractMemoryMapParser> parsers = parsersChosen();
         for(AbstractMemoryMapParser parser : parsers) {
             if(parser.getParserUniqueName().equals(id)) {
                 for(MemoryMapGraphConfiguration conf : parser.getGraphConfiguration()) {
@@ -133,8 +132,8 @@ public class MemoryMapProjectAction extends Actionable implements ProminentProje
     }
 
     public List<String> getGraphTitles() {
-        ArrayList<String> titles = new ArrayList<String>();
-        List<AbstractMemoryMapParser> parsers =  project.getPublishersList().get(MemoryMapRecorder.class).getChosenParsers();
+        ArrayList<String> titles = new ArrayList<>();
+        List<AbstractMemoryMapParser> parsers = parsersChosen();
         for(AbstractMemoryMapParser parser : parsers) {
             List<MemoryMapGraphConfiguration> graphConfigurations = parser.getGraphConfiguration();
             for(MemoryMapGraphConfiguration gc : graphConfigurations) {

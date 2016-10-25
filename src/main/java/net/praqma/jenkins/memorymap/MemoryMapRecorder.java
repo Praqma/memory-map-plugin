@@ -82,11 +82,10 @@ public class MemoryMapRecorder extends Recorder implements SimpleBuildStep {
 
     @Override
     public void perform(@Nonnull Run<?, ?> build, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull TaskListener listener) throws InterruptedException, IOException {
-
-        boolean failed = false;
+        
         PrintStream out = listener.getLogger();
 
-        HashMap<String, MemoryMapConfigMemory> config = null;
+        HashMap<String, MemoryMapConfigMemory> config;
 
         String version = Jenkins.getInstance().getPlugin( "memory-map" ).getWrapper().getVersion();
         out.println( "Memory Map Plugin version " + version );
@@ -116,6 +115,7 @@ public class MemoryMapRecorder extends Recorder implements SimpleBuildStep {
         MemoryMapBuildAction mmba = new MemoryMapBuildAction(build, config);
         mmba.setRecorder(this);
         mmba.setMemoryMapConfigs(config);
+        mmba.setChosenParsers(getChosenParsers());
         build.addAction(mmba);
     }
 
@@ -196,7 +196,6 @@ public class MemoryMapRecorder extends Recorder implements SimpleBuildStep {
     @Extension
     public static final class DescriptorImpl extends BuildStepDescriptor<Publisher> {
 
-
         @Override
         public boolean isApplicable(Class<? extends AbstractProject> type) {
             return true;
@@ -210,8 +209,6 @@ public class MemoryMapRecorder extends Recorder implements SimpleBuildStep {
         public List<MemoryMapParserDescriptor<?>> getParsers() {
             return AbstractMemoryMapParser.getDescriptors();
         }
-
-
 
         @Override
         public Publisher newInstance(StaplerRequest req, JSONObject formData) throws FormException {
@@ -245,10 +242,5 @@ public class MemoryMapRecorder extends Recorder implements SimpleBuildStep {
              return FormValidation.validateRequired(configurationFile);
          }
 
-    }
-
-    @Override
-    public Action getProjectAction(AbstractProject<?, ?> project) {
-        return new MemoryMapProjectAction(project);
     }
 }

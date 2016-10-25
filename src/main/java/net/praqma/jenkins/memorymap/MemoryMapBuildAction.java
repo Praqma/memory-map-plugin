@@ -23,7 +23,6 @@
  */
 package net.praqma.jenkins.memorymap;
 
-import hudson.model.AbstractBuild;
 import hudson.model.Action;
 import hudson.model.Run;
 import hudson.util.ChartUtil;
@@ -31,12 +30,15 @@ import hudson.util.DataSetBuilder;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.logging.Level;
+import jenkins.tasks.SimpleBuildStep;
+import net.praqma.jenkins.memorymap.parser.AbstractMemoryMapParser;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemoryItem;
 import net.praqma.jenkins.memorymap.util.HexUtils;
@@ -61,7 +63,7 @@ import org.kohsuke.stapler.StaplerResponse;
  *
  * @author Praqma
  */
-public class MemoryMapBuildAction implements Action {
+public class MemoryMapBuildAction implements Action, SimpleBuildStep.LastBuildAction {
     private static final Logger logger = Logger.getLogger(MemoryMapBuildAction.class.getName());
 
     @Deprecated
@@ -71,10 +73,17 @@ public class MemoryMapBuildAction implements Action {
     private HashMap<String, MemoryMapConfigMemory> memoryMapConfigs;
     private Run<?, ?> build;
     private MemoryMapRecorder recorder;
+    private List<AbstractMemoryMapParser> parsers;
+    
+    private final List<MemoryMapProjectAction> projectActions;
 
     public MemoryMapBuildAction(Run<?, ?> build, HashMap<String, MemoryMapConfigMemory> memoryMapConfig) {
         this.build = build;
         this.memoryMapConfigs = memoryMapConfig;
+        
+        List<MemoryMapProjectAction> projectActions = new ArrayList<>();
+        projectActions.add(new MemoryMapProjectAction(build.getParent()));
+        this.projectActions = projectActions;
     }
 
     @Override
@@ -241,6 +250,20 @@ public class MemoryMapBuildAction implements Action {
      */
     public void setRecorder(MemoryMapRecorder recorder) {
         this.recorder = recorder;
+    }
+    
+    /**
+     * @return the chosen parsers
+     */
+    public List<AbstractMemoryMapParser> getChosenParsers() {
+        return parsers;
+    }
+
+    /**
+     * @param parsers the parsers to set
+     */
+    public void setChosenParsers(List<AbstractMemoryMapParser> parsers) {
+        this.parsers = parsers;
     }
 
     /**
@@ -488,5 +511,10 @@ public class MemoryMapBuildAction implements Action {
     @Deprecated
     public void setMemoryMapConfig(MemoryMapConfigMemory memoryMapConfig) {
         this.memoryMapConfig = memoryMapConfig;
+    }
+
+    @Override
+    public Collection<? extends Action> getProjectActions() {
+        return this.projectActions;
     }
 }
