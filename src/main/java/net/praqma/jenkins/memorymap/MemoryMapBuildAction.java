@@ -67,9 +67,6 @@ public class MemoryMapBuildAction implements Action, SimpleBuildStep.LastBuildAc
 
     private static final Logger logger = Logger.getLogger(MemoryMapBuildAction.class.getName());
 
-    @Deprecated
-    private MemoryMapConfigMemory memoryMapConfig;
-
     private static final double labelOffset = 1.2d;
     private HashMap<String, MemoryMapConfigMemory> memoryMapConfigs;
     private Run<?, ?> build;
@@ -479,34 +476,6 @@ public class MemoryMapBuildAction implements Action, SimpleBuildStep.LastBuildAc
             }
         }
         return max;
-    }
-
-    public Object readResolve() {
-        if (getMemoryMapConfig() != null) {
-            logger.log(Level.FINE, "Entering 1.x compatibility block, assigning memory map to Default parser");
-            HashMap<String, MemoryMapConfigMemory> configs = new HashMap<>();
-            configs.put("Default", getMemoryMapConfig());
-            setMemoryMapConfigs(configs);
-        }
-        return this;
-    }
-
-    /**
-     * @return the memoryMapConfig
-     * @deprecated use memoryMapConfigs instead
-     */
-    @Deprecated
-    public MemoryMapConfigMemory getMemoryMapConfig() {
-        return memoryMapConfig;
-    }
-
-    /**
-     * @param memoryMapConfig the memoryMapConfig to set
-     * @deprecated use memoryMapConfigs instead
-     */
-    @Deprecated
-    public void setMemoryMapConfig(MemoryMapConfigMemory memoryMapConfig) {
-        this.memoryMapConfig = memoryMapConfig;
     }
 
     @Override

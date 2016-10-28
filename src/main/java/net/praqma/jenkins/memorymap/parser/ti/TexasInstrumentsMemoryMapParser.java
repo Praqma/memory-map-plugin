@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package net.praqma.jenkins.memorymap.parser.ti; //Remains in the parser package for backwards compatibility
+package net.praqma.jenkins.memorymap.parser.ti;
 
 import hudson.Extension;
 import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfiguration;
@@ -76,7 +76,7 @@ public class TexasInstrumentsMemoryMapParser extends AbstractMemoryMapParser {
 
     @DataBoundConstructor
     public TexasInstrumentsMemoryMapParser(String parserUniqueName, String mapFile, String configurationFile, Integer wordSize, List<MemoryMapGraphConfiguration> graphConfiguration, Boolean bytesOnGraph) {
-        super(parserUniqueName,mapFile, configurationFile, wordSize, bytesOnGraph, graphConfiguration, TEXT_DOT, CONST_DOT, ECONST_DOT, PINIT, SWITCH, CINIT_DOT, STACK_DOT, BSS_DOT, EBSS_DOT, SYSMEM, ESYSMEM, CIO, DATA);
+        super(parserUniqueName, mapFile, configurationFile, wordSize, bytesOnGraph, graphConfiguration, TEXT_DOT, CONST_DOT, ECONST_DOT, PINIT, SWITCH, CINIT_DOT, STACK_DOT, BSS_DOT, EBSS_DOT, SYSMEM, ESYSMEM, CIO, DATA);
     }
 
     public TexasInstrumentsMemoryMapParser() {
@@ -113,17 +113,17 @@ public class TexasInstrumentsMemoryMapParser extends AbstractMemoryMapParser {
     @Override
     public MemoryMapConfigMemory parseMapFile(File f, MemoryMapConfigMemory config) throws IOException {
         CharSequence sequence = createCharSequenceFromFile(f);
-        
-        for(MemoryMapConfigMemoryItem item : config) {            
+
+        for (MemoryMapConfigMemoryItem item : config) {
             Matcher matcher = MemoryMapMapParserDelegate.getPatternForMemorySection(item.getName()).matcher(sequence);
             boolean found = false;
-            while(matcher.find()) {
+            while (matcher.find()) {
                 item.setUsed(matcher.group(8));
                 item.setUnused(matcher.group(10));
                 found = true;
             }
-            if(!found) {
-                logger.logp(Level.WARNING, "parseMapFile", AbstractMemoryMapParser.class.getName(), String.format("parseMapFile(File f, MemoryMapConfigMemory configuration) non existing item: %s",item));                
+            if (!found) {
+                logger.logp(Level.WARNING, "parseMapFile", AbstractMemoryMapParser.class.getName(), String.format("parseMapFile(File f, MemoryMapConfigMemory configuration) non existing item: %s", item));
                 throw new MemoryMapMemorySelectionError(String.format("Linker command element %s not found in .map file", item));
             }
         }

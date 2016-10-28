@@ -52,7 +52,7 @@ public class MemoryMapConfigFileParserDelegate extends FileFoundable<HashMap<Str
     
     @Override
     public HashMap<String, MemoryMapConfigMemory> invoke(File f, VirtualChannel channel) throws IOException, InterruptedException {
-        HashMap<String, MemoryMapConfigMemory> memorys = new HashMap<String, MemoryMapConfigMemory>();
+        HashMap<String, MemoryMapConfigMemory> memorys = new HashMap<>();
         
         for (AbstractMemoryMapParser parser : parsers) {
             String uuid = parser.getParserUniqueName();
@@ -71,7 +71,7 @@ public class MemoryMapConfigFileParserDelegate extends FileFoundable<HashMap<Str
     
     public static Pattern getPatternForMemoryLayout(String sectionName) {
         if(patternRegistry == null) {
-            patternRegistry = new HashMap<String, Pattern>();
+            patternRegistry = new HashMap<>();
         }
         
         if(patternRegistry.containsKey(sectionName)) {
