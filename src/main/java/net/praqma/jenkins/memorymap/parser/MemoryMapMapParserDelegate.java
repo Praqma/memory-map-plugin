@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
-import jenkins.security.SlaveToMasterCallable;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
 import net.praqma.jenkins.memorymap.util.FileFoundable;
 import org.jenkinsci.remoting.RoleChecker;
@@ -43,7 +42,7 @@ import org.jenkinsci.remoting.RoleChecker;
  */
 public class MemoryMapMapParserDelegate extends FileFoundable<HashMap<String, MemoryMapConfigMemory>> {
 
-    private static final Logger log = Logger.getLogger(MemoryMapMapParserDelegate.class.getName());
+    private static final Logger LOG = Logger.getLogger(MemoryMapMapParserDelegate.class.getName());
     private List<AbstractMemoryMapParser> parsers;
     private HashMap<String, MemoryMapConfigMemory> config;
     private static HashMap<String, Pattern> patternRegistry;
@@ -63,16 +62,8 @@ public class MemoryMapMapParserDelegate extends FileFoundable<HashMap<String, Me
 
     @Override
     public HashMap<String, MemoryMapConfigMemory> invoke(File file, VirtualChannel vc) throws IOException, InterruptedException {
-        final File fileForCall = file;
-        for (AbstractMemoryMapParser tempParser : parsers) {
-            final AbstractMemoryMapParser parser = tempParser;
-            vc.call(new SlaveToMasterCallable<String, IOException>() {
-                @Override
-                public String call() throws IOException {
-                    MemoryMapConfigMemory mem = parser.parseMapFile(findFile(fileForCall, parser.mapFile), config.get(parser.getParserUniqueName()));
-                    return fileForCall.getAbsolutePath();
-                }
-            });
+        for (AbstractMemoryMapParser parser : parsers) {
+            MemoryMapConfigMemory mem = parser.parseMapFile(findFile(file, parser.mapFile), config.get(parser.getParserUniqueName()));
         }
         return config;
     }
@@ -107,8 +98,7 @@ public class MemoryMapMapParserDelegate extends FileFoundable<HashMap<String, Me
     }
 
     @Override
-    public void checkRoles(RoleChecker rc) throws SecurityException {
-        // no-op
-        // throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void checkRoles(RoleChecker checker) throws SecurityException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

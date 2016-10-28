@@ -61,7 +61,7 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSSerializer;
 import org.xml.sax.SAXException;
-import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
 /**
@@ -164,8 +164,6 @@ public class TestUtils {
      */
     public static void setMemoryMapConfiguration(FreeStyleProject project, AbstractMemoryMapParser parser) {
         MemoryMapRecorder recorder = new MemoryMapRecorder(Arrays.asList((AbstractMemoryMapParser) parser));
-        recorder.setShowBytesOnGraph(true);
-        recorder.setWordSize(8);
         project.getPublishersList().clear(); //remove any old recorders
         project.getPublishersList().add(recorder);
     }
@@ -229,7 +227,7 @@ public class TestUtils {
         File buildFile = new File(build.getLogFile().getParent() + "/build.xml");
         Document document = parseXml(buildFile);
 
-        HashMap<String, MemoryMapConfigMemoryItem> usageMap = new HashMap<String, MemoryMapConfigMemoryItem>();
+        HashMap<String, MemoryMapConfigMemoryItem> usageMap = new HashMap<>();
 
         NodeList allNodes = document.getElementsByTagName("*");
         for (int i = 0; i < allNodes.getLength(); i++) {
@@ -276,14 +274,11 @@ public class TestUtils {
      * @return an instance of GsonXml
      */
     private static GsonXml createGson() {
-        XmlParserCreator parserCreator = new XmlParserCreator() {
-            @Override
-            public XmlPullParser createParser() {
-                try {
-                    return XmlPullParserFactory.newInstance().newPullParser();
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
+        XmlParserCreator parserCreator = () -> {
+            try {
+                return XmlPullParserFactory.newInstance().newPullParser();
+            } catch (XmlPullParserException e) {
+                throw new RuntimeException(e);
             }
         };
         return new GsonXmlBuilder().setXmlParserCreator(parserCreator).create();
