@@ -59,7 +59,6 @@ import org.kohsuke.stapler.QueryParameter;
  */
 public class MemoryMapRecorder extends Recorder implements SimpleBuildStep {
 
-    private String mapFile;
     private int wordSize = 8;
     private boolean showBytesOnGraph = false;
 
@@ -117,20 +116,6 @@ public class MemoryMapRecorder extends Recorder implements SimpleBuildStep {
         mmba.setMemoryMapConfigs(config);
         mmba.setChosenParsers(getChosenParsers());
         build.addAction(mmba);
-    }
-
-    /**
-     * @return the mapFile
-     */
-    public String getMapFile() {
-        return mapFile;
-    }
-
-    /**
-     * @param mapFile the mapFile to set
-     */
-    public void setMapFile(String mapFile) {
-        this.mapFile = mapFile;
     }
 
     /**
