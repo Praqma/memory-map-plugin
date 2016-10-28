@@ -160,13 +160,6 @@ public class MemoryMapConfigMemoryItem implements Serializable, Comparable<Memor
         return associatedSections;
     }
 
-    /**
-     * @param associatedSections the associatedSections to set
-     */
-    public void setAssociatedSections(List<MemoryMapConfigMemoryItem> associatedSections) {
-        this.setAssociatedSections(associatedSections);
-    }
-
     private Object getValueOrNotApplicable(Object o) {
         if (o == null) {
             return "N/A";

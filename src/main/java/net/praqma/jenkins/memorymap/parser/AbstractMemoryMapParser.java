@@ -106,7 +106,7 @@ public abstract class AbstractMemoryMapParser implements Describable<AbstractMem
         if (graphConfiguration == null) {
             graphConfiguration = new ArrayList<>();
         }
-        if (getParserUniqueName() == null || getParserUniqueName() == null) {
+        if (getParserUniqueName() == null) {
             logger.log(Level.FINE, "Entering 1.x compatibility block, assigning name: Default");
             setParserUniqueName("Default");
         }
