@@ -125,15 +125,13 @@ public class GccMemoryMapParser extends AbstractMemoryMapParser implements Seria
         return p;
     }
 
-    public class MemoryMapMemItemComparator implements Comparator<MemoryMapConfigMemoryItem> {
-
+    private static class MemoryMapMemItemComparator implements Comparator<MemoryMapConfigMemoryItem>, Serializable {
         @Override
         public int compare(MemoryMapConfigMemoryItem t, MemoryMapConfigMemoryItem t1) {
             long vt = new HexifiableString(t.getOrigin()).getLongValue();
             long vt1 = new HexifiableString(t1.getOrigin()).getLongValue();
             return (vt < vt1 ? -1 : (vt == vt1 ? 1 : 0));
         }
-
     }
 
     /**
