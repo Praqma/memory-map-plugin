@@ -125,8 +125,8 @@ public class HexUtils {
 
         @Override
         public int compareTo(HexifiableString t) {
-            long current = Long.parseLong(rawString.trim().replace("0x", ""), 16);
-            long other = Long.parseLong(t.rawString.trim().replace("0x", ""), 16);
+            long current = getLongValue();
+            long other = t.getLongValue();
 
             if (other > current) {
                 return 1;
@@ -135,6 +135,23 @@ public class HexUtils {
             } else {
                 return 0;
             }
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null) return false;
+            if (!HexifiableString.class.isAssignableFrom(obj.getClass())) return false;
+            final HexifiableString other = (HexifiableString) obj;
+            long mine = getLongValue();
+            long his  = other.getLongValue();
+            return mine == his;
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 3;
+            hash = 53 * hash + getLongValue().intValue();
+            return hash;
         }
 
         /**
