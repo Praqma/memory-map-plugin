@@ -26,6 +26,6 @@ public class MemoryMapParserDslContext implements Context {
         MemoryMapGraphDslContext context = new MemoryMapGraphDslContext();
         executeInContext(closure, context);
 
-        graphConfigurations.add(new MemoryMapGraphConfiguration(context.graphData, context.graphCaption, showBytesOnGraph));
+        graphConfigurations.add(new MemoryMapGraphConfiguration(context.graphData, context.graphCaption));
     }
 }

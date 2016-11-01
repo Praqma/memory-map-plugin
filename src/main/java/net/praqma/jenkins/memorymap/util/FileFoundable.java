@@ -31,7 +31,8 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * Small class that wraps the file callable interface, to wrap functionality to find a file given a pattern on a remote machine.
+ * Small class that wraps the file callable interface, to wrap functionality to
+ * find a file given a pattern on a remote machine.
  */
 public abstract class FileFoundable<T> implements FilePath.FileCallable<T> {
 

@@ -22,6 +22,7 @@ import net.praqma.jenkins.memorymap.util.HexUtils;
 import net.praqma.jenkins.memorymap.util.HexUtils.HexifiableString;
 import net.praqma.jenkins.memorymap.util.MemoryMapMemorySelectionError;
 import net.sf.json.JSONObject;
+import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -41,11 +42,16 @@ public class GccMemoryMapParser extends AbstractMemoryMapParser implements Seria
 
     /**
      * Strip any c-style block comments, e.g slash-star to star-slash.
-     * <b>Note:</b> this function down not correctly handle nested comment blocks.
-     * <b>Note:</b> this function is a bit greedy, and will incorrectly strip comments inside strings,
-     * but this shouldn't be a problem for memory config files.
-     * @param seq The content of a file that might contain c-style block-comments
-     * @return The same content, that has now had all block-comments stripped out.
+     * <b>Note:</b> this function down not correctly handle nested comment
+     * blocks.
+     * <b>Note:</b> this function is a bit greedy, and will incorrectly strip
+     * comments inside strings, but this shouldn't be a problem for memory
+     * config files.
+     *
+     * @param seq The content of a file that might contain c-style
+     * block-comments
+     * @return The same content, that has now had all block-comments stripped
+     * out.
      */
     public static CharSequence stripComments(CharSequence seq) {
         Matcher commentMatcher = COMMENT_BLOCKS.matcher(seq);
@@ -53,12 +59,14 @@ public class GccMemoryMapParser extends AbstractMemoryMapParser implements Seria
     }
 
     /**
-     * Parses the MEMORY section of the GCC file. Throws an abort exception which will be shown in the Jenkins console log. 
-     * 
+     * Parses the MEMORY section of the GCC file. Throws an abort exception
+     * which will be shown in the Jenkins console log.
+     *
      * @param seq The content of the map file
      * @return a list of the defined MEMORY in the map file
      * @throws hudson.AbortException          
-     **/
+     *
+     */
     public MemoryMapConfigMemory getMemory(CharSequence seq) throws AbortException {
 
         Pattern allMemory = Pattern.compile("^\\s*(\\S+).*?(?:ORIGIN|org|o)\\s*=\\s*([^,]*).*?(?:LENGTH|len|l)\\s*\\=\\s*([^\\s]*)", Pattern.MULTILINE);
@@ -71,7 +79,7 @@ public class GccMemoryMapParser extends AbstractMemoryMapParser implements Seria
                 memory.add(item);
             } catch (Throwable ex) {
                 logger.log(Level.SEVERE, "Unable to convert %s to a valid hex string.", ex);
-                throw new AbortException( String.format( "Unable to convert %s to a valid hex string.", match.group(3) ) );
+                throw new AbortException(String.format("Unable to convert %s to a valid hex string.", match.group(3)));
             }
         }
         return memory;
@@ -87,7 +95,7 @@ public class GccMemoryMapParser extends AbstractMemoryMapParser implements Seria
      * 
      */
     public List<MemoryMapConfigMemoryItem> getSections(CharSequence m) {
-        List<MemoryMapConfigMemoryItem> items = new ArrayList<MemoryMapConfigMemoryItem>();
+        List<MemoryMapConfigMemoryItem> items = new ArrayList<>();
 
         Pattern section = Pattern.compile("SECTIONS\\s?\\r?\\n?\\{([\\s\\S]*)\\n\\}", Pattern.MULTILINE);
 
@@ -182,8 +190,8 @@ public class GccMemoryMapParser extends AbstractMemoryMapParser implements Seria
             for (String gItem : g.itemizeGraphDataList()) {
                 for (String gSplitItem : gItem.split("\\+")) {
                     //We will fail if the name of the data section does not match any of the named items in the map file.
-                    if (!memconfig.containsSectionWithName(gSplitItem)) {                        
-                        throw new MemoryMapMemorySelectionError(String.format("The memory section named %s not found in map file%nAvailable sections are:%n%s", gSplitItem, memconfig.getItemNames()));                        
+                    if (!memconfig.containsSectionWithName(gSplitItem)) {
+                        throw new MemoryMapMemorySelectionError(String.format("The memory section named %s not found in map file%nAvailable sections are:%n%s", gSplitItem, memconfig.getItemNames()));
                     }
                 }
             }
@@ -196,6 +204,7 @@ public class GccMemoryMapParser extends AbstractMemoryMapParser implements Seria
         return 8;
     }
 
+    @Symbol("GccMemoryMapParser")
     @Extension
     public static final class DescriptorImpl extends MemoryMapParserDescriptor<GccMemoryMapParser> {
 

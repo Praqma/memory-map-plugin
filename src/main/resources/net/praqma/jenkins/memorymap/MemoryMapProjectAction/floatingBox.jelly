@@ -1,9 +1,8 @@
+<?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
          xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-
     <j:choose>
         <j:when test="${from.getLastApplicableMemoryMapResult() != null}">
-            
             <j:forEach var="pc" items="${from.parsersChosen()}">
                 <div style="max-width:450px;text-align:center;border-style:solid;border-width:1px;margin:5px;padding:5px">
                 <h3>${pc.parserTitle}</h3>
@@ -17,5 +16,4 @@
             </j:forEach>
         </j:when>
     </j:choose>
-
 </j:jelly>

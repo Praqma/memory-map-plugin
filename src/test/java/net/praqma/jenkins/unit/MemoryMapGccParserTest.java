@@ -46,7 +46,7 @@ public class MemoryMapGccParserTest {
     @Test
     public void testParsingOfMemorySegmentInLinkerCommandFile() throws IOException {
         GccMemoryMapParser parser = new GccMemoryMapParser();
-        MemoryMapGraphConfiguration conf = new MemoryMapGraphConfiguration("application", "Application test", Boolean.TRUE);
+        MemoryMapGraphConfiguration conf = new MemoryMapGraphConfiguration("application", "Application test");
         List<MemoryMapGraphConfiguration> singletonList = Collections.singletonList(conf);
         
         String fileNameLinker = MemoryMapGccParserTest.class.getResource("prom.ld").getFile();

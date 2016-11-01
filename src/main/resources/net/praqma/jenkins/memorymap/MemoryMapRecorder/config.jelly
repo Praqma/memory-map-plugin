@@ -1,13 +1,12 @@
-
+<?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
          xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-    
     <style type="text/css">
         td.setting-name {
             vertical-align:middle;
         }             
     </style>        
-    <f:entry title="${%Word size}" field="wordSize" name="wordSize">            
+    <f:entry title="${%Word size}" field="wordSize" name="wordSize" default="8">            
         <f:textbox/>
     </f:entry>
     <f:entry title="${%Show bytes on graphs}" field="showBytesOnGraph" name="showBytesOnGraph">            
@@ -20,7 +19,4 @@
     <f:entry field="chosenParsers" title="Configured parsers">
         <f:hetero-list name="chosenParsers" oneEach="false" items="${instance.chosenParsers}" addCaption="Add parser" deleteCaption="Remove parser" descriptors="${descriptor.getParsers()}"/>
     </f:entry>
-    
-
-
 </j:jelly>

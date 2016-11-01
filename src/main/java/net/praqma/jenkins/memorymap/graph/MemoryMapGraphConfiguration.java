@@ -47,7 +47,7 @@ public class MemoryMapGraphConfiguration implements Describable<MemoryMapGraphCo
     private String graphDataList = "Specify graph datasets for graph";
     
     @DataBoundConstructor
-    public MemoryMapGraphConfiguration(String graphDataList, String graphCaption, Boolean displayUsageInBytes) {
+    public MemoryMapGraphConfiguration(String graphDataList, String graphCaption) {
         this.graphDataList = graphDataList;
         this.graphCaption = graphCaption;
     }

@@ -32,32 +32,37 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
 import net.praqma.jenkins.memorymap.util.FileFoundable;
+import org.jenkinsci.remoting.RoleChecker;
+
 /**
- * Class to wrap the FileCallable method. Serves as a proxy to the parser method. 
+ * Class to wrap the FileCallable method. Serves as a proxy to the parser
+ * method.
+ *
  * @author Praqma
  */
-public class MemoryMapMapParserDelegate extends FileFoundable<HashMap<String,MemoryMapConfigMemory>> 
-{
-    private static final Logger log = Logger.getLogger(MemoryMapMapParserDelegate.class.getName());
+public class MemoryMapMapParserDelegate extends FileFoundable<HashMap<String, MemoryMapConfigMemory>> {
+
+    private static final Logger LOG = Logger.getLogger(MemoryMapMapParserDelegate.class.getName());
     private List<AbstractMemoryMapParser> parsers;
     private HashMap<String, MemoryMapConfigMemory> config;
-    private static HashMap<String,Pattern> patternRegistry;
-    
+    private static HashMap<String, Pattern> patternRegistry;
+
     //Empty constructor. For serialization purposes.
-    public MemoryMapMapParserDelegate() { }
+    public MemoryMapMapParserDelegate() {
+    }
 
     public MemoryMapMapParserDelegate(List<AbstractMemoryMapParser> parsers) {
         this.parsers = parsers;
     }
-    
-    public MemoryMapMapParserDelegate(List<AbstractMemoryMapParser> parsers, HashMap<String,MemoryMapConfigMemory> config) {
+
+    public MemoryMapMapParserDelegate(List<AbstractMemoryMapParser> parsers, HashMap<String, MemoryMapConfigMemory> config) {
         this.parsers = parsers;
-        this.config = config;        
+        this.config = config;
     }
 
     @Override
-    public HashMap<String, MemoryMapConfigMemory> invoke(File file, VirtualChannel vc) throws IOException, InterruptedException {        
-        for(AbstractMemoryMapParser parser : parsers) {
+    public HashMap<String, MemoryMapConfigMemory> invoke(File file, VirtualChannel vc) throws IOException, InterruptedException {
+        for (AbstractMemoryMapParser parser : parsers) {
             MemoryMapConfigMemory mem = parser.parseMapFile(findFile(file, parser.mapFile), config.get(parser.getParserUniqueName()));
         }
         return config;
@@ -71,24 +76,29 @@ public class MemoryMapMapParserDelegate extends FileFoundable<HashMap<String,Mem
     }
 
     /**
-     * @param parser the parser to set
+     * @param parsers the parsers to set
      */
     public void setParsers(List<AbstractMemoryMapParser> parsers) {
         this.parsers = parsers;
     }
-    
+
     public static Pattern getPatternForMemorySection(String sectionName) {
-        if(patternRegistry == null) {
-            patternRegistry = new HashMap<String, Pattern>();
+        if (patternRegistry == null) {
+            patternRegistry = new HashMap<>();
         }
-        if(patternRegistry.containsKey(sectionName)) {
+        if (patternRegistry.containsKey(sectionName)) {
             return patternRegistry.get(sectionName);
         } else {
             String regex = String.format("^(\\s+)(\\b%s)(\\s+)(\\S+)(\\s+)(\\S+)(\\s+)(\\S+)(\\s+)(\\S+)(\\s+)(\\S+)", sectionName);
-            Pattern memsection = Pattern.compile(regex,Pattern.MULTILINE);
+            Pattern memsection = Pattern.compile(regex, Pattern.MULTILINE);
             patternRegistry.put(sectionName, memsection);
             return memsection;
         }
-      
+
+    }
+
+    @Override
+    public void checkRoles(RoleChecker checker) throws SecurityException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

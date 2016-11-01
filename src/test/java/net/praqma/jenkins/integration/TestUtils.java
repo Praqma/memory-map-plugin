@@ -61,7 +61,7 @@ import org.w3c.dom.NodeList;
 import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSSerializer;
 import org.xml.sax.SAXException;
-import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
 /**
@@ -147,12 +147,12 @@ public class TestUtils {
      * workspace.
      *
      * @param project the project for which to do the setup
-     * @param archvieName the archive you want to extract to the workspace
+     * @param archiveName the archive you want to extract to the workspace
      */
-    public static void prepareProjectWorkspace(FreeStyleProject project, String archvieName) throws Exception {
+    public static void prepareProjectWorkspace(FreeStyleProject project, String archiveName) throws Exception {
         TestUtils.runNewBuild(project);
-        if (archvieName != null) {
-            TestUtils.unzipArchiveToProjectWorkspace(project, archvieName);
+        if (archiveName != null) {
+            TestUtils.unzipArchiveToProjectWorkspace(project, archiveName);
         }
     }
 
@@ -163,7 +163,7 @@ public class TestUtils {
      * @param parser the parser whose configuration must be added
      */
     public static void setMemoryMapConfiguration(FreeStyleProject project, AbstractMemoryMapParser parser) {
-        MemoryMapRecorder recorder = new MemoryMapRecorder(Arrays.asList((AbstractMemoryMapParser) parser), true, null, null, parser.getGraphConfiguration());
+        MemoryMapRecorder recorder = new MemoryMapRecorder(Arrays.asList((AbstractMemoryMapParser) parser));
         project.getPublishersList().clear(); //remove any old recorders
         project.getPublishersList().add(recorder);
     }
@@ -190,7 +190,7 @@ public class TestUtils {
     }
 
     /**
-     * Extracts given archive into the project's workspace. Note: archvie file is
+     * Extracts given archive into the project's workspace. Note: archive file is
      * retrieved from TestUtils's resources.
      *
      * @param archiveName Archive to extract.
@@ -227,7 +227,7 @@ public class TestUtils {
         File buildFile = new File(build.getLogFile().getParent() + "/build.xml");
         Document document = parseXml(buildFile);
 
-        HashMap<String, MemoryMapConfigMemoryItem> usageMap = new HashMap<String, MemoryMapConfigMemoryItem>();
+        HashMap<String, MemoryMapConfigMemoryItem> usageMap = new HashMap<>();
 
         NodeList allNodes = document.getElementsByTagName("*");
         for (int i = 0; i < allNodes.getLength(); i++) {
@@ -274,14 +274,11 @@ public class TestUtils {
      * @return an instance of GsonXml
      */
     private static GsonXml createGson() {
-        XmlParserCreator parserCreator = new XmlParserCreator() {
-            @Override
-            public XmlPullParser createParser() {
-                try {
-                    return XmlPullParserFactory.newInstance().newPullParser();
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
+        XmlParserCreator parserCreator = () -> {
+            try {
+                return XmlPullParserFactory.newInstance().newPullParser();
+            } catch (XmlPullParserException e) {
+                throw new RuntimeException(e);
             }
         };
         return new GsonXmlBuilder().setXmlParserCreator(parserCreator).create();
