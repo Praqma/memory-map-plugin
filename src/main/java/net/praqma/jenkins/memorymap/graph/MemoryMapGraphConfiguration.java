@@ -87,7 +87,7 @@ public class MemoryMapGraphConfiguration implements Describable<MemoryMapGraphCo
 
     @Override
     public Descriptor<MemoryMapGraphConfiguration> getDescriptor() {
-        return (Descriptor<MemoryMapGraphConfiguration>) Jenkins.getInstance().getDescriptorOrDie(getClass());
+        return (Descriptor<MemoryMapGraphConfiguration>) Jenkins.getActiveInstance().getDescriptorOrDie(getClass());
     }
 
     @Extension
@@ -107,7 +107,7 @@ public class MemoryMapGraphConfiguration implements Describable<MemoryMapGraphCo
     }
 
     public static DescriptorExtensionList<MemoryMapGraphConfiguration, MemoryMapGraphConfigurationDescriptor<MemoryMapGraphConfiguration>> all() {
-        return Jenkins.getInstance().<MemoryMapGraphConfiguration, MemoryMapGraphConfigurationDescriptor<MemoryMapGraphConfiguration>>getDescriptorList(MemoryMapGraphConfiguration.class);
+        return Jenkins.getActiveInstance().<MemoryMapGraphConfiguration, MemoryMapGraphConfigurationDescriptor<MemoryMapGraphConfiguration>>getDescriptorList(MemoryMapGraphConfiguration.class);
     }
 
     public static List<MemoryMapGraphConfigurationDescriptor<?>> getDescriptors() {

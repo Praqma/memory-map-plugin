@@ -389,11 +389,11 @@ public class MemoryMapBuildAction implements Action, SimpleBuildStep.LastBuildAc
     /**
      * Builds the dataset. Returns the maximum value.
      *
-     * @param graphData
-     * @param dataset
-     * @param graphDataset
-     * @param markers
-     * @return
+     * @param graphData GraphData
+     * @param dataset the dataset
+     * @param graphDataset the graph dataset
+     * @param markers markers to add (max values)
+     * @return a double with the value to be drawn on graph
      */
     public double buildDataSet(List<String> graphData, String dataset, DataSetBuilder<String, ChartUtil.NumberOnlyBuildLabel> graphDataset, HashMap<String, ValueMarker> markers) {
         logger.log(Level.FINE, "Entering buildDataSet with dataset {0}", dataset);

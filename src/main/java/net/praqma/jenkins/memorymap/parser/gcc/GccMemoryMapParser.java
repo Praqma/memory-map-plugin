@@ -64,7 +64,7 @@ public class GccMemoryMapParser extends AbstractMemoryMapParser implements Seria
      *
      * @param seq The content of the map file
      * @return a list of the defined MEMORY in the map file
-     * @throws hudson.AbortException          
+     * @throws hudson.AbortException when a illegal value of memory found
      *
      */
     public MemoryMapConfigMemory getMemory(CharSequence seq) throws AbortException {
@@ -91,8 +91,8 @@ public class GccMemoryMapParser extends AbstractMemoryMapParser implements Seria
      * secname start BLOCK(align) (NOLOAD) : AT ( ldadr )
      { contents } >region =fill
      ...
-     }   
-     * 
+     }
+     *
      */
     public List<MemoryMapConfigMemoryItem> getSections(CharSequence m) {
         List<MemoryMapConfigMemoryItem> items = new ArrayList<>();
@@ -140,7 +140,7 @@ public class GccMemoryMapParser extends AbstractMemoryMapParser implements Seria
      * Given an item with length == null. Look down in the list. If we find an
      * item whoose length is not null, set the items length to that
      *
-     * @param memory
+     * @param memory the memory list
      * @return a more complete configuration, where i have better values
      */
     public MemoryMapConfigMemory guessLengthOfSections(MemoryMapConfigMemory memory) {

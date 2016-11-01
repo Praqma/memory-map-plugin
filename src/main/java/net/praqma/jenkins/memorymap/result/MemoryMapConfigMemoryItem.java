@@ -41,24 +41,19 @@ public class MemoryMapConfigMemoryItem implements Serializable, Comparable<Memor
     private String origin;
     private String endAddress;
 
-    //The "length" attribute is used to display MAX values on graphs.    
+    //The "length" attribute is used to display MAX values on graphs.
     private String length;
 
     //The used attributes is what is consumed by the component
     private String used;
     private String unused;
 
-    //Model property for 
+    //Model property for
     private List<MemoryMapConfigMemoryItem> associatedSections;
 
     public MemoryMapConfigMemoryItem() {
     }
 
-    /**
-     *
-     * @param name
-     * @param origin
-     */
     public MemoryMapConfigMemoryItem(String name, String origin) {
         this.name = name != null ? name.trim() : "";
         this.origin = origin;
@@ -143,8 +138,8 @@ public class MemoryMapConfigMemoryItem implements Serializable, Comparable<Memor
      * Calculates the "length" of a segment if the map file does not explicitly
      * tell it to do so.
      *
-     * @param startHex
-     * @param endHex
+     * @param startHex Hex address start
+     * @param endHex Hex address end
      */
     public void setCalculatedLength(String startHex, String endHex) {
         HexUtils.HexifiableString sHex = new HexUtils.HexifiableString(startHex);
@@ -220,12 +215,6 @@ public class MemoryMapConfigMemoryItem implements Serializable, Comparable<Memor
         return max;
     }
 
-    /**
-     * Utility methods checks to see if all items belong to the same parent
-     *
-     * @param items
-     * @return
-     */
     public static boolean allBelongSameParent(MemoryMapConfigMemoryItem... items) {
 
         MemoryMapConfigMemoryItem parent = null;
@@ -274,13 +263,6 @@ public class MemoryMapConfigMemoryItem implements Serializable, Comparable<Memor
         return hash;
     }
 
-    /**
-     * We sort the memory sections by their placement in memory, in ascending
-     * order.
-     *
-     * @param t
-     * @return
-     */
     @Override
     public int compareTo(MemoryMapConfigMemoryItem t) {
         HexUtils.HexifiableString hexStringThis = new HexUtils.HexifiableString(getOrigin());

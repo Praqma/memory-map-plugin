@@ -116,7 +116,7 @@ public abstract class AbstractMemoryMapParser implements Describable<AbstractMem
     /**
      * Implemented in order to get a unique name for the chosen parser
      *
-     * @return
+     * @return The parsers unique name
      */
     public String getUniqueName() {
         return String.format("%s_%s_%s", this.getClass().getSimpleName().replace(".class", ""), mapFile, configurationFile);
@@ -178,14 +178,14 @@ public abstract class AbstractMemoryMapParser implements Describable<AbstractMem
 
     @Override
     public Descriptor<AbstractMemoryMapParser> getDescriptor() {
-        return (Descriptor<AbstractMemoryMapParser>) Jenkins.getInstance().getDescriptorOrDie(getClass());
+        return (Descriptor<AbstractMemoryMapParser>) Jenkins.getActiveInstance().getDescriptorOrDie(getClass());
     }
 
     /**
-     * @return All registered {@link AbstractConfigurationRotatorSCM}s.
+     * @return All registered {@link AbstractMemoryMapParser}s.
      */
     public static DescriptorExtensionList<AbstractMemoryMapParser, MemoryMapParserDescriptor<AbstractMemoryMapParser>> all() {
-        return Jenkins.getInstance().<AbstractMemoryMapParser, MemoryMapParserDescriptor<AbstractMemoryMapParser>>getDescriptorList(AbstractMemoryMapParser.class);
+        return Jenkins.getActiveInstance().<AbstractMemoryMapParser, MemoryMapParserDescriptor<AbstractMemoryMapParser>>getDescriptorList(AbstractMemoryMapParser.class);
     }
 
     public static List<MemoryMapParserDescriptor<?>> getDescriptors() {

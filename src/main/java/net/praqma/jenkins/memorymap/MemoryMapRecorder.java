@@ -86,7 +86,7 @@ public class MemoryMapRecorder extends Recorder implements SimpleBuildStep {
 
         HashMap<String, MemoryMapConfigMemory> config;
 
-        String version = Jenkins.getInstance().getPlugin( "memory-map" ).getWrapper().getVersion();
+        String version = Jenkins.getActiveInstance().getPlugin( "memory-map" ).getWrapper().getVersion();
         out.println( "Memory Map Plugin version " + version );
 
         try {

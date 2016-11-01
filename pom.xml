@@ -4,10 +4,10 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
-        <version>2.13</version> 
+        <version>2.13</version>
     </parent>
     <properties>
-        <jenkins.version>1.580.1</jenkins.version> <!-- Don't forget to up the test harness dependency as well!!-->
+        <jenkins.version>1.596.1</jenkins.version> <!-- Don't forget to up the test harness dependency as well!!-->
         <java.level>8</java.level>
     </properties>
     <groupId>net.praqma</groupId>
@@ -257,20 +257,6 @@
                 </configuration>
             </plugin>
             <!--
-                Use java 1.7. We need this for our testing environment. Java 6 was EOL last year
-                and i was starting to get some wierd errors with FindBugs plugin. Plugins also require
-                Java 7 with the version of Jenkins we're using so i decided to move to Java 7 which also soon
-                is EOL.
-            -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
-                </configuration>
-            </plugin>
-            <!--
             Binds automatically surefire:test goal to the test phase and generates
             .txt and .xml reports for test results.
             Reports can later be converted to html reports by the 'maven-surefire-report-plugin'
@@ -322,10 +308,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9.1</version>
-                <configuration>
-                    <additionalparam>-Xdoclint:none</additionalparam>   <!--Fix for java 8. http://stackoverflow.com/questions/15886209-->
-                </configuration>
+                <version>2.10.4</version>
             </plugin>
             <!--
             Run pmd:pmd and pmd:cpd goals directly without being part of 'mvn site' lifecycle
@@ -443,10 +426,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9.1</version>
-                <configuration>
-                    <additionalparam>-Xdoclint:none</additionalparam>   <!--Fix for java 8. http://stackoverflow.com/questions/15886209-->
-                </configuration>
+                <version>2.10.4</version>
             </plugin>
             <!--
             Includes the PMD/CPD reports in the mvn site reports
