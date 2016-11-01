@@ -16,7 +16,7 @@ job {
             scale (String scale)
             parser(String parserType, String parserUniqueName, String commandFile, String mapFile) {
                 parserTitle (String parserTitle)
-              	graph{
+              	graph {
                   	graphCaption (String graphCaption)
                   	graphData    (String graphData)
               	}
@@ -37,11 +37,11 @@ job ('mmap_GEN'){
             scale 'KILO'
             parser('GCC', 'gcc-5391', 'cmd.ld', 'mem.map') {
                 parserTitle 'gcc graphs'
-              	graph{
+              	graph {
                   	graphCaption 'RAM'
                   	graphData    'ram08+ram09'
               	}
-              	graph{
+              	graph {
                   	graphCaption 'ETC'
                   	graphData    'etc.'
               	}

@@ -8,12 +8,6 @@ import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfiguration;
 
 public class MemoryMapParserDslContext implements Context {
 
-    boolean showBytesOnGraph;
-
-    public MemoryMapParserDslContext(boolean showBytesOnGraph){
-        this.showBytesOnGraph = showBytesOnGraph;
-    }
-
     String parserTitle;
 
     public void parserTitle(String value){
