@@ -33,7 +33,6 @@ import org.apache.commons.lang.StringUtils;
  */
 public class HexUtils {
 
-    private static final int HEXA_RADIX = 16;
     private static final int BITS_PER_BYTE = 8;
 
     private static final long DEFAULT = 1;
@@ -53,16 +52,15 @@ public class HexUtils {
     }
 
     public static double wordCount(String hexString, int wordSize, String scale) {
-        return (HexUtils.getRadix(hexString, HEXA_RADIX)) / HexUtils.scale.get(scale.toLowerCase());
+        return HexUtils.getRadix(hexString, wordSize) / (double) HexUtils.scale.get(scale.toLowerCase());
     }
 
     public static double byteCount(String hexString, int wordSize, String scale) {
-        return HexUtils.wordCount(hexString, HEXA_RADIX, scale) * (wordSize / BITS_PER_BYTE);
+        return HexUtils.wordCount(hexString, wordSize, scale) * (wordSize / (double) BITS_PER_BYTE);
     }
 
     private static double getRadix(String hexString, int radix) {
-        Double i = (double) (Long.parseLong(hexString.replace("0x", "").replaceAll("\\s", ""), radix));
-        return i;
+        return (double) Long.parseLong(hexString.replace("0x", "").replaceAll("\\s", ""), radix);
     }
 
     public static class HexifiableString implements Comparable<HexifiableString> {
@@ -98,7 +96,7 @@ public class HexUtils {
             if (isValidHexString()) {
                 return this;
             } else {
-                HexifiableString newString = null;
+                HexifiableString newString;
                 if (rawString.contains("M") || rawString.contains("m")) {
                     newString = new HexifiableString(Long.parseLong(rawString.replaceAll("[mM]", "")) * MEGA);
                 } else if (rawString.contains("G") || rawString.contains("g")) {

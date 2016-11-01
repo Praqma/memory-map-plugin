@@ -64,7 +64,7 @@ public class HexUtilsTest {
     }
 
     /**
-     * Test aorund the conversion of the number 1024 to kWords 
+     * Test the conversion of the number 1024 to kWords
      */
     @Test
     public void wordCountTestKilo() {
@@ -75,7 +75,7 @@ public class HexUtilsTest {
     }
 
     /**
-     * Test aorund the conversion of the number 1024 to MWords 
+     * Test the conversion of the number 1024 to MWords
      */
     @Test
     public void wordCountTestMega() {
@@ -86,7 +86,7 @@ public class HexUtilsTest {
     }
 
     /**
-     * Test aorund the conversion of the number 1024 to GWords 
+     * Test the conversion of the number 1024 to GWords
      */
     @Test
     public void wordCountTestGiga() {
@@ -97,7 +97,7 @@ public class HexUtilsTest {
     }
 
     /**
-     * Test aorund the conversion of the number 1024 to kBytes 
+     * Test the conversion of the number 1024 to kBytes
      */
     @Test
     public void byteCountTestkilo() {
@@ -108,7 +108,7 @@ public class HexUtilsTest {
     }
 
     /**
-     * Test aorund the conversion of the number 1024 to MBytes 
+     * Test the conversion of the number 1024 to MBytes
      */
     @Test
     public void byteCountTestMega() {
@@ -119,7 +119,7 @@ public class HexUtilsTest {
     }
 
     /**
-     * Test arund the conversion of the number 1024 to GBytes 
+     * Test the conversion of the number 1024 to GBytes
      */
     @Test
     public void byteCountTestGiga() {
