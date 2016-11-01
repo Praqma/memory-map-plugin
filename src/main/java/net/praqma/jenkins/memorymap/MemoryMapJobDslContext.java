@@ -61,6 +61,9 @@ public class MemoryMapJobDslContext implements Context {
             case "TI":
                 parser = new TexasInstrumentsMemoryMapParser(parserUniqueName, mapFile, commandFile, wordSize, context.graphConfigurations, showBytesOnGraphs);
                 break;
+            default:
+                System.out.println("Unable to allocate parser: " + parserType);
+                break;
         }
 
         if (parser != null) {

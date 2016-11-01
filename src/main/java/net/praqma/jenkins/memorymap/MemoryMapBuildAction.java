@@ -30,11 +30,7 @@ import hudson.util.DataSetBuilder;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import jenkins.tasks.SimpleBuildStep;
@@ -140,26 +136,27 @@ public class MemoryMapBuildAction implements Action, SimpleBuildStep.LastBuildAc
     }
 
     /**
-     * We need to filter markers. If they have the same max value. We need to
-     * remove the marker, and concatenate the label.
+     * We need to filter out markers with the same max value.
+     * Simply concatenate the marker labels if they share the same max value.
      */
     private void filterMarkers(HashMap<String, ValueMarker> markers) {
-        HashMap<Long, String> maxLabel = new HashMap<>();
+        HashMap<Long, String> labels = new HashMap<>();
 
-        for (String markerLabel : markers.keySet()) {
-            long max = (long) markers.get(markerLabel).getValue();
-            if (maxLabel.containsKey(max)) {
-                //If the label already is contained. Store the Original value. And add the new one.
-                String current = maxLabel.get(max);
-                maxLabel.put(max, current + " " + markerLabel);
+        for (Map.Entry<String, ValueMarker> marker : markers.entrySet()) {
+            long markerValue = (long) marker.getValue().getValue();
+            if (labels.containsKey(markerValue)) {
+                // Append marker label
+                String existingLabel = labels.get(markerValue);
+                labels.put(markerValue, existingLabel + " " + marker.getKey());
             } else {
-                maxLabel.put(max, markerLabel);
+                // New entry
+                labels.put(markerValue, marker.getKey());
             }
         }
 
         markers.clear();
-        for (Long key : maxLabel.keySet()) {
-            makeMarker(maxLabel.get(key), (double) key, markers);
+        for (Map.Entry<Long, String> label : labels.entrySet()) {
+            makeMarker(label.getValue(), (double) label.getKey(), markers);
         }
 
     }
@@ -371,7 +368,7 @@ public class MemoryMapBuildAction implements Action, SimpleBuildStep.LastBuildAc
 
     public void makeMarker(String labelName, double value, HashMap<String, ValueMarker> markers) {
         if (!markers.containsKey(labelName)) {
-            ValueMarker vm = new ValueMarker((double) value, Color.BLACK, new BasicStroke(
+            ValueMarker vm = new ValueMarker(value, Color.BLACK, new BasicStroke(
                     1.2f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER,
                     1.0f, new float[]{6.0f, 6.0f}, 0.0f));
             vm.setLabel(labelName);

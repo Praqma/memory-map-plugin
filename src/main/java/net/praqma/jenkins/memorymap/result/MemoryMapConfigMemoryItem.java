@@ -48,9 +48,6 @@ public class MemoryMapConfigMemoryItem implements Serializable, Comparable<Memor
     private String used;
     private String unused;
 
-    //Model property for
-    private List<MemoryMapConfigMemoryItem> associatedSections;
-
     public MemoryMapConfigMemoryItem() {
     }
 
@@ -71,10 +68,6 @@ public class MemoryMapConfigMemoryItem implements Serializable, Comparable<Memor
         this.length = length;
         this.unused = unused;
         this.used = used;
-    }
-
-    public boolean isRoot() {
-        return !associatedSections.isEmpty();
     }
 
     /**
@@ -146,13 +139,6 @@ public class MemoryMapConfigMemoryItem implements Serializable, Comparable<Memor
         HexUtils.HexifiableString eHex = new HexUtils.HexifiableString(endHex);
         HexUtils.HexifiableString len = sHex.getLengthAsHex(eHex);
         setLength(len.rawString);
-    }
-
-    /**
-     * @return the associatedSections
-     */
-    public List<MemoryMapConfigMemoryItem> getAssociatedSections() {
-        return associatedSections;
     }
 
     private Object getValueOrNotApplicable(Object o) {
@@ -259,7 +245,6 @@ public class MemoryMapConfigMemoryItem implements Serializable, Comparable<Memor
         hash = 83 * hash + (this.endAddress != null ? this.endAddress.hashCode() : 0);
         hash = 83 * hash + (this.used != null ? this.used.hashCode() : 0);
         hash = 83 * hash + (this.unused != null ? this.unused.hashCode() : 0);
-        hash = 83 * hash + (this.associatedSections != null ? this.associatedSections.hashCode() : 0);
         return hash;
     }
 
