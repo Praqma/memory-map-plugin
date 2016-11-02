@@ -63,7 +63,7 @@ public class UseCase {
         BuildResultValidator validator = new BuildResultValidator();
         validator.expect(resultsJson);
 
-        //Cherry pick a sha and transplant a commmit
+        //Cherry pick a sha and transplant a commit
         ObjectId current;
         int commitNumber = 1;
         while ((current = manipulator.nextCommit()) != null) {
@@ -78,7 +78,6 @@ public class UseCase {
 
     private MemoryMapRecorder getMemoryMapRecorder() throws JsonSyntaxException, IOException {
         File recorderConfigFile = new File(useCaseRule.getUseCaseDir(useCase), "graphConfiguration.json");
-        MemoryMapRecorder recorder = JsonParser.jackson.readValue(recorderConfigFile, MemoryMapRecorder.class);
-        return recorder;
+        return JsonParser.jackson.readValue(recorderConfigFile, MemoryMapRecorder.class);
     }
 }

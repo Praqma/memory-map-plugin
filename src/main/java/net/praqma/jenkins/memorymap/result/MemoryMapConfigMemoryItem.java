@@ -23,10 +23,10 @@
  */
 package net.praqma.jenkins.memorymap.result;
 
-import java.io.Serializable;
-import java.util.List;
 import net.praqma.jenkins.memorymap.util.HexUtils;
 import org.apache.commons.lang.StringUtils;
+
+import java.io.Serializable;
 
 /**
  *
@@ -37,7 +37,7 @@ public class MemoryMapConfigMemoryItem implements Serializable, Comparable<Memor
     private MemoryMapConfigMemoryItem parent;
     private String name;
 
-    //The "start" address. Not always relavant but in some cases we use the 'origin' and the 'endAddress' to calculate the size
+    //The "start" address. Not always relevant but in some cases we use the 'origin' and the 'endAddress' to calculate the size
     private String origin;
     private String endAddress;
 

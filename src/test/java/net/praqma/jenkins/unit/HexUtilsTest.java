@@ -23,17 +23,15 @@
  */
 package net.praqma.jenkins.unit;
 
+import net.praqma.jenkins.memorymap.util.HexUtils;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
 import java.util.HashMap;
 import java.util.Map;
-import net.praqma.jenkins.memorymap.util.HexUtils;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+
 import static org.junit.Assert.*;
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
 
 /**
  *
@@ -43,25 +41,6 @@ public class HexUtilsTest {
     
     @Rule
     public ExpectedException thrown = ExpectedException.none();
-
-    public HexUtilsTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() throws Exception {
-    }
-
-    @AfterClass
-    public static void tearDownClass() throws Exception {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
 
     /**
      * Test the conversion of the number 1024 to kWords
@@ -100,7 +79,7 @@ public class HexUtilsTest {
      * Test the conversion of the number 1024 to kBytes
      */
     @Test
-    public void byteCountTestkilo() {
+    public void byteCountTestKilo() {
         assertEquals((1023d / 1024) * (16 / 8), HexUtils.byteCount("3FF", 16, "kilo"), 0);
         assertEquals((1024d / 1024) * (16 / 8), HexUtils.byteCount("400", 16, "kilo"), 0);
         assertEquals((1025d / 1024) * (16 / 8), HexUtils.byteCount("401", 16, "kilo"), 0);
@@ -148,7 +127,7 @@ public class HexUtilsTest {
         assertFalse(invalidMetricValue.isValidMetricValue());
         
         HexUtils.HexifiableString metricToHex = new HexUtils.HexifiableString("2m");
-        HexUtils.HexifiableString hexified = metricToHex.toValidHexString();       
+        HexUtils.HexifiableString hexed = metricToHex.toValidHexString();
     }
 
     @Test

@@ -45,6 +45,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
 import jenkins.model.Jenkins;
 import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfiguration;
 import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfigurationDescriptor;
@@ -127,21 +129,19 @@ public abstract class AbstractMemoryMapParser implements Describable<AbstractMem
     }
 
     protected CharSequence createCharSequenceFromFile(String charset, File f) throws IOException {
-        String chosenCharset = charset;
-
-        CharBuffer cbuf = null;
+        CharBuffer cBuffer = null;
         FileInputStream fis = null;
         try {
             fis = new FileInputStream(f.getAbsolutePath());
             logger.log(java.util.logging.Level.FINE, String.format("Parser %s created input stream for file.", getParserUniqueName()));
             FileChannel fc = fis.getChannel();
-            ByteBuffer bbuf = fc.map(FileChannel.MapMode.READ_ONLY, 0, (int) fc.size());
+            ByteBuffer bBuffer = fc.map(FileChannel.MapMode.READ_ONLY, 0, (int) fc.size());
 
-            if (!Charset.isSupported(chosenCharset)) {
+            if (!Charset.isSupported(charset)) {
                 logger.warning(String.format("The charset %s is not supported", charset));
-                cbuf = Charset.defaultCharset().newDecoder().decode(bbuf);
+                cBuffer = Charset.defaultCharset().newDecoder().decode(bBuffer);
             } else {
-                cbuf = Charset.forName(charset).newDecoder().decode(bbuf);
+                cBuffer = Charset.forName(charset).newDecoder().decode(bBuffer);
             }
         } catch (FileNotFoundException ex) {
             logger.log(java.util.logging.Level.FINE, String.format("Parser %s reported exception of type FileNotFoundException.", getParserUniqueName()));
@@ -155,7 +155,7 @@ public abstract class AbstractMemoryMapParser implements Describable<AbstractMem
                 logger.log(java.util.logging.Level.FINE, String.format("Parser %s closed input stream for file.", getParserUniqueName()));
             }
         }
-        return cbuf;
+        return cBuffer;
     }
 
     public abstract MemoryMapConfigMemory parseConfigFile(File f) throws IOException;
@@ -189,11 +189,7 @@ public abstract class AbstractMemoryMapParser implements Describable<AbstractMem
     }
 
     public static List<MemoryMapParserDescriptor<?>> getDescriptors() {
-        List<MemoryMapParserDescriptor<?>> list = new ArrayList<>();
-        for (MemoryMapParserDescriptor<?> d : all()) {
-            list.add(d);
-        }
-        return list;
+        return all().stream().collect(Collectors.toList());
     }
 
     /**

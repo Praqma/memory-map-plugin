@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * @author Praqma
@@ -52,11 +53,7 @@ public class MemoryMapConfigMemory extends LinkedList<MemoryMapConfigMemoryItem>
     }
 
     public List<String> getItemNames() {
-        List<String> items = new ArrayList<>();
-        for (MemoryMapConfigMemoryItem item : this) {
-            items.add(item.getName());
-        }
-        return items;
+        return stream().map(MemoryMapConfigMemoryItem::getName).collect(Collectors.toList());
     }
 
     public boolean containsSectionWithName(String name) {

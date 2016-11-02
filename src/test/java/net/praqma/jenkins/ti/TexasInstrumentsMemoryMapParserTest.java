@@ -55,17 +55,15 @@ public class TexasInstrumentsMemoryMapParserTest {
         String file = TexasInstrumentsMemoryMapParserTest.class.getResource("TexasInstrumentsMapFile.txt").getFile();
         File f = new File(file);
 
-        MemoryMapConfigMemory mmcm = new MemoryMapConfigMemory();
-        mmcm.add(new MemoryMapConfigMemoryItem("RAMM0", "00000050", "000003b0", "00000195", "0000021b"));
-        mmcm = parser.parseMapFile(f, mmcm);
-        assertTrue(mmcm.size() > 0);
+        MemoryMapConfigMemory configMemory = new MemoryMapConfigMemory();
+        configMemory.add(new MemoryMapConfigMemoryItem("RAMM0", "00000050", "000003b0", "00000195", "0000021b"));
+        configMemory = parser.parseMapFile(f, configMemory);
+        assertTrue(configMemory.size() > 0);
 
-        for (MemoryMapConfigMemoryItem item : mmcm){
-          if(item.getName().equals("RAMM0")){
-              assertEquals(item.getUsed(), "00000195");
-              assertEquals(item.getUnused(), "0000021b");
-          }
-        }
+        configMemory.stream().filter(item -> item.getName().equals("RAMM0")).forEach(item -> {
+            assertEquals(item.getUsed(), "00000195");
+            assertEquals(item.getUnused(), "0000021b");
+        });
 
     }
 

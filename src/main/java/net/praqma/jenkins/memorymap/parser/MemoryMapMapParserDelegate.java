@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
-import net.praqma.jenkins.memorymap.util.FileFoundable;
+import net.praqma.jenkins.memorymap.util.FileFinder;
 import org.jenkinsci.remoting.RoleChecker;
 
 /**
@@ -40,7 +40,7 @@ import org.jenkinsci.remoting.RoleChecker;
  *
  * @author Praqma
  */
-public class MemoryMapMapParserDelegate extends FileFoundable<HashMap<String, MemoryMapConfigMemory>> {
+public class MemoryMapMapParserDelegate extends FileFinder<HashMap<String, MemoryMapConfigMemory>> {
 
     private static final Logger LOG = Logger.getLogger(MemoryMapMapParserDelegate.class.getName());
     private List<AbstractMemoryMapParser> parsers;
@@ -63,7 +63,7 @@ public class MemoryMapMapParserDelegate extends FileFoundable<HashMap<String, Me
     @Override
     public HashMap<String, MemoryMapConfigMemory> invoke(File file, VirtualChannel vc) throws IOException, InterruptedException {
         for (AbstractMemoryMapParser parser : parsers) {
-            MemoryMapConfigMemory mem = parser.parseMapFile(findFile(file, parser.mapFile), config.get(parser.getParserUniqueName()));
+            parser.parseMapFile(findFile(file, parser.mapFile), config.get(parser.getParserUniqueName()));
         }
         return config;
     }
@@ -90,9 +90,9 @@ public class MemoryMapMapParserDelegate extends FileFoundable<HashMap<String, Me
             return patternRegistry.get(sectionName);
         } else {
             String regex = String.format("^(\\s+)(\\b%s)(\\s+)(\\S+)(\\s+)(\\S+)(\\s+)(\\S+)(\\s+)(\\S+)(\\s+)(\\S+)", sectionName);
-            Pattern memsection = Pattern.compile(regex, Pattern.MULTILINE);
-            patternRegistry.put(sectionName, memsection);
-            return memsection;
+            Pattern memSection = Pattern.compile(regex, Pattern.MULTILINE);
+            patternRegistry.put(sectionName, memSection);
+            return memSection;
         }
 
     }

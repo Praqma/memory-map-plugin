@@ -31,7 +31,7 @@ import java.io.IOException;
  * @author mads
  */
 public class MemoryMapFileNotFoundError extends IOException implements MemoryMapError {
-    public MemoryMapFileNotFoundError(String msg, File file) {
+    public MemoryMapFileNotFoundError(String msg) {
         super(msg);
     }
 

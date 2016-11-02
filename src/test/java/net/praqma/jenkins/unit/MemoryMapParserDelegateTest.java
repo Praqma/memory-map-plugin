@@ -70,10 +70,10 @@ public class MemoryMapParserDelegateTest {
 
         MemoryMapMapParserDelegate delegate = new MemoryMapMapParserDelegate();
 
-        MemoryMapGraphConfiguration mmgc = new MemoryMapGraphConfiguration(null, null);
-        mmgc.setGraphDataList("CODE,DATA,CONST");
-        mmgc.setGraphCaption("Config Memory Graph");
-        List<MemoryMapGraphConfiguration> graphConfig = Collections.singletonList(mmgc);
+        MemoryMapGraphConfiguration gc = new MemoryMapGraphConfiguration(null, null);
+        gc.setGraphDataList("CODE,DATA,CONST");
+        gc.setGraphCaption("Config Memory Graph");
+        List<MemoryMapGraphConfiguration> graphConfig = Collections.singletonList(gc);
 
         AbstractMemoryMapParser parser = new TexasInstrumentsMemoryMapParser("TI", "TexasInstrumentsMapFile.txt", "28069_RAM_lnk.cmd", 16, graphConfig, Boolean.TRUE);
         List<AbstractMemoryMapParser> parsers = Collections.singletonList(parser);

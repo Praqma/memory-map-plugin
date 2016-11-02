@@ -34,11 +34,11 @@ import java.io.IOException;
  * Small class that wraps the file callable interface, to wrap functionality to
  * find a file given a pattern on a remote machine.
  */
-public abstract class FileFoundable<T> implements FilePath.FileCallable<T> {
+public abstract class FileFinder<T> implements FilePath.FileCallable<T> {
 
     public File findFile(File dir, String pattern) throws IOException {
         if (StringUtils.isBlank(pattern)) {
-            throw new MemoryMapFileNotFoundError(String.format("Failed to find files as an empty file pattern was provided. Workspace was '%s'", dir.getAbsolutePath()), dir);
+            throw new MemoryMapFileNotFoundError(String.format("Failed to find files as an empty file pattern was provided. Workspace was '%s'", dir.getAbsolutePath()));
         }
 
         FileSet fileSet = new FileSet();
@@ -49,13 +49,13 @@ public abstract class FileFoundable<T> implements FilePath.FileCallable<T> {
 
         int numberOfFoundFiles = fileSet.getDirectoryScanner(project).getIncludedFiles().length;
         if (numberOfFoundFiles == 0) {
-            throw new MemoryMapFileNotFoundError(String.format("Found no files matching '%s' in directory '%s'", pattern, dir.getAbsolutePath()), dir);
+            throw new MemoryMapFileNotFoundError(String.format("Found no files matching '%s' in directory '%s'", pattern, dir.getAbsolutePath()));
         }
 
         File file = new File(dir.getAbsoluteFile() + System.getProperty("file.separator") + fileSet.getDirectoryScanner(project).getIncludedFiles()[0]);
 
         if (!file.exists()) {
-            throw new MemoryMapFileNotFoundError(String.format("Couldn't find file '%s' in workspace '%s'. Scanner matched '%s' files.", file.getAbsolutePath(), dir.getAbsolutePath(), numberOfFoundFiles), dir);
+            throw new MemoryMapFileNotFoundError(String.format("Couldn't find file '%s' in workspace '%s'. Scanner matched '%s' files.", file.getAbsolutePath(), dir.getAbsolutePath(), numberOfFoundFiles));
         }
         return file;
     }

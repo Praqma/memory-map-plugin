@@ -54,10 +54,8 @@ public class UseCaseCommits implements Iterable<ObjectId> {
         RevWalk walker = new RevWalk(repo);
         walker.markStart(walker.parseCommit(last.getObjectId()));
         walker.markUninteresting(walker.parseCommit(first.getObjectId()));
-        Iterator<RevCommit> commitIterator = walker.iterator();
-        while (commitIterator.hasNext()) {
-            ObjectId commit = commitIterator.next().getId();
-            commits.add(commit);
+        for (RevCommit commit : walker) {
+            commits.add(commit.getId());
         }
         commits.add(walker.parseCommit(first.getObjectId()));
         repo.close();

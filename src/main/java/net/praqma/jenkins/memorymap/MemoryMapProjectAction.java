@@ -23,15 +23,18 @@
  */
 package net.praqma.jenkins.memorymap;
 
-import hudson.model.*;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import hudson.model.Action;
+import hudson.model.Actionable;
+import hudson.model.Job;
+import hudson.model.Run;
 import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfiguration;
 import net.praqma.jenkins.memorymap.parser.AbstractMemoryMapParser;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -81,13 +84,12 @@ public class MemoryMapProjectAction extends Actionable implements Action {
     public MemoryMapBuildAction getLastApplicableMemoryMapResult() {
         Run<?, ?> build = getProject().getLastCompletedBuild();
         while (build != null) {
-            MemoryMapBuildAction mmba = build.getAction(MemoryMapBuildAction.class);
-            if (mmba != null && mmba.isValidConfigurationWithData()) {
-                return mmba;
+            MemoryMapBuildAction buildAction = build.getAction(MemoryMapBuildAction.class);
+            if (buildAction != null && buildAction.isValidConfigurationWithData()) {
+                return buildAction;
             }
             build = build.getPreviousBuild();
         }
-
         return null;
     }
 
@@ -99,11 +101,6 @@ public class MemoryMapProjectAction extends Actionable implements Action {
 
     public List<AbstractMemoryMapParser> parsersChosen() {
         return getLatestActionInProject().getChosenParsers();
-    }
-
-    public HashMap<String, MemoryMapGraphConfiguration> getConfiguration() {
-        HashMap<String, MemoryMapGraphConfiguration> map = new HashMap<>();
-        return map;
     }
 
     public List<String> getGraphTitles(String parserId) {

@@ -48,7 +48,7 @@ public class TexasInstrumentsMemoryMapParserIT {
         parser.setMapFile("TexasInstrumentsMapFile.txt");
         parser.setConfigurationFile("28069_RAM_lnk.cmd");
 
-        HashMap<String, String> expectedValues = new HashMap<String, String>();
+        HashMap<String, String> expectedValues = new HashMap<>();
         expectedValues.put("RAMM0", "00000195");
         expectedValues.put("RAML0_L3", "00001a8f");
 

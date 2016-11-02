@@ -35,24 +35,22 @@ public class MemoryMapProjectActionSimpleTest {
     
     @Test
     public void memoryMapProjectAction_trivial_accessor_mutator_test()  {
-        MemoryMapProjectAction mmpaj = new MemoryMapProjectAction(null);
-        assertNotNull(mmpaj.getIconFileName());
-        assertEquals("memory-map",mmpaj.getUrlName());
-        assertEquals("Memory map",mmpaj.getSearchUrl());
-        assertEquals("Memory Map Publisher", mmpaj.getDisplayName());
+        MemoryMapProjectAction projectAction = new MemoryMapProjectAction(null);
+        assertNotNull(projectAction.getIconFileName());
+        assertEquals("memory-map",projectAction.getUrlName());
+        assertEquals("Memory map",projectAction.getSearchUrl());
+        assertEquals("Memory Map Publisher", projectAction.getDisplayName());
     }
     
     @Test(expected=NullPointerException.class)
     public void memoryMapProjectAction_null_pointer_is_thrown_test() {
-        MemoryMapProjectAction mmpaj = new MemoryMapProjectAction(null);
-        mmpaj.getLastApplicableMemoryMapResult();
-        
+        MemoryMapProjectAction projectAction = new MemoryMapProjectAction(null);
+        projectAction.getLastApplicableMemoryMapResult();
     }
     
     @Test(expected=NullPointerException.class)
     public void memoryMapProjectAction_null_pointer_is_thrown_get_latest_action_in_project_test() {
-        MemoryMapProjectAction mmpaj = new MemoryMapProjectAction(null);
-        mmpaj.getLatestActionInProject();
-        
+        MemoryMapProjectAction projectAction = new MemoryMapProjectAction(null);
+        projectAction.getLatestActionInProject();
     }
 }

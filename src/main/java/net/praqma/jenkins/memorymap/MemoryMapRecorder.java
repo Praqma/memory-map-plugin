@@ -111,11 +111,11 @@ public class MemoryMapRecorder extends Recorder implements SimpleBuildStep {
             out.println(config.toString());
         }
 
-        MemoryMapBuildAction mmba = new MemoryMapBuildAction(build, config);
-        mmba.setRecorder(this);
-        mmba.setMemoryMapConfigs(config);
-        mmba.setChosenParsers(getChosenParsers());
-        build.addAction(mmba);
+        MemoryMapBuildAction buildAction = new MemoryMapBuildAction(build, config);
+        buildAction.setRecorder(this);
+        buildAction.setMemoryMapConfigs(config);
+        buildAction.setChosenParsers(getChosenParsers());
+        build.addAction(buildAction);
     }
 
     /**

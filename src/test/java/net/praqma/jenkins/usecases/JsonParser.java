@@ -13,7 +13,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSSerializer;
-import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;
 
 public class JsonParser {
@@ -38,14 +37,11 @@ public class JsonParser {
     }
 
     private static GsonXml createGsonXml() {
-        XmlParserCreator parserCreator = new XmlParserCreator() {
-            @Override
-            public XmlPullParser createParser() {
-                try {
-                    return XmlPullParserFactory.newInstance().newPullParser();
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
+        XmlParserCreator parserCreator = () -> {
+            try {
+                return XmlPullParserFactory.newInstance().newPullParser();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
         };
         return new GsonXmlBuilder().setXmlParserCreator(parserCreator).create();

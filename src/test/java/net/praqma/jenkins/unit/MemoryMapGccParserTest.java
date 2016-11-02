@@ -23,17 +23,17 @@
  */
 package net.praqma.jenkins.unit;
 import hudson.AbortException;
-import java.io.File;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfiguration;
 import net.praqma.jenkins.memorymap.parser.gcc.GccMemoryMapParser;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
-import static org.junit.Assert.*;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import java.io.File;
+import java.io.IOException;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 /**
  *
  * @author mads
@@ -46,9 +46,7 @@ public class MemoryMapGccParserTest {
     @Test
     public void testParsingOfMemorySegmentInLinkerCommandFile() throws IOException {
         GccMemoryMapParser parser = new GccMemoryMapParser();
-        MemoryMapGraphConfiguration conf = new MemoryMapGraphConfiguration("application", "Application test");
-        List<MemoryMapGraphConfiguration> singletonList = Collections.singletonList(conf);
-        
+
         String fileNameLinker = MemoryMapGccParserTest.class.getResource("prom.ld").getFile();
         String fileNameMap = MemoryMapGccParserTest.class.getResource("prom.map").getFile();
 
@@ -59,16 +57,15 @@ public class MemoryMapGccParserTest {
         MemoryMapConfigMemory mem = parser.parseConfigFile(f);
         
         File f2 = new File(fileNameMap);
-        mem = parser.parseMapFile(f2, mem);
+        parser.parseMapFile(f2, mem);
     }
 
     @Test
     public void testStrippingNoComments() {
         String testData = "This string contains a line-change" +
                 "but no comments";
-        String expected = testData;
         String result = GccMemoryMapParser.stripComments(testData).toString();
-        assertEquals("Testing successful stripping of lots of block comments", expected, result);
+        assertEquals("Testing successful stripping of lots of block comments", testData, result);
     }
 
     @Test
@@ -129,7 +126,7 @@ public class MemoryMapGccParserTest {
     
     @Test
     public void testAssertCorrectExceptionThrown() throws Exception {
-        String illegaAmountOfMemory =
+        String illegalAmountOfMemory =
             "MEMORY/*" +
                     "" +
                     "" +
@@ -149,6 +146,6 @@ public class MemoryMapGccParserTest {
         thrown.expectMessage("Unable to convert 0xÅP to a valid hex string.");  
         
         GccMemoryMapParser parser = new GccMemoryMapParser();
-        parser.getMemory(illegaAmountOfMemory);
+        parser.getMemory(illegalAmountOfMemory);
     }
 }

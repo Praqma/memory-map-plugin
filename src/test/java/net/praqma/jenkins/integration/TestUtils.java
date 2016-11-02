@@ -108,12 +108,12 @@ public class TestUtils {
         return project;
     }
     
-    public static FreeStyleProject configureGit(FreeStyleProject project, String branchName, String repository) throws IOException {        
-        List<UserRemoteConfig> repos = Arrays.asList(new UserRemoteConfig(repository, null, null, null));        
+    public static FreeStyleProject configureGit(FreeStyleProject project, String branchName, String repository) throws IOException {
+        List<UserRemoteConfig> repos = Collections.singletonList(new UserRemoteConfig(repository, null, null, null));
         GitSCM gitSCM = new GitSCM(repos,
                 Collections.singletonList(new BranchSpec(branchName)),
                 false, Collections.<SubmoduleConfig>emptyList(),
-                null, null, Collections.EMPTY_LIST);        
+                null, null, Collections.EMPTY_LIST);
         project.setScm(gitSCM);
         
         return project;
@@ -163,7 +163,7 @@ public class TestUtils {
      * @param parser the parser whose configuration must be added
      */
     public static void setMemoryMapConfiguration(FreeStyleProject project, AbstractMemoryMapParser parser) {
-        MemoryMapRecorder recorder = new MemoryMapRecorder(Arrays.asList((AbstractMemoryMapParser) parser));
+        MemoryMapRecorder recorder = new MemoryMapRecorder(Collections.singletonList(parser));
         project.getPublishersList().clear(); //remove any old recorders
         project.getPublishersList().add(recorder);
     }

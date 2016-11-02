@@ -121,8 +121,7 @@ public class GccMemoryMapParser extends AbstractMemoryMapParser implements Seria
     }
 
     public Pattern getLinePatternForMapFile(String sectionName) {
-        Pattern p = Pattern.compile(String.format("^(%s)(\\s+)(\\w+)(\\s+)(\\w+)(\\w*)", sectionName), Pattern.MULTILINE);
-        return p;
+        return Pattern.compile(String.format("^(%s)(\\s+)(\\w+)(\\s+)(\\w+)(\\w*)", sectionName), Pattern.MULTILINE);
     }
 
     private static class MemoryMapMemItemComparator implements Comparator<MemoryMapConfigMemoryItem>, Serializable {
@@ -136,7 +135,7 @@ public class GccMemoryMapParser extends AbstractMemoryMapParser implements Seria
 
     /**
      * Given an item with length == null. Look down in the list. If we find an
-     * item whoose length is not null, set the items length to that
+     * item whose length is not null, set the items length to that
      *
      * @param memory the memory list
      * @return a more complete configuration, where i have better values
@@ -182,19 +181,19 @@ public class GccMemoryMapParser extends AbstractMemoryMapParser implements Seria
         //The memory are the top level components, sections belong to one of these sections
         CharSequence stripped = stripComments(createCharSequenceFromFile(f));
 
-        MemoryMapConfigMemory memconfig = getMemory(stripped);
-        memconfig.addAll(getSections(stripped));
+        MemoryMapConfigMemory memConfig = getMemory(stripped);
+        memConfig.addAll(getSections(stripped));
         for (MemoryMapGraphConfiguration g : getGraphConfiguration()) {
             for (String gItem : g.itemizeGraphDataList()) {
                 for (String gSplitItem : gItem.split("\\+")) {
                     //We will fail if the name of the data section does not match any of the named items in the map file.
-                    if (!memconfig.containsSectionWithName(gSplitItem)) {
-                        throw new MemoryMapMemorySelectionError(String.format("The memory section named %s not found in map file%nAvailable sections are:%n%s", gSplitItem, memconfig.getItemNames()));
+                    if (!memConfig.containsSectionWithName(gSplitItem)) {
+                        throw new MemoryMapMemorySelectionError(String.format("The memory section named %s not found in map file%nAvailable sections are:%n%s", gSplitItem, memConfig.getItemNames()));
                     }
                 }
             }
         }
-        return memconfig;
+        return memConfig;
     }
 
     @Override

@@ -6,7 +6,6 @@ import java.util.Iterator;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.lib.AnyObjectId;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.transport.TagOpt;
@@ -66,7 +65,7 @@ public class BranchManipulator {
 
         // Push the changes to the remote used for testing
         if (id != null) {
-            Git.open(workDir).cherryPick().include((AnyObjectId) id).call();
+            Git.open(workDir).cherryPick().include(id).call();
             Git.open(workDir).push().call();
         }
 
