@@ -357,18 +357,6 @@
                 </configuration>
             </plugin>
             <!--
-            Java source code complexity analysis, use javancss:check to get result
-            Included in reporting below to also include it in the site reports.
-            -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>javancss-maven-plugin</artifactId>
-                <version>2.1</version>
-                <configuration>
-                    <failOnViolation>false</failOnViolation>
-                </configuration>
-            </plugin>
-            <!--
             Another Java code metric reporting tool. Included in the site report
             as a plugin under reporting.
             use  'mvn jdepend:generate' to generate jdepende report in xml (and html) reports
@@ -454,16 +442,6 @@
                         </reports>
                     </reportSet>
                 </reportSets>
-            </plugin>
-            <!--
-            Include java complexity metrics in the site report.
-            Also used in build/plugin as a goal to manually use for developers
-            or in the build pipeline.
-            -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>javancss-maven-plugin</artifactId>
-                <version>2.1</version>
             </plugin>
             <!--
             Generates cross-reference of the project's source as part of project's reports which other
