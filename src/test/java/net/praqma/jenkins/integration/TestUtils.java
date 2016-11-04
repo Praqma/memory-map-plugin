@@ -103,11 +103,23 @@ public class TestUtils {
      * @return a new project
      */
     public static FreeStyleProject createProject(JenkinsRule jenkins) throws Exception {
+        return createProject(jenkins, true);
+    }
+
+    /**
+     * Creates a new project to test with.
+     *
+     * @param jenkins a JenkinsRule instance used to create the project.
+     * @return a new project
+     */
+    public static FreeStyleProject createProject(JenkinsRule jenkins, boolean useSlave) throws Exception {
         FreeStyleProject project = jenkins.createFreeStyleProject(UUID.randomUUID().toString());
-        project.setAssignedNode(jenkins.createOnlineSlave());
+        if(useSlave) {
+            project.setAssignedNode(jenkins.createOnlineSlave());
+        }
         return project;
     }
-    
+
     public static FreeStyleProject configureGit(FreeStyleProject project, String branchName, String repository) throws IOException {
         List<UserRemoteConfig> repos = Collections.singletonList(new UserRemoteConfig(repository, null, null, null));
         GitSCM gitSCM = new GitSCM(repos,
@@ -115,9 +127,9 @@ public class TestUtils {
                 false, Collections.<SubmoduleConfig>emptyList(),
                 null, null, Collections.EMPTY_LIST);
         project.setScm(gitSCM);
-        
+
         return project;
-    } 
+    }
 
     /**
      * Runs a build and asserts all the given usage values.
@@ -283,7 +295,7 @@ public class TestUtils {
         };
         return new GsonXmlBuilder().setXmlParserCreator(parserCreator).create();
     }
-    
+
     public static boolean printAndReturnConsoleOfBuild(Run<?,?> build, JenkinsRule jenkinsRule) throws IOException, SAXException {
         // this outputs loft of HTML garbage... so pretty printing after:
         String console = jenkinsRule.createWebClient().getPage(build, "console").asXml();
@@ -308,7 +320,7 @@ public class TestUtils {
             System.out.format("Writing full log to trace%n");
             System.out.format("************************************************************************%n");
             System.out.format(console+"%n");
-            System.out.format("************************************************************************%n");           
+            System.out.format("************************************************************************%n");
             return false;
         }
     }
