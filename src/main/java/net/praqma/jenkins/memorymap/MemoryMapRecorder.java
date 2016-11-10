@@ -80,10 +80,8 @@ public class MemoryMapRecorder extends Recorder implements SimpleBuildStep {
     }
 
     @Override
-    public void perform(@Nonnull Run<?, ?> build, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull TaskListener listener) throws InterruptedException, IOException {
-        
+    public void perform(@Nonnull Run<?, ?> build, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull TaskListener listener) throws InterruptedException, IOException {        
         PrintStream out = listener.getLogger();
-
         HashMap<String, MemoryMapConfigMemory> config;
 
         String version = Jenkins.getActiveInstance().getPlugin( "memory-map" ).getWrapper().getVersion();

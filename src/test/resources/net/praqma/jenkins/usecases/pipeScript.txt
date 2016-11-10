@@ -1,0 +1,10 @@
+node {
+    git branch: 'arm-none-eabi-gcc_4.8.4_hello_world', url: 'https://github.com/Praqma/memory-map-examples'
+    sh '''
+if [ "$(docker images | grep -c arm-none-eabi-gcc_4.8.4_hello_world)" -eq "0" ]; then
+  docker build --rm -f Dockerfile -t arm-none-eabi-gcc_4.8.4_hello_world
+fi
+docker run -v `pwd`:/data arm-none-eabi-gcc_4.8.4_hello_world make clean all
+'''
+    MemoryMapRecorder([GccMemoryMapParser(configurationFile: 'viperlite.ld', graphConfiguration: [[graphCaption: 'Memory sections', graphDataList: '.data,.bss,.text'], [graphCaption: 'Target memory', graphDataList: 'rom,ram']], mapFile: 'blink.map', parserTitle: 'GCC memory map', parserUniqueName: 'Gcc')])
+}

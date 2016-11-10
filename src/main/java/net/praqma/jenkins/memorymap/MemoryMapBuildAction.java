@@ -59,7 +59,7 @@ import org.kohsuke.stapler.StaplerResponse;
  *
  * @author Praqma
  */
-public class MemoryMapBuildAction implements Action, SimpleBuildStep.LastBuildAction {
+public class MemoryMapBuildAction implements SimpleBuildStep.LastBuildAction {
 
     private static final Logger logger = Logger.getLogger(MemoryMapBuildAction.class.getName());
 
