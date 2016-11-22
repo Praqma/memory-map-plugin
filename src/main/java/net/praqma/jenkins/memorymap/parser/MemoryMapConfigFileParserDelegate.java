@@ -31,13 +31,14 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
-import net.praqma.jenkins.memorymap.util.FileFoundable;
+import net.praqma.jenkins.memorymap.util.FileFinder;
+import org.jenkinsci.remoting.RoleChecker;
 
 /**
  *
  * @author Praqma
  */
-public class MemoryMapConfigFileParserDelegate extends FileFoundable<HashMap<String, MemoryMapConfigMemory>>  {
+public class MemoryMapConfigFileParserDelegate extends FileFinder<HashMap<String, MemoryMapConfigMemory>> {
 
     private static final Logger log = Logger.getLogger(MemoryMapMapParserDelegate.class.getName());
     private List<AbstractMemoryMapParser> parsers;
@@ -51,13 +52,12 @@ public class MemoryMapConfigFileParserDelegate extends FileFoundable<HashMap<Str
     
     @Override
     public HashMap<String, MemoryMapConfigMemory> invoke(File f, VirtualChannel channel) throws IOException, InterruptedException {
-        HashMap<String, MemoryMapConfigMemory> memorys = new HashMap<String, MemoryMapConfigMemory>();
-        
+        HashMap<String, MemoryMapConfigMemory> memoryConfigs = new HashMap<>();
         for (AbstractMemoryMapParser parser : parsers) {
             String uuid = parser.getParserUniqueName();
-            memorys.put(uuid, parser.parseConfigFile(findFile(f, parser.getConfigurationFile())));
+            memoryConfigs.put(uuid, parser.parseConfigFile(findFile(f, parser.getConfigurationFile())));
         } 
-        return memorys;
+        return memoryConfigs;
     }
     
     public List<AbstractMemoryMapParser> getParsers() {
@@ -70,17 +70,23 @@ public class MemoryMapConfigFileParserDelegate extends FileFoundable<HashMap<Str
     
     public static Pattern getPatternForMemoryLayout(String sectionName) {
         if(patternRegistry == null) {
-            patternRegistry = new HashMap<String, Pattern>();
+            patternRegistry = new HashMap<>();
         }
         
         if(patternRegistry.containsKey(sectionName)) {
             return patternRegistry.get(sectionName);
         } else {
             String regex = String.format("^(\\s+%s\\b)(.*origin\\s=\\s)(0x\\S+)(,.*)(0x\\S+)(.*)$", sectionName);
-            Pattern memsection = Pattern.compile(regex, Pattern.MULTILINE);
-            patternRegistry.put(sectionName, memsection);
-            return memsection;
+            Pattern memSection = Pattern.compile(regex, Pattern.MULTILINE);
+            patternRegistry.put(sectionName, memSection);
+            return memSection;
         }
+    }
+
+    @Override
+    public void checkRoles(RoleChecker rc) throws SecurityException {
+        // no-op
+        // throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
 }

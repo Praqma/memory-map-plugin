@@ -13,6 +13,8 @@ import net.praqma.jenkins.integration.TestUtils;
 import net.praqma.jenkins.memorymap.MemoryMapRecorder;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.lib.ObjectId;
+import static org.hamcrest.CoreMatchers.is;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -51,7 +53,7 @@ public class UseCase {
         BranchManipulator manipulator = new BranchManipulator(commits);
 
         //Configuration of the jenkins job
-        FreeStyleProject project = TestUtils.createProject(jenkinsRule);
+        FreeStyleProject project = TestUtils.createProject(jenkinsRule, false);
         project = TestUtils.configureGit(project, manipulator.getUseCase().getDeliverBranch(), manipulator.getUseCase().getFileRemoteName());
         project.getPublishersList().add(getMemoryMapRecorder());
         project.getBuildersList().add(new Shell("env BN=" + useCase + " sh run.sh"));
@@ -63,13 +65,13 @@ public class UseCase {
         BuildResultValidator validator = new BuildResultValidator();
         validator.expect(resultsJson);
 
-        //Cherry pick a sha and transplant a commmit
+        //Cherry pick a sha and transplant a commit
         ObjectId current;
         int commitNumber = 1;
         while ((current = manipulator.nextCommit()) != null) {
             System.out.printf("%sCherry picked #%s %s%n", UseCaseCommits.PREFIX, commitNumber, current.getName());
             AbstractBuild<?, ?> build = project.scheduleBuild2(0, new Cause.UserIdCause()).get();
-            assert build.getResult() == Result.SUCCESS;
+            Assert.assertThat(build.getResult(), is(Result.SUCCESS));
             System.out.printf("%sBuild %s finished with status %s using sha %s%n", UseCaseCommits.PREFIX, build.number, build.getResult(), current.getName());
             validator.forBuild(build).validate();
             commitNumber++;
@@ -78,7 +80,6 @@ public class UseCase {
 
     private MemoryMapRecorder getMemoryMapRecorder() throws JsonSyntaxException, IOException {
         File recorderConfigFile = new File(useCaseRule.getUseCaseDir(useCase), "graphConfiguration.json");
-        MemoryMapRecorder recorder = JsonParser.jackson.readValue(recorderConfigFile, MemoryMapRecorder.class);
-        return recorder;
+        return JsonParser.jackson.readValue(recorderConfigFile, MemoryMapRecorder.class);
     }
 }

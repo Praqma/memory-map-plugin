@@ -16,7 +16,7 @@ job {
             scale (String scale)
             parser(String parserType, String parserUniqueName, String commandFile, String mapFile) {
                 parserTitle (String parserTitle)
-              	graph{
+              	graph {
                   	graphCaption (String graphCaption)
                   	graphData    (String graphData)
               	}
@@ -37,11 +37,11 @@ job ('mmap_GEN'){
             scale 'KILO'
             parser('GCC', 'gcc-5391', 'cmd.ld', 'mem.map') {
                 parserTitle 'gcc graphs'
-              	graph{
+              	graph {
                   	graphCaption 'RAM'
                   	graphData    'ram08+ram09'
               	}
-              	graph{
+              	graph {
                   	graphCaption 'ETC'
                   	graphData    'etc.'
               	}
@@ -61,6 +61,10 @@ public class MemoryMapDslExtension extends ContextExtensionPoint {
         MemoryMapJobDslContext context = new MemoryMapJobDslContext();
         executeInContext(closure, context);
 
-        return new MemoryMapRecorder(context.parsers, context.showBytesOnGraphs, String.valueOf(context.wordSize), context.scale, null);
+        MemoryMapRecorder mmr = new MemoryMapRecorder(context.parsers);
+        mmr.setScale(context.scale);
+        mmr.setWordSize(context.wordSize);
+        mmr.setShowBytesOnGraph(context.showBytesOnGraphs);
+        return mmr;
     }
 }

@@ -27,7 +27,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.UUID;
 import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfiguration;
-import net.praqma.jenkins.memorymap.parser.TexasInstrumentsMemoryMapParser;
+import net.praqma.jenkins.memorymap.parser.ti.TexasInstrumentsMemoryMapParser;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -43,12 +43,12 @@ public class TexasInstrumentsMemoryMapParserIT {
 
     @Test
     public void testUsageValues() throws Exception {
-        MemoryMapGraphConfiguration graphConfiguration = new MemoryMapGraphConfiguration("RAMM0+RAML0_L3", "432", true);
+        MemoryMapGraphConfiguration graphConfiguration = new MemoryMapGraphConfiguration("RAMM0+RAML0_L3", "432");
         TexasInstrumentsMemoryMapParser parser = createParser(graphConfiguration);
         parser.setMapFile("TexasInstrumentsMapFile.txt");
         parser.setConfigurationFile("28069_RAM_lnk.cmd");
 
-        HashMap<String, String> expectedValues = new HashMap<String, String>();
+        HashMap<String, String> expectedValues = new HashMap<>();
         expectedValues.put("RAMM0", "00000195");
         expectedValues.put("RAML0_L3", "00001a8f");
 

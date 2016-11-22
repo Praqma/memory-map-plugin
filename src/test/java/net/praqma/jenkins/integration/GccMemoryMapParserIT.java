@@ -43,12 +43,12 @@ public class GccMemoryMapParserIT {
 
     @Test
     public void gcc432_testUsageValues() throws Exception {
-        MemoryMapGraphConfiguration graphConfiguration = new MemoryMapGraphConfiguration(".text+.rodata", "432", true);
+        MemoryMapGraphConfiguration graphConfiguration = new MemoryMapGraphConfiguration(".text+.rodata", "432");
         GccMemoryMapParser parser = createParser(graphConfiguration);
         parser.setMapFile("prom2_432.map");
         parser.setConfigurationFile("prom432.ld");
 
-        HashMap<String, String> expectedValues = new HashMap<String, String>();
+        HashMap<String, String> expectedValues = new HashMap<>();
         expectedValues.put(".text", "0x10a008");
         expectedValues.put(".rodata", "0x33fd7");
 
@@ -57,12 +57,12 @@ public class GccMemoryMapParserIT {
 
     @Test
     public void gcc482_testUsageValues() throws Exception {
-        MemoryMapGraphConfiguration graphConfiguration = new MemoryMapGraphConfiguration(".prom_text+.ram_data", "482", true);
+        MemoryMapGraphConfiguration graphConfiguration = new MemoryMapGraphConfiguration(".prom_text+.ram_data", "482");
         GccMemoryMapParser parser = createParser(graphConfiguration);
         parser.setMapFile("gcc482.map");
         parser.setConfigurationFile("prom482.ld");
 
-        HashMap<String, String> expectedValues = new HashMap<String, String>();
+        HashMap<String, String> expectedValues = new HashMap<>();
         expectedValues.put(".prom_text", "0x10cb70");
         expectedValues.put(".ram_data", "0x20c4");
 
@@ -71,7 +71,7 @@ public class GccMemoryMapParserIT {
 
     @Test
     public void gcc484_testUsageValues() throws Exception {
-        MemoryMapGraphConfiguration graphConfiguration = new MemoryMapGraphConfiguration("rom", "484", true);
+        MemoryMapGraphConfiguration graphConfiguration = new MemoryMapGraphConfiguration("rom", "484");
         GccMemoryMapParser parser = createParser(graphConfiguration);
         parser.setMapFile("map.map");
         parser.setConfigurationFile("link.ld");

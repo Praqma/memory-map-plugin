@@ -34,7 +34,7 @@ import static org.junit.Assert.*;
 
 
 public class MemoryMapBuildActionSimpleTest {
-    
+
     @Test
     public void memoryMapBuildAction_trivial_accessor_mutator_test() throws Exception {
         MemoryMapBuildAction memoryMapBuildAction = new MemoryMapBuildAction(null, null);

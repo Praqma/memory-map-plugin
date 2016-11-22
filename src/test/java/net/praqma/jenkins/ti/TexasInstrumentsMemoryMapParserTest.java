@@ -25,7 +25,7 @@ package net.praqma.jenkins.ti;
 
 import java.io.File;
 import java.io.IOException;
-import net.praqma.jenkins.memorymap.parser.TexasInstrumentsMemoryMapParser;
+import net.praqma.jenkins.memorymap.parser.ti.TexasInstrumentsMemoryMapParser;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemoryItem;
 import org.junit.Test;
@@ -48,30 +48,28 @@ public class TexasInstrumentsMemoryMapParserTest {
         File f = new File(file);
         parser.parseConfigFile(f);
     }
-    
+
     @Test
     public void testParseMapFile() throws IOException{
         TexasInstrumentsMemoryMapParser parser = new TexasInstrumentsMemoryMapParser();
         String file = TexasInstrumentsMemoryMapParserTest.class.getResource("TexasInstrumentsMapFile.txt").getFile();
         File f = new File(file);
-        
-        MemoryMapConfigMemory mmcm = new MemoryMapConfigMemory();
-        mmcm.add(new MemoryMapConfigMemoryItem("RAMM0", "00000050", "000003b0", "00000195", "0000021b"));
-        mmcm = parser.parseMapFile(f, mmcm);
-        assertTrue(mmcm.size() > 0);
-        
-        for (MemoryMapConfigMemoryItem item : mmcm){
-          if(item.getName().equals("RAMM0")){
-              assertEquals(item.getUsed(), "00000195");
-              assertEquals(item.getUnused(), "0000021b");
-          }
-        }
-            
+
+        MemoryMapConfigMemory configMemory = new MemoryMapConfigMemory();
+        configMemory.add(new MemoryMapConfigMemoryItem("RAMM0", "00000050", "000003b0", "00000195", "0000021b"));
+        configMemory = parser.parseMapFile(f, configMemory);
+        assertTrue(configMemory.size() > 0);
+
+        configMemory.stream().filter(item -> item.getName().equals("RAMM0")).forEach(item -> {
+            assertEquals(item.getUsed(), "00000195");
+            assertEquals(item.getUnused(), "0000021b");
+        });
+
     }
-    
+
     @Test
     public void testGetDefaultWordSize(){
         TexasInstrumentsMemoryMapParser parser = new TexasInstrumentsMemoryMapParser();
-        assertEquals("16 equals parser.getDefaultWordSize()", 16, parser.getDefaultWordSize());      
+        assertEquals("16 equals parser.getDefaultWordSize()", 16, parser.getDefaultWordSize());
     }
 }

@@ -28,50 +28,50 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * @author Praqma
  */
 public class MemoryMapConfigMemory extends LinkedList<MemoryMapConfigMemoryItem> implements Serializable {
+
     private static final Logger LOG = Logger.getLogger(MemoryMapConfigMemory.class.getName());
-    
-    public MemoryMapConfigMemory() {}
+
+    public MemoryMapConfigMemory() {
+    }
 
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        
-        for (MemoryMapConfigMemoryItem item : this) {            
+
+        for (MemoryMapConfigMemoryItem item : this) {
             builder.append(String.format("[%s] %s", this.indexOf(item), item));
-            builder.append("\n");            
+            builder.append("\n");
         }
-        
+
         return builder.toString();
     }
-    
+
     public List<String> getItemNames() {
-        List<String> items = new ArrayList<String>();
-        for(MemoryMapConfigMemoryItem item : this) {
-            items.add(item.getName());
-        }
-        return items;
+        return stream().map(MemoryMapConfigMemoryItem::getName).collect(Collectors.toList());
     }
-    
+
     public boolean containsSectionWithName(String name) {
         for (MemoryMapConfigMemoryItem item : this) {
-            if(item.getName().equals(name)) {
+            if (item.getName().equals(name)) {
                 return true;
             }
         }
         return false;
     }
-    
+
     public List<MemoryMapConfigMemoryItem> getItemByNames(String... name) {
-        ArrayList<MemoryMapConfigMemoryItem> items = new ArrayList<MemoryMapConfigMemoryItem>();
-        for(MemoryMapConfigMemoryItem item : this) {
-            for(String memoryName : name )
-            if(item.getName().equals(memoryName)) {
-                items.add(item);
+        ArrayList<MemoryMapConfigMemoryItem> items = new ArrayList<>();
+        for (MemoryMapConfigMemoryItem item : this) {
+            for (String memoryName : name) {
+                if (item.getName().equals(memoryName)) {
+                    items.add(item);
+                }
             }
         }
         return items;
@@ -79,12 +79,10 @@ public class MemoryMapConfigMemory extends LinkedList<MemoryMapConfigMemoryItem>
 
     @Override
     public boolean add(MemoryMapConfigMemoryItem e) {
-        if(this.contains(e)) {
+        if (this.contains(e)) {
             return false;
         }
-        return super.add(e); 
+        return super.add(e);
     }
-    
-    
 
 }

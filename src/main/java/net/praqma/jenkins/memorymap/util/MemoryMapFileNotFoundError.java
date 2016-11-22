@@ -31,11 +31,11 @@ import java.io.IOException;
  * @author mads
  */
 public class MemoryMapFileNotFoundError extends IOException implements MemoryMapError {
-    public MemoryMapFileNotFoundError(String msg, File file) {
+    public MemoryMapFileNotFoundError(String msg) {
         super(msg);
     }
 
     public MemoryMapFileNotFoundError() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

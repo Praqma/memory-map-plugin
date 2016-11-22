@@ -50,7 +50,7 @@ public class MemoryMapJobDslContext implements Context {
 
     public void parser(String parserType, String parserUniqueName, String commandFile, String mapFile, Runnable closure) {
         checkArgument(parserTypes.contains(parserType), "Parser type must be one of " + parserTypes);
-        MemoryMapParserDslContext context = new MemoryMapParserDslContext(showBytesOnGraphs);
+        MemoryMapParserDslContext context = new MemoryMapParserDslContext();
         executeInContext(closure, context);
 
         AbstractMemoryMapParser parser = null;
@@ -60,6 +60,9 @@ public class MemoryMapJobDslContext implements Context {
                 break;
             case "TI":
                 parser = new TexasInstrumentsMemoryMapParser(parserUniqueName, mapFile, commandFile, wordSize, context.graphConfigurations, showBytesOnGraphs);
+                break;
+            default:
+                System.out.println("Unable to allocate parser: " + parserType);
                 break;
         }
 

@@ -23,7 +23,6 @@
  */
 package net.praqma.jenkins.memorymap;
 
-import hudson.model.AbstractBuild;
 import hudson.model.Action;
 import hudson.model.Run;
 import hudson.util.ChartUtil;
@@ -31,12 +30,11 @@ import hudson.util.DataSetBuilder;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.logging.Level;
+import jenkins.tasks.SimpleBuildStep;
+import net.praqma.jenkins.memorymap.parser.AbstractMemoryMapParser;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemoryItem;
 import net.praqma.jenkins.memorymap.util.HexUtils;
@@ -61,18 +59,17 @@ import org.kohsuke.stapler.StaplerResponse;
  *
  * @author Praqma
  */
-public class MemoryMapBuildAction implements Action {
-    private static final Logger logger = Logger.getLogger(MemoryMapBuildAction.class.getName());
+public class MemoryMapBuildAction implements Action, SimpleBuildStep.LastBuildAction {
 
-    @Deprecated
-    private MemoryMapConfigMemory memoryMapConfig;
+    private static final Logger logger = Logger.getLogger(MemoryMapBuildAction.class.getName());
 
     private static final double labelOffset = 1.2d;
     private HashMap<String, MemoryMapConfigMemory> memoryMapConfigs;
-    private AbstractBuild<?, ?> build;
+    private Run<?, ?> build;
     private MemoryMapRecorder recorder;
+    private List<AbstractMemoryMapParser> parsers;
 
-    public MemoryMapBuildAction(AbstractBuild<?, ?> build, HashMap<String, MemoryMapConfigMemory> memoryMapConfig) {
+    public MemoryMapBuildAction(Run<?, ?> build, HashMap<String, MemoryMapConfigMemory> memoryMapConfig) {
         this.build = build;
         this.memoryMapConfigs = memoryMapConfig;
     }
@@ -97,13 +94,14 @@ public class MemoryMapBuildAction implements Action {
      * builds.
      *
      * Goes to the end of list.
-     * @param base
+     *
+     * @param base the Run to use as base
      * @return The previous MemoryMap build.
      */
-    public MemoryMapBuildAction getPreviousAction(AbstractBuild<?, ?> base) {
+    public MemoryMapBuildAction getPreviousAction(Run<?, ?> base) {
         logger.log(Level.FINER, "Entering getPreviousAction(base).");
         MemoryMapBuildAction action;
-        AbstractBuild<?, ?> start = base;
+        Run<?, ?> start = base;
         while (true) {
             start = start.getPreviousCompletedBuild();
             if (start == null) {
@@ -121,7 +119,7 @@ public class MemoryMapBuildAction implements Action {
     public MemoryMapBuildAction getPreviousAction() {
         logger.log(Level.FINER, "Entering getPreviousAction.");
         MemoryMapBuildAction action;
-        AbstractBuild<?, ?> start = build;
+        Run<?, ?> start = build;
         while (true) {
             start = start.getPreviousCompletedBuild();
             if (start == null) {
@@ -138,32 +136,33 @@ public class MemoryMapBuildAction implements Action {
     }
 
     /**
-     * We need to filter markers. If they have the same max value. We need to
-     * remove the marker, and concatenate the label.
+     * We need to filter out markers with the same max value.
+     * Simply concatenate the marker labels if they share the same max value.
      */
     private void filterMarkers(HashMap<String, ValueMarker> markers) {
-        HashMap<Long, String> maxLabel = new HashMap<>();
+        HashMap<Long, String> labels = new HashMap<>();
 
-        for (String markerLabel : markers.keySet()) {
-            long max = (long) markers.get(markerLabel).getValue();
-            if (maxLabel.containsKey(max)) {
-                //If the label already is contained. Store the Original value. And add the new one.
-                String current = maxLabel.get(max);
-                maxLabel.put(max, current + " " + markerLabel);
+        for (Map.Entry<String, ValueMarker> marker : markers.entrySet()) {
+            long markerValue = (long) marker.getValue().getValue();
+            if (labels.containsKey(markerValue)) {
+                // Append marker label
+                String existingLabel = labels.get(markerValue);
+                labels.put(markerValue, existingLabel + " " + marker.getKey());
             } else {
-                maxLabel.put(max, markerLabel);
+                // New entry
+                labels.put(markerValue, marker.getKey());
             }
         }
 
         markers.clear();
-        for (Long key : maxLabel.keySet()) {
-            makeMarker(maxLabel.get(key), (double) key, markers);
+        for (Map.Entry<Long, String> label : labels.entrySet()) {
+            makeMarker(label.getValue(), (double) label.getKey(), markers);
         }
 
     }
 
     public void doDrawMemoryMapUsageGraph(StaplerRequest req, StaplerResponse rsp) throws IOException {
-        DataSetBuilder<String, ChartUtil.NumberOnlyBuildLabel> dataset = new DataSetBuilder<>();
+        DataSetBuilder<String, ChartUtil.NumberOnlyBuildLabel> dataSet = new DataSetBuilder<>();
 
         String members = req.getParameter("categories");
         String graphTitle = req.getParameter("title");
@@ -176,9 +175,9 @@ public class MemoryMapBuildAction implements Action {
 
         HashMap<String, ValueMarker> markers = new HashMap<>();
 
-        String scale = getRecorder().scale;
+        String scale = getRecorder().getScale();
 
-        double max = buildDataSet(memberList, uniqueDataSet, dataset, markers);
+        double max = buildDataSet(memberList, uniqueDataSet, dataSet, markers);
         filterMarkers(markers);
 
         String s = "";
@@ -195,22 +194,22 @@ public class MemoryMapBuildAction implements Action {
 
         String legend = getRecorder().getShowBytesOnGraph() ? byteLegend : wordLegend;
 
-        JFreeChart chart = createPairedBarCharts(graphTitle, legend, max * 1.1d, 0d, dataset.build(), markers.values());
+        JFreeChart chart = createPairedBarCharts(graphTitle, legend, max * 1.1d, 0d, dataSet.build(), markers.values());
 
         chart.setBackgroundPaint(Color.WHITE);
         chart.getLegend().setPosition(RectangleEdge.BOTTOM);
         ChartUtil.generateGraph(req, rsp, chart, w, h);
     }
 
-    protected JFreeChart createPairedBarCharts(String title, String yaxis, double max, double min, CategoryDataset dataset, Collection<ValueMarker> markers) {
+    protected JFreeChart createPairedBarCharts(String title, String yAxis, double max, double min, CategoryDataset dataSet, Collection<ValueMarker> markers) {
         final CategoryAxis domainAxis = new CategoryAxis3D();
-        final NumberAxis rangeAxis = new NumberAxis(yaxis);
+        final NumberAxis rangeAxis = new NumberAxis(yAxis);
         rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
         rangeAxis.setUpperBound(max);
         rangeAxis.setLowerBound(min);
         BarRenderer renderer = new BarRenderer();
 
-        CategoryPlot plot = new CategoryPlot(dataset, domainAxis, rangeAxis, renderer);
+        CategoryPlot plot = new CategoryPlot(dataSet, domainAxis, rangeAxis, renderer);
         plot.setDomainAxis(domainAxis);
         domainAxis.setCategoryLabelPositions(CategoryLabelPositions.UP_90);
 
@@ -241,6 +240,20 @@ public class MemoryMapBuildAction implements Action {
      */
     public void setRecorder(MemoryMapRecorder recorder) {
         this.recorder = recorder;
+    }
+
+    /**
+     * @return the chosen parsers
+     */
+    public List<AbstractMemoryMapParser> getChosenParsers() {
+        return parsers;
+    }
+
+    /**
+     * @param parsers the parsers to set
+     */
+    public void setChosenParsers(List<AbstractMemoryMapParser> parsers) {
+        this.parsers = parsers;
     }
 
     /**
@@ -293,18 +306,18 @@ public class MemoryMapBuildAction implements Action {
      * Extracts the value from a given memory map item. If multiple objects are
      * passed in, values get added.
      *
-     * @param item
-     * @return
+     * @param items the MemoryMapConfigMemoryItems to get the value of
+     * @return the value of the MemoryMapConfigMemoryItems
      */
-    private double extractValue(MemoryMapConfigMemoryItem... item) {
+    private double extractValue(MemoryMapConfigMemoryItem... items) {
         double value = 0d;
-        String scale = getRecorder().scale;
-        for (MemoryMapConfigMemoryItem it : item) {
-            if (!StringUtils.isBlank(it.getUsed())) {
+        String scale = getRecorder().getScale();
+        for (MemoryMapConfigMemoryItem item : items) {
+            if (!StringUtils.isBlank(item.getUsed())) {
                 if (getRecorder().getShowBytesOnGraph()) {
-                    value = value + HexUtils.byteCount(it.getUsed(), getRecorder().getWordSize(), scale);
+                    value = value + HexUtils.byteCount(item.getUsed(), getRecorder().getWordSize(), scale);
                 } else {
-                    value = value + HexUtils.wordCount(it.getUsed(), getRecorder().getWordSize(), scale);
+                    value = value + HexUtils.wordCount(item.getUsed(), getRecorder().getWordSize(), scale);
                 }
             }
         }
@@ -313,7 +326,7 @@ public class MemoryMapBuildAction implements Action {
 
     private double extractMaxNonZeroValue(MemoryMapConfigMemoryItem... item) {
         double value = 0d;
-        String scale = getRecorder().scale;
+        String scale = getRecorder().getScale();
         for (MemoryMapConfigMemoryItem it : item) {
 
             if (getRecorder().getShowBytesOnGraph()) {
@@ -337,7 +350,7 @@ public class MemoryMapBuildAction implements Action {
 
     private double extractMaxValue(MemoryMapConfigMemoryItem... item) {
         double value = 0d;
-        String scale = getRecorder().scale;
+        String scale = getRecorder().getScale();
         for (MemoryMapConfigMemoryItem it : item) {
 
             if (getRecorder().getShowBytesOnGraph()) {
@@ -355,7 +368,7 @@ public class MemoryMapBuildAction implements Action {
 
     public void makeMarker(String labelName, double value, HashMap<String, ValueMarker> markers) {
         if (!markers.containsKey(labelName)) {
-            ValueMarker vm = new ValueMarker((double) value, Color.BLACK, new BasicStroke(
+            ValueMarker vm = new ValueMarker(value, Color.BLACK, new BasicStroke(
                     1.2f, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER,
                     1.0f, new float[]{6.0f, 6.0f}, 0.0f));
             vm.setLabel(labelName);
@@ -371,16 +384,16 @@ public class MemoryMapBuildAction implements Action {
     }
 
     /**
-     * Builds the dataset. Returns the maximum value.
+     * Builds the data set. Returns the maximum value.
      *
-     * @param graphData
-     * @param dataset
-     * @param graphDataset
-     * @param markers
-     * @return
+     * @param graphData GraphData
+     * @param dataSet the data set
+     * @param graphDataSet the graph data set
+     * @param markers markers to add (max values)
+     * @return a double with the value to be drawn on graph
      */
-    public double buildDataSet(List<String> graphData, String dataset, DataSetBuilder<String, ChartUtil.NumberOnlyBuildLabel> graphDataset, HashMap<String, ValueMarker> markers) {
-        logger.log(Level.FINE, "Entering buildDataSet with dataset {0}", dataset);
+    public double buildDataSet(List<String> graphData, String dataSet, DataSetBuilder<String, ChartUtil.NumberOnlyBuildLabel> graphDataSet, HashMap<String, ValueMarker> markers) {
+        logger.log(Level.FINE, "Entering buildDataSet with data set {0}", dataSet);
         double max = 0d;
         for (String s : graphData) {
             if (s.contains(" ")) {
@@ -389,17 +402,17 @@ public class MemoryMapBuildAction implements Action {
                 String maxLabel = constructMaxLabel(parts);
                 String categoryLabel = constructCategoryLabel(parts);
 
-                for (MemoryMapBuildAction membuild = this; membuild != null; membuild = membuild.getPreviousAction()) {
-                    logger.log(Level.FINE, "Building graph dataset for build #{0}", membuild.build.number);
-                    MemoryMapConfigMemory result = membuild.getMemoryMapConfigs().get(dataset);
+                for (MemoryMapBuildAction memBuild = this; memBuild != null; memBuild = memBuild.getPreviousAction()) {
+                    logger.log(Level.FINE, "Building graph data set for build #{0}", memBuild.build.number);
+                    MemoryMapConfigMemory result = memBuild.getMemoryMapConfigs().get(dataSet);
                     logger.log(Level.FINE, "Building MemoryMapConfig: {0}", result);
-                    if(result == null){
-                        logger.log(Level.FINEST, "Dataset {0} not found", dataset);
-                        for(String key :membuild.getMemoryMapConfigs().keySet()){
+                    if (result == null) {
+                        logger.log(Level.FINEST, "Data set {0} not found", dataSet);
+                        for (String key : memBuild.getMemoryMapConfigs().keySet()) {
                             logger.log(Level.FINEST, "found {0}", key);
                         }
-                    }                        
-                    ChartUtil.NumberOnlyBuildLabel label = new ChartUtil.NumberOnlyBuildLabel((Run<?,?>)membuild.build);
+                    }
+                    ChartUtil.NumberOnlyBuildLabel label = new ChartUtil.NumberOnlyBuildLabel(memBuild.build);
                     if (result != null) {
                         List<MemoryMapConfigMemoryItem> ourItems = result.getItemByNames(parts);
                         MemoryMapConfigMemoryItem[] ourItemsArray = ourItems.toArray(new MemoryMapConfigMemoryItem[ourItems.size()]);
@@ -413,42 +426,42 @@ public class MemoryMapBuildAction implements Action {
                             max = extractMaxValue(ourItemsArray);
                         }
 
-                        graphDataset.add(value, categoryLabel, label);
+                        graphDataSet.add(value, categoryLabel, label);
                         makeMarker(maxLabel, max, markers);
                     }
                 }
 
             } else {
-                for (MemoryMapBuildAction membuild = this; membuild != null; membuild = membuild.getPreviousAction()) {
-                    logger.log(Level.FINE, "Building graph dataset for build #{0}", membuild.build.number);
-                    MemoryMapConfigMemory result = membuild.getMemoryMapConfigs().get(dataset);
+                for (MemoryMapBuildAction memBuild = this; memBuild != null; memBuild = memBuild.getPreviousAction()) {
+                    logger.log(Level.FINE, "Building graph data set for build #{0}", memBuild.build.number);
+                    MemoryMapConfigMemory result = memBuild.getMemoryMapConfigs().get(dataSet);
                     logger.log(Level.FINE, "Building MemoryMapConfig: {0}", result);
-                    if(result == null){
-                        logger.log(Level.FINEST, "Dataset {0} not found", dataset);
-                        for(String key :membuild.getMemoryMapConfigs().keySet()){
+                    if (result == null) {
+                        logger.log(Level.FINEST, "Data set {0} not found", dataSet);
+                        for (String key : memBuild.getMemoryMapConfigs().keySet()) {
                             logger.log(Level.FINEST, "found {0}", key);
                         }
                     }
-                    ChartUtil.NumberOnlyBuildLabel label = new ChartUtil.NumberOnlyBuildLabel((Run<?,?>)membuild.build);                    
+                    ChartUtil.NumberOnlyBuildLabel label = new ChartUtil.NumberOnlyBuildLabel(memBuild.build);
                     if (result != null) {
-                        //Do something we have a result                        
+                        //Do something we have a result
 
                         for (MemoryMapConfigMemoryItem item : result) {
-                            //The name of the item matches the configured grap item
+                            //The name of the item matches the configured graph item
 
                             if (item.getName().equals(s)) {
                                 String maxLabel = constructMaxLabel(item.getName());
-                                double newmax = extractMaxNonZeroValue(item);
+                                double newMax = extractMaxNonZeroValue(item);
                                 double value = extractValue(item);
                                 String categoryLabel = constructCategoryLabel(item.getName());
-                                graphDataset.add(value, categoryLabel, label);
+                                graphDataSet.add(value, categoryLabel, label);
 
-                                if (newmax >= max) {
-                                    max = newmax;
+                                if (newMax >= max) {
+                                    max = newMax;
                                 }
 
-                                if (newmax > 0d) {
-                                    makeMarker(maxLabel, newmax, markers);
+                                if (newMax > 0d) {
+                                    makeMarker(maxLabel, newMax, markers);
                                 }
 
                             }
@@ -462,31 +475,10 @@ public class MemoryMapBuildAction implements Action {
         return max;
     }
 
-    public Object readResolve() {
-        if (getMemoryMapConfig() != null) {
-            logger.log(Level.FINE, "Entering 1.x compatibility block, assigning memory map to Default parser");
-            HashMap<String, MemoryMapConfigMemory> configs = new HashMap<>();
-            configs.put("Default", getMemoryMapConfig());
-            setMemoryMapConfigs(configs);
-        }
-        return this;
-    }
-
-    /**
-     * @return the memoryMapConfig
-     * @deprecated use memoryMapConfigs instead
-     */
-    @Deprecated
-    public MemoryMapConfigMemory getMemoryMapConfig() {
-        return memoryMapConfig;
-    }
-
-    /**
-     * @param memoryMapConfig the memoryMapConfig to set
-     * @deprecated use memoryMapConfigs instead
-     */
-    @Deprecated
-    public void setMemoryMapConfig(MemoryMapConfigMemory memoryMapConfig) {
-        this.memoryMapConfig = memoryMapConfig;
+    @Override
+    public Collection<? extends Action> getProjectActions() {
+        List<MemoryMapProjectAction> projectActions = new ArrayList<>();
+        projectActions.add(new MemoryMapProjectAction(build.getParent()));
+        return projectActions;
     }
 }

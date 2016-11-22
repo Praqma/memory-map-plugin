@@ -23,43 +23,35 @@
  */
 package net.praqma.jenkins.memorymap.result;
 
-import java.io.Serializable;
-import java.util.List;
 import net.praqma.jenkins.memorymap.util.HexUtils;
 import org.apache.commons.lang.StringUtils;
+
+import java.io.Serializable;
 
 /**
  *
  * @author Praqma
  */
 public class MemoryMapConfigMemoryItem implements Serializable, Comparable<MemoryMapConfigMemoryItem> {
-    
-    private MemoryMapConfigMemoryItem parent;    
+
+    private MemoryMapConfigMemoryItem parent;
     private String name;
-    
-    //The "start" address. Not always relavant but in some cases we use the 'origin' and the 'endAddress' to calculate the size
+
+    //The "start" address. Not always relevant but in some cases we use the 'origin' and the 'endAddress' to calculate the size
     private String origin;
     private String endAddress;
-    
-    //The "length" attribute is used to display MAX values on graphs.    
-    private String length;   
+
+    //The "length" attribute is used to display MAX values on graphs.
+    private String length;
 
     //The used attributes is what is consumed by the component
     private String used;
     private String unused;
-    
-    //Model property for 
-    private List<MemoryMapConfigMemoryItem> associatedSections;
-    
-    public MemoryMapConfigMemoryItem() { }
-    
-    /**
-     * 
-     * @param name
-     * @param origin 
-     */
-   
-    public MemoryMapConfigMemoryItem (String name, String origin){
+
+    public MemoryMapConfigMemoryItem() {
+    }
+
+    public MemoryMapConfigMemoryItem(String name, String origin) {
         this.name = name != null ? name.trim() : "";
         this.origin = origin;
     }
@@ -76,10 +68,6 @@ public class MemoryMapConfigMemoryItem implements Serializable, Comparable<Memor
         this.length = length;
         this.unused = unused;
         this.used = used;
-    }
-    
-    public boolean isRoot() {
-        return !associatedSections.isEmpty();
     }
 
     /**
@@ -123,26 +111,28 @@ public class MemoryMapConfigMemoryItem implements Serializable, Comparable<Memor
     public void setLength(String length) {
         this.length = length;
     }
-    
+
     /**
      * @return the endAddress of the segment
      */
     public String getEndAddress() {
         return endAddress;
     }
-    
+
     /**
-     * 
+     *
      * @param endAddress of the segment
      */
-    public void setEndAddress(String endAddress) {        
+    public void setEndAddress(String endAddress) {
         this.endAddress = endAddress;
     }
-    
+
     /**
-     * Calculates the "length" of a segment if the map file does not explicitly tell it to do so.
-     * @param startHex
-     * @param endHex 
+     * Calculates the "length" of a segment if the map file does not explicitly
+     * tell it to do so.
+     *
+     * @param startHex Hex address start
+     * @param endHex Hex address end
      */
     public void setCalculatedLength(String startHex, String endHex) {
         HexUtils.HexifiableString sHex = new HexUtils.HexifiableString(startHex);
@@ -150,21 +140,7 @@ public class MemoryMapConfigMemoryItem implements Serializable, Comparable<Memor
         HexUtils.HexifiableString len = sHex.getLengthAsHex(eHex);
         setLength(len.rawString);
     }
-     
-    /**
-     * @return the associatedSections
-     */
-    public List<MemoryMapConfigMemoryItem> getAssociatedSections() {
-        return associatedSections;
-    }
 
-    /**
-     * @param associatedSections the associatedSections to set
-     */
-    public void setAssociatedSections(List<MemoryMapConfigMemoryItem> associatedSections) {
-        this.setAssociatedSections(associatedSections);
-    }
-    
     private Object getValueOrNotApplicable(Object o) {
         if (o == null) {
             return "N/A";
@@ -172,14 +148,14 @@ public class MemoryMapConfigMemoryItem implements Serializable, Comparable<Memor
             return o;
         }
     }
-    
+
     @Override
     public String toString() {
         String base = String.format("%s [origin = %s, length = %s, used = %s, unused = %s, endAddress = %s]", getName(), getOrigin(), getValueOrNotApplicable(getLength()), getUsed(), getValueOrNotApplicable(getUnused()), getValueOrNotApplicable(getEndAddress()));
-        if(parent != null) {
-            base = base + String.format("%n---- %s",parent);
+        if (parent != null) {
+            base = base + String.format("%n---- %s", parent);
         }
-        
+
         return base;
     }
 
@@ -208,48 +184,43 @@ public class MemoryMapConfigMemoryItem implements Serializable, Comparable<Memor
      * @param unused the unused to set
      */
     public void setUnused(String unused) {
-        this.unused = unused;    
+        this.unused = unused;
     }
-    
+
     /**
      *
-     */ 
+     * @return maximum top level memory
+     */
     public String getTopLevelMemoryMax() {
         MemoryMapConfigMemoryItem item = this;
         String max = null;
-        while(item != null) {
+        while (item != null) {
             max = item.getLength();
             item = item.getParent();
         }
         return max;
     }
-    
-    /**
-     * Utility methods checks to see if all items belong to the same parent
-     * @param items
-     * @return 
-     */
+
     public static boolean allBelongSameParent(MemoryMapConfigMemoryItem... items) {
-        
+
         MemoryMapConfigMemoryItem parent = null;
-        
-        for(MemoryMapConfigMemoryItem it : items) {
-            if(!StringUtils.isNumeric(it.getOrigin())) {
-                if(it.getParent() == null) {
+
+        for (MemoryMapConfigMemoryItem it : items) {
+            if (!StringUtils.isNumeric(it.getOrigin())) {
+                if (it.getParent() == null) {
                     //This is a parent return false
                     return false;
                 }
 
-                if(parent == null) {            
+                if (parent == null) {
                     parent = it.getParent();
                 }
 
-                if(parent != null && !parent.getName().equals(it.getParent().getName())) {
+                if (parent != null && !parent.getName().equals(it.getParent().getName())) {
                     return false;
-                }  
+                }
             }
         }
-        
 
         return true;
     }
@@ -274,17 +245,11 @@ public class MemoryMapConfigMemoryItem implements Serializable, Comparable<Memor
         hash = 83 * hash + (this.endAddress != null ? this.endAddress.hashCode() : 0);
         hash = 83 * hash + (this.used != null ? this.used.hashCode() : 0);
         hash = 83 * hash + (this.unused != null ? this.unused.hashCode() : 0);
-        hash = 83 * hash + (this.associatedSections != null ? this.associatedSections.hashCode() : 0);
         return hash;
     }
 
-    /**
-     * We sort the memory sections by their placement in memory, in ascending order.
-     * @param t
-     * @return 
-     */
     @Override
-    public int compareTo(MemoryMapConfigMemoryItem t) {        
+    public int compareTo(MemoryMapConfigMemoryItem t) {
         HexUtils.HexifiableString hexStringThis = new HexUtils.HexifiableString(getOrigin());
         HexUtils.HexifiableString hexStringOther = new HexUtils.HexifiableString(t.getOrigin());
         return hexStringThis.compareTo(hexStringOther);
@@ -303,6 +268,4 @@ public class MemoryMapConfigMemoryItem implements Serializable, Comparable<Memor
     public void setParent(MemoryMapConfigMemoryItem parent) {
         this.parent = parent;
     }
-    
-    
 }

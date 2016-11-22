@@ -26,17 +26,16 @@ package net.praqma.jenkins.memorymap;
 import hudson.AbortException;
 import hudson.Extension;
 import hudson.Launcher;
-import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
-import hudson.model.Action;
-import hudson.model.BuildListener;
-import hudson.model.Hudson;
+import hudson.FilePath;
+import hudson.model.*;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Publisher;
 import hudson.tasks.Recorder;
+import jenkins.tasks.SimpleBuildStep;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -44,121 +43,55 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfiguration;
+import jenkins.model.Jenkins;
 import net.praqma.jenkins.memorymap.parser.*;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
 import net.praqma.jenkins.memorymap.util.MemoryMapError;
 import net.sf.json.JSONObject;
-import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.QueryParameter;
 /**
  *
  * @author Praqma
  */
-public class MemoryMapRecorder extends Recorder {
-    
-    private String mapFile;
-    private Integer wordSize;
-    private boolean showBytesOnGraph;
-    
-    @Deprecated
-    private transient AbstractMemoryMapParser chosenParser;
-    
-    @Deprecated
-    private transient String configurationFile;
-    
-    @Deprecated
-    public final List<MemoryMapGraphConfiguration> graphConfiguration;
-    
-    public final String scale;
+public class MemoryMapRecorder extends Recorder implements SimpleBuildStep {
+
+    private int wordSize = 8;
+    private boolean showBytesOnGraph = false;
+
+    private String scale = "default";
     private List<AbstractMemoryMapParser> chosenParsers;
     private static final Logger logger = Logger.getLogger(MemoryMapRecorder.class.getName());
-        
+
     @Override
     public BuildStepMonitor getRequiredMonitorService() {
         return BuildStepMonitor.BUILD;
     }
-    
+
     public MemoryMapRecorder(){
-        scale = null;
-        graphConfiguration = null;
     }
 
     @DataBoundConstructor
-    public MemoryMapRecorder(List<AbstractMemoryMapParser> chosenParsers, boolean showBytesOnGraph, String wordSize, final String scale , final List<MemoryMapGraphConfiguration> graphConfiguration) {
+    public MemoryMapRecorder(List<AbstractMemoryMapParser> chosenParsers) {
         this.chosenParsers = chosenParsers;
-        this.showBytesOnGraph = showBytesOnGraph;
-        //TODO: This should be chose at parse-time. The 8 that is...
-        this.wordSize = StringUtils.isBlank(wordSize) ? 8 : Integer.parseInt(wordSize);   
-        this.scale = scale;
-        this.graphConfiguration = graphConfiguration;
     }
-    
-    public Object readResolve()
-    {
-        if (getChosenParser() != null) {
-            logger.log(Level.FINE, "Entering 1.x compatibility block, adding legacy parser to parser list.");
 
-            //Set the config file, this was moved from the recorder to the parser
-            if(getConfigurationFile() != null && getChosenParser().getConfigurationFile() == null){
-                getChosenParser().setConfigurationFile(configurationFile);
-            }
-                    
-            //The graphs were also moved to the parser
-            if(graphConfiguration != null){
-                if(getChosenParser().getGraphConfiguration() == null){
-                    getChosenParser().setGraphConfiguration(new ArrayList<MemoryMapGraphConfiguration>());
-                }
-                
-                for(MemoryMapGraphConfiguration graphConfig : graphConfiguration) {
-                    getChosenParser().getGraphConfiguration().add(graphConfig);
-                }
-            }
-
-            List<AbstractMemoryMapParser> parsers = new ArrayList<>();
-            parsers.add(getChosenParser());
-            setChosenParsers(parsers);
-        }
-
-        ArrayList<AbstractMemoryMapParser> deprecatedParsers = new ArrayList<>();
-        ArrayList<AbstractMemoryMapParser> newParsers = new ArrayList<>();
-        for(AbstractMemoryMapParser oldParser  : chosenParsers){
-            if(oldParser.getClass().equals(net.praqma.jenkins.memorymap.parser.TexasInstrumentsMemoryMapParser.class)){
-                logger.log(Level.FINE, "Entering Texas Instruments deprecation block, swapping old TI parser with the new one.");
-                net.praqma.jenkins.memorymap.parser.ti.TexasInstrumentsMemoryMapParser newParser = new net.praqma.jenkins.memorymap.parser.ti.TexasInstrumentsMemoryMapParser();
-                newParser.setBytesOnGraph(oldParser.getBytesOnGraph());
-                newParser.setConfigurationFile(oldParser.getConfigurationFile());
-                newParser.setMapFile(oldParser.getMapFile());
-                newParser.setWordSize(oldParser.getWordSize());
-                newParser.setParserTitle(oldParser.getParserTitle());
-                newParser.setParserUniqueName(oldParser.getParserUniqueName());
-                newParser.setGraphConfiguration(oldParser.getGraphConfiguration());
-                deprecatedParsers.add(oldParser);
-                newParsers.add(newParser);
-            }
-        }
-        chosenParsers.removeAll(deprecatedParsers);
-        chosenParsers.addAll(newParsers);
-
-        return this;
-    }
-    
     @Override
-    public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) throws InterruptedException, IOException {
+    public void perform(@Nonnull Run<?, ?> build, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull TaskListener listener) throws InterruptedException, IOException {
         
-        boolean failed = false;
         PrintStream out = listener.getLogger();
-                
-        HashMap<String, MemoryMapConfigMemory> config = null;
-        
-        String version = Hudson.getInstance().getPlugin( "memory-map" ).getWrapper().getVersion();
+
+        HashMap<String, MemoryMapConfigMemory> config;
+
+        String version = Jenkins.getActiveInstance().getPlugin( "memory-map" ).getWrapper().getVersion();
         out.println( "Memory Map Plugin version " + version );
-        
+
         try {
-            config = build.getWorkspace().act(new MemoryMapConfigFileParserDelegate(getChosenParsers()));
-            config = build.getWorkspace().act(new MemoryMapMapParserDelegate(getChosenParsers(), config));            
+            config = workspace.act(new MemoryMapConfigFileParserDelegate(getChosenParsers()));
+            config = workspace.act(new MemoryMapMapParserDelegate(getChosenParsers(), config));
         } catch(IOException ex) {
             //Catch all known errors (By using a marker interface)
             if (ex instanceof MemoryMapError) {
@@ -168,8 +101,8 @@ public class MemoryMapRecorder extends Recorder {
                 logger.log(Level.SEVERE, "Abnormal plugin execution, trace written to log", ex);
                 throw new AbortException( String.format("Unspecified error. Please review error message.%nPlease install the logging plugin to record the standard java logger output stream."
                         + "%nThe plugin is described here: https://wiki.jenkins-ci.org/display/JENKINS/Logging+plugin and requires core 1.483  "));
-            }       
-            return false;
+            }
+            return;
         }
 
         out.println("Printing configuration");
@@ -178,28 +111,13 @@ public class MemoryMapRecorder extends Recorder {
             out.println(config.toString());
         }
 
-        MemoryMapBuildAction mmba = new MemoryMapBuildAction(build, config);
-        mmba.setRecorder(this);
-        mmba.setMemoryMapConfigs(config);                
-        build.getActions().add(mmba);
-        
-        return true;        
-    } 
-
-    /**
-     * @return the mapFile
-     */
-    public String getMapFile() {
-        return mapFile;
+        MemoryMapBuildAction buildAction = new MemoryMapBuildAction(build, config);
+        buildAction.setRecorder(this);
+        buildAction.setMemoryMapConfigs(config);
+        buildAction.setChosenParsers(getChosenParsers());
+        build.addAction(buildAction);
     }
 
-    /**
-     * @param mapFile the mapFile to set
-     */
-    public void setMapFile(String mapFile) {
-        this.mapFile = mapFile;
-    }
-    
     /**
      * @return the showBytesOnGraph
      */
@@ -210,6 +128,7 @@ public class MemoryMapRecorder extends Recorder {
     /**
      * @param showBytesOnGraph the showBytesOnGraph to set
      */
+    @DataBoundSetter
     public void setShowBytesOnGraph(Boolean showBytesOnGraph) {
         this.showBytesOnGraph = showBytesOnGraph;
     }
@@ -224,44 +143,24 @@ public class MemoryMapRecorder extends Recorder {
     /**
      * @param wordSize the wordSize to set
      */
-    public void setWordSize(Integer wordSize) {
+    @DataBoundSetter
+    public void setWordSize(int wordSize) {
         this.wordSize = wordSize;
     }
-
+    
     /**
-     * @return the chosenParser
-     * @deprecated use chosenParsers instead
+     * @return the scale
      */
-    @Deprecated
-    public AbstractMemoryMapParser getChosenParser() {
-        return chosenParser;
+    public String getScale() {
+        return scale;
     }
-
-    /**
-     * @param chosenParser the chosenParser to set
-     * @deprecated use chosenParsers instead
+    
+     /**
+     * @param scale the scale to set
      */
-    @Deprecated
-    public void setChosenParser(AbstractMemoryMapParser chosenParser) {
-        this.chosenParser = chosenParser;
-    }
-
-    /**
-     * @return the configurationFile
-     * @deprecated moved to parser level
-     */
-    @Deprecated
-    public String getConfigurationFile() {
-        return configurationFile;
-    }
-
-    /**
-     * @param configurationFile the configurationFile to set
-     * @deprecated moved to parser level
-     */
-    @Deprecated
-    public void setConfigurationFile(String configurationFile) {
-        this.configurationFile = configurationFile;
+    @DataBoundSetter
+    public void setScale(String scale) {
+        this.scale = scale;
     }
 
     /**
@@ -277,11 +176,11 @@ public class MemoryMapRecorder extends Recorder {
     public void setChosenParsers(List<AbstractMemoryMapParser> chosenParsers) {
         this.chosenParsers = chosenParsers;
     }
-    
+
+    @Symbol("MemoryMapRecorder")
     @Extension
     public static final class DescriptorImpl extends BuildStepDescriptor<Publisher> {
 
-        
         @Override
         public boolean isApplicable(Class<? extends AbstractProject> type) {
             return true;
@@ -291,34 +190,32 @@ public class MemoryMapRecorder extends Recorder {
         public String getDisplayName() {
             return "Memory Map Publisher";
         }
-        
+
         public List<MemoryMapParserDescriptor<?>> getParsers() {
             return AbstractMemoryMapParser.getDescriptors();
         }
-        
-
 
         @Override
         public Publisher newInstance(StaplerRequest req, JSONObject formData) throws FormException {
-            MemoryMapRecorder instance = req.bindJSON(MemoryMapRecorder.class, formData);   
-            save();            
+            MemoryMapRecorder instance = req.bindJSON(MemoryMapRecorder.class, formData);
+            save();
             return instance;
         }
-        
+
         public DescriptorImpl() {
             super(MemoryMapRecorder.class);
             load();
         }
-        
+
         private List<String> getScales(){
-            List<String> scales = new ArrayList<String>();
+            List<String> scales = new ArrayList<>();
             scales.add("default");
             scales.add("kilo");
             scales.add("Mega");
             scales.add("Giga");
             return scales;
         }
-        
+
          public ListBoxModel doFillScaleItems() {
             ListBoxModel items = new ListBoxModel();
             for (String scale : getScales()) {
@@ -329,11 +226,6 @@ public class MemoryMapRecorder extends Recorder {
          public FormValidation doCheckConfigurationFile(@QueryParameter String configurationFile) {
              return FormValidation.validateRequired(configurationFile);
          }
-                 
+
     }
-    
-    @Override
-    public Action getProjectAction(AbstractProject<?, ?> project) {
-        return new MemoryMapProjectAction(project);
-    }    
 }
