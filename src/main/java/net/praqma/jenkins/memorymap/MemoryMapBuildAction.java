@@ -338,7 +338,7 @@ public class MemoryMapBuildAction implements Action, SimpleBuildStep.LastBuildAc
                 }
             } else {
                 if (it.getTopLevelMemoryMax() != null) {
-                    value = value + HexUtils.byteCount(it.getTopLevelMemoryMax(), getRecorder().getWordSize(), scale);
+                    value = value + HexUtils.wordCount(it.getTopLevelMemoryMax(), getRecorder().getWordSize(), scale);
                     if (value > 0d) {
                         return value;
                     }
