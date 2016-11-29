@@ -135,7 +135,7 @@ public class TexasInstrumentsMemoryMapParser extends AbstractMemoryMapParser {
         return 16;
     }
 
-    @Symbol("TexasInstrumentsMemoryMapParser")
+    @Symbol("tiParser")
     @Extension
     public static final class DescriptorImpl extends MemoryMapParserDescriptor<TexasInstrumentsMemoryMapParser> {
 

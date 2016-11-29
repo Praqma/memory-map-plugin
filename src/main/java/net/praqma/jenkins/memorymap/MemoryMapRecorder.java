@@ -177,7 +177,7 @@ public class MemoryMapRecorder extends Recorder implements SimpleBuildStep {
         this.chosenParsers = chosenParsers;
     }
 
-    @Symbol("MemoryMapRecorder")
+    @Symbol("memoryMap")
     @Extension
     public static final class DescriptorImpl extends BuildStepDescriptor<Publisher> {
 

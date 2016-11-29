@@ -201,7 +201,7 @@ public class GccMemoryMapParser extends AbstractMemoryMapParser implements Seria
         return 8;
     }
 
-    @Symbol("GccMemoryMapParser")
+    @Symbol("gccParser")
     @Extension
     public static final class DescriptorImpl extends MemoryMapParserDescriptor<GccMemoryMapParser> {
 
