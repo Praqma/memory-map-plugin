@@ -50,6 +50,17 @@ public class UseCase {
         this.useCase = useCase;
     }
 
+    /**
+     *
+     * Test that is executed for each string in {@link #data()}. Uses the default `FreeStyle` job type.
+     *
+     * Each test has a set of commits which the @{@link BranchManipulator} modifies and transplants. On the branch
+     * that is check out from the examples repository, we have a list of expected results store in a .JSON file.
+     *
+     * See <a href="https://github.com/Praqma/memory-map-examples">PUBLIC_EXAMPLE_URL</a>
+     *
+     * @throws Exception when there are test errors
+     */
     @Test
     public void testUseCase() throws Exception {
         System.out.printf("%sUse case: %s%n", UseCaseCommits.PREFIX, useCase);
@@ -83,7 +94,12 @@ public class UseCase {
         }
     }
 
-
+    /**
+     *
+     * See @{@link UseCase}. Does the same as the FreeStyle job. Iterates commits and expects specific results from each commit.
+     *
+     * @throws Exception
+     */
     @Test
     public void testUseCase_pipelines() throws Exception {
         System.out.printf("%sUse case: %s%n", UseCaseCommits.PREFIX, useCase);
