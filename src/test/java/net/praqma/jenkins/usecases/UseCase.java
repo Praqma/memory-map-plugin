@@ -82,7 +82,7 @@ public class UseCase {
             commitNumber++;
         }
     }
-    
+
     @Test
     public void testUseCase_pipelines() throws Exception {
         System.out.printf("%sUse case: %s%n", UseCaseCommits.PREFIX, useCase);
@@ -91,7 +91,7 @@ public class UseCase {
         BranchManipulator manipulator = new BranchManipulator(commits);
 
         InputStream fis = UseCase.class.getResourceAsStream("pipeScript.txt");
-        String s = IOUtils.toString(fis);
+        String s = IOUtils.toString(fis).replace("$deliverBranch", manipulator.getUseCase().getDeliverBranch()).replace("$deliverUrl",manipulator.getUseCase().getFileRemoteName());
                 
         WorkflowJob job = jenkinsRule.jenkins.createProject(WorkflowJob.class, "p");
         CpsFlowDefinition flowDef = new CpsFlowDefinition(s, true);
