@@ -192,7 +192,7 @@ public class MemoryMapRecorder extends Recorder implements SimpleBuildStep {
         }
 
         @Override
-        public Publisher newInstance(StaplerRequest req, JSONObject formData) throws FormException {
+        public Publisher newInstance(@Nonnull  StaplerRequest req, JSONObject formData) throws FormException {
             MemoryMapRecorder instance = req.bindJSON(MemoryMapRecorder.class, formData);
             save();
             return instance;
