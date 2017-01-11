@@ -98,7 +98,7 @@ public class UseCase {
      *
      * See @{@link UseCase}. Does the same as the FreeStyle job. Iterates commits and expects specific results from each commit.
      *
-     * @throws Exception
+     * @throws Exception when the test fails
      */
     @Test
     public void testUseCase_pipelines() throws Exception {
