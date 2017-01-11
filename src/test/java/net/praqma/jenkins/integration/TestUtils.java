@@ -52,6 +52,7 @@ import net.praqma.jenkins.memorymap.parser.AbstractMemoryMapParser;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemoryItem;
 import net.praqma.jenkins.memorymap.util.HexUtils;
 import org.apache.commons.io.FileUtils;
+import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.jvnet.hudson.test.JenkinsRule;

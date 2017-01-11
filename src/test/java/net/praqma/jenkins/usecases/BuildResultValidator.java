@@ -11,6 +11,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
+import org.apache.commons.io.FileUtils;
 
 public class BuildResultValidator {
 
@@ -44,14 +45,14 @@ public class BuildResultValidator {
         HashMap<String, MemoryMapConfigMemoryItem> actualValues = getMemoryItems(build);
 
         System.out.println("¤¤¤¤¤ VALIDATING BUILD " + build.number + " ¤¤¤¤¤");
-        printExpected(expectedValues);
+        //printExpected(expectedValues);
         printActual(actualValues);
 
         if (validateValues) {
             for (Map.Entry<String, HashMap<String, String>> expectedSection : expectedValues.entrySet()) {
                 String expectedSectionName = expectedSection.getKey();
                 MemoryMapConfigMemoryItem actualSection = actualValues.get(expectedSectionName);
-                assertNotNull(String.format("Expected value for key '%s' not found in build result for build #%s", expectedSectionName, build.number), actualSection);
+                assertNotNull(String.format("Expected value for key '%s' not found in build result for build #%s: Possible values: %n%s%n======", expectedSectionName, build.number, actualValues), actualSection);
 
                 for (Map.Entry<String, String> x : expectedSection.getValue().entrySet()) {
                     String expectedField = x.getKey();
@@ -104,6 +105,10 @@ public class BuildResultValidator {
         HashMap<String, MemoryMapConfigMemoryItem> usageMap = new HashMap<>();
 
         File buildFile = new File(build.getLogFile().getParent() + "/build.xml");
+        String fileF = FileUtils.readFileToString(buildFile);
+        System.out.println("===XML===");
+        System.out.println(fileF);
+        System.out.println("===XML===");
         Document document = JsonParser.parseXml(buildFile);
         NodeList allNodes = document.getElementsByTagName("*");
         for (int i = 0; i < allNodes.getLength(); i++) {

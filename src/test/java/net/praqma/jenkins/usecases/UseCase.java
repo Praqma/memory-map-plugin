@@ -8,12 +8,17 @@ import hudson.model.Result;
 import hudson.tasks.Shell;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import net.praqma.jenkins.integration.TestUtils;
 import net.praqma.jenkins.memorymap.MemoryMapRecorder;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.eclipse.jgit.lib.ObjectId;
 import static org.hamcrest.CoreMatchers.is;
+import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
+import org.jenkinsci.plugins.workflow.job.WorkflowJob;
+import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -45,6 +50,17 @@ public class UseCase {
         this.useCase = useCase;
     }
 
+    /**
+     *
+     * Test that is executed for each string in {@link #data()}. Uses the default `FreeStyle` job type.
+     *
+     * Each test has a set of commits which the @{@link BranchManipulator} modifies and transplants. On the branch
+     * that is check out from the examples repository, we have a list of expected results store in a .JSON file.
+     *
+     * See <a href="https://github.com/Praqma/memory-map-examples">PUBLIC_EXAMPLE_URL</a>
+     *
+     * @throws Exception when there are test errors
+     */
     @Test
     public void testUseCase() throws Exception {
         System.out.printf("%sUse case: %s%n", UseCaseCommits.PREFIX, useCase);
@@ -74,6 +90,51 @@ public class UseCase {
             Assert.assertThat(build.getResult(), is(Result.SUCCESS));
             System.out.printf("%sBuild %s finished with status %s using sha %s%n", UseCaseCommits.PREFIX, build.number, build.getResult(), current.getName());
             validator.forBuild(build).validate();
+            commitNumber++;
+        }
+    }
+
+    /**
+     *
+     * See @{@link UseCase}. Does the same as the FreeStyle job. Iterates commits and expects specific results from each commit.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testUseCase_pipelines() throws Exception {
+        System.out.printf("%sUse case: %s%n", UseCaseCommits.PREFIX, useCase);
+
+        UseCaseCommits commits = new UseCaseCommits(useCase, useCaseRule.getRepository());
+        BranchManipulator manipulator = new BranchManipulator(commits);
+
+        InputStream fis = UseCase.class.getResourceAsStream("pipeScript.txt");
+        String s = IOUtils.toString(fis).replace("$deliverBranch", manipulator.getUseCase().getDeliverBranch()).replace("$deliverUrl", manipulator.getUseCase().getFileRemoteName());
+
+        WorkflowJob job = jenkinsRule.jenkins.createProject(WorkflowJob.class, "p");
+        CpsFlowDefinition flowDef = new CpsFlowDefinition(s, true);
+        job.setDefinition(flowDef);
+
+        System.out.println("----------------flow def script ---------------");
+        System.out.println(flowDef.getScript());
+        System.out.println("-------------------------------------------------");
+
+        //Configure the validator
+        File expectedResults = new File(useCaseRule.getUseCaseDir(useCase), "expectedResult.json");
+        String resultsJson = FileUtils.readFileToString(expectedResults);
+        BuildResultValidator validator = new BuildResultValidator();
+        validator.expect(resultsJson);
+
+        ObjectId current;
+        int commitNumber = 1;
+        while ((current = manipulator.nextCommit()) != null) {
+            System.out.printf("%sCherry picked #%s %s%n", UseCaseCommits.PREFIX, commitNumber, current.getName());
+            WorkflowRun b = job.scheduleBuild2(0).get();
+            System.out.println("++++++++++ LOG +++++++++++++++++");
+            System.out.println(b.getLog());
+            System.out.println("++++++++++++++++++++++++++++++++");
+            Assert.assertThat(b.getResult(), is(Result.SUCCESS));
+            System.out.printf("%sBuild %s finished with status %s using sha %s%n", UseCaseCommits.PREFIX, b.number, b.getResult(), current.getName());
+            validator.forBuild(b).validate();
             commitNumber++;
         }
     }

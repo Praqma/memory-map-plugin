@@ -23,10 +23,7 @@
  */
 package net.praqma.jenkins.memorymap;
 
-import hudson.AbortException;
-import hudson.Extension;
-import hudson.Launcher;
-import hudson.FilePath;
+import hudson.*;
 import hudson.model.*;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.BuildStepMonitor;
@@ -80,14 +77,13 @@ public class MemoryMapRecorder extends Recorder implements SimpleBuildStep {
     }
 
     @Override
-    public void perform(@Nonnull Run<?, ?> build, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull TaskListener listener) throws InterruptedException, IOException {
-        
+    public void perform(@Nonnull Run<?, ?> build, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull TaskListener listener) throws InterruptedException, IOException {        
         PrintStream out = listener.getLogger();
-
         HashMap<String, MemoryMapConfigMemory> config;
 
-        String version = Jenkins.getActiveInstance().getPlugin( "memory-map" ).getWrapper().getVersion();
-        out.println( "Memory Map Plugin version " + version );
+        Plugin plug = Jenkins.getActiveInstance().getPlugin("memory-map" );
+        if(plug != null)
+            out.println( "Memory Map Plugin version " + plug.getWrapper().getVersion() );
 
         try {
             config = workspace.act(new MemoryMapConfigFileParserDelegate(getChosenParsers()));
