@@ -87,6 +87,7 @@ public class TestUtils {
      * files
      * @param expectedValues map of the values you want to check. key = name,
      * value = expected usage value
+     * @throws Exception when project creation fails, or build assertion fails
      */
     public static void testUsageValues(JenkinsRule jenkins, AbstractMemoryMapParser parser, String zipName, Map<String, String> expectedValues) throws Exception {
         FreeStyleProject project = createProject(jenkins);
@@ -102,6 +103,7 @@ public class TestUtils {
      *
      * @param jenkins a JenkinsRule instance used to create the project.
      * @return a new project
+     * @throws Exception when project creation fails
      */
     public static FreeStyleProject createProject(JenkinsRule jenkins) throws Exception {
         return createProject(jenkins, true);
@@ -112,6 +114,7 @@ public class TestUtils {
      *
      * @param jenkins a JenkinsRule instance used to create the project.
      * @return a new project
+     * @throws Exception when project creation fails
      */
     public static FreeStyleProject createProject(JenkinsRule jenkins, boolean useSlave) throws Exception {
         FreeStyleProject project = jenkins.createFreeStyleProject(UUID.randomUUID().toString());
@@ -139,6 +142,7 @@ public class TestUtils {
      * @param jenkins a JenkinsRule instance
      * @param expectedValues map of the values you want to check. key = name,
      * value = expected usage value
+     * @throws Exception when assert fails
      */
     public static void doBuildAssert(FreeStyleProject project, JenkinsRule jenkins, Map<String, String> expectedValues) throws Exception {
         FreeStyleBuild build = TestUtils.runNewBuild(project);
@@ -161,6 +165,7 @@ public class TestUtils {
      *
      * @param project the project for which to do the setup
      * @param archiveName the archive you want to extract to the workspace
+     * @throws Exception when workspace cannot be created
      */
     public static void prepareProjectWorkspace(FreeStyleProject project, String archiveName) throws Exception {
         TestUtils.runNewBuild(project);
@@ -186,7 +191,7 @@ public class TestUtils {
      *
      * @param project the project to run the build for
      * @return the build
-     * @throws Exception
+     * @throws Exception when new build doesn't execute in an orderly fashion.
      */
     public static FreeStyleBuild runNewBuild(FreeStyleProject project) throws Exception {
         return project.scheduleBuild2(0).get();
@@ -197,6 +202,7 @@ public class TestUtils {
      *
      * @param build the build of which to print the console log
      * @param jenkins an jenkinsRule instance
+     * @throws Exception when print fails
      */
     public static void printBuildConsoleLog(FreeStyleBuild build, JenkinsRule jenkins) throws Exception {
         System.out.println(jenkins.createWebClient().getPage(build, "console").asText());
@@ -209,7 +215,7 @@ public class TestUtils {
      * @param archiveName Archive to extract.
      * @param project The project in whose workspace the archive will be
      * extracted.
-     * @throws Exception
+     * @throws Exception when the archive cannot be extracted into workspace
      */
     public static void unzipArchiveToProjectWorkspace(FreeStyleProject project, String archiveName) throws Exception {
         FilePath workspace = project.getWorkspace();
@@ -234,7 +240,7 @@ public class TestUtils {
      *
      * @param build the build of which to get the MemoryMapConfigMemoryItems
      * @return the MemoryMapConfigMemoryItems
-     * @throws Exception
+     * @throws Exception when items cannot be found
      */
     private static HashMap<String, MemoryMapConfigMemoryItem> getMemoryItems(FreeStyleBuild build) throws Exception {
         File buildFile = new File(build.getLogFile().getParent() + "/build.xml");
@@ -258,6 +264,7 @@ public class TestUtils {
      *
      * @param node the node to return as raw xml.
      * @return the node as raw xml
+     * @throws Exception when the raw xml from build.xml cannot be serialized
      */
     private static String getRawXml(Node node) throws Exception {
         Document nodeDocument = node.getOwnerDocument();
@@ -271,6 +278,7 @@ public class TestUtils {
      *
      * @param xml the xml file to parse
      * @return the xml file as a Document
+     * @throws Exception when the builx.xml cannot be parsed
      */
     private static Document parseXml(File xml) throws Exception {
         Document document;
@@ -297,6 +305,14 @@ public class TestUtils {
         return new GsonXmlBuilder().setXmlParserCreator(parserCreator).create();
     }
 
+    /**
+     *
+     * @param build current build
+     * @param jenkinsRule the jenkins rule. Utilty library
+     * @return true when the correct part could be parsed, false otherwise
+     * @throws IOException when an IOException occurs
+     * @throws SAXException when the console cannot be parsed
+     */
     public static boolean printAndReturnConsoleOfBuild(Run<?,?> build, JenkinsRule jenkinsRule) throws IOException, SAXException {
         // this outputs loft of HTML garbage... so pretty printing after:
         String console = jenkinsRule.createWebClient().getPage(build, "console").asXml();
