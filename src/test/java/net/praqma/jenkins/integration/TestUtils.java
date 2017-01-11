@@ -100,7 +100,6 @@ public class TestUtils {
 
     /**
      * Creates a new project to test with.
-     *
      * @param jenkins a JenkinsRule instance used to create the project.
      * @return a new project
      * @throws Exception when project creation fails
@@ -113,6 +112,7 @@ public class TestUtils {
      * Creates a new project to test with.
      *
      * @param jenkins a JenkinsRule instance used to create the project.
+     * @param useSlave true when build needs to be assigned a specific slave
      * @return a new project
      * @throws Exception when project creation fails
      */
