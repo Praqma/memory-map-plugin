@@ -83,6 +83,7 @@ public class UseCase {
         }
     }
 
+
     @Test
     public void testUseCase_pipelines() throws Exception {
         System.out.printf("%sUse case: %s%n", UseCaseCommits.PREFIX, useCase);
@@ -91,22 +92,22 @@ public class UseCase {
         BranchManipulator manipulator = new BranchManipulator(commits);
 
         InputStream fis = UseCase.class.getResourceAsStream("pipeScript.txt");
-        String s = IOUtils.toString(fis).replace("$deliverBranch", manipulator.getUseCase().getDeliverBranch()).replace("$deliverUrl",manipulator.getUseCase().getFileRemoteName());
-                
+        String s = IOUtils.toString(fis).replace("$deliverBranch", manipulator.getUseCase().getDeliverBranch()).replace("$deliverUrl", manipulator.getUseCase().getFileRemoteName());
+
         WorkflowJob job = jenkinsRule.jenkins.createProject(WorkflowJob.class, "p");
         CpsFlowDefinition flowDef = new CpsFlowDefinition(s, true);
         job.setDefinition(flowDef);
-       
+
         System.out.println("----------------flow def script ---------------");
         System.out.println(flowDef.getScript());
         System.out.println("-------------------------------------------------");
-        
+
         //Configure the validator
         File expectedResults = new File(useCaseRule.getUseCaseDir(useCase), "expectedResult.json");
         String resultsJson = FileUtils.readFileToString(expectedResults);
         BuildResultValidator validator = new BuildResultValidator();
         validator.expect(resultsJson);
-        
+
         ObjectId current;
         int commitNumber = 1;
         while ((current = manipulator.nextCommit()) != null) {
@@ -121,7 +122,6 @@ public class UseCase {
             commitNumber++;
         }
     }
-
 
     private MemoryMapRecorder getMemoryMapRecorder() throws JsonSyntaxException, IOException {
         File recorderConfigFile = new File(useCaseRule.getUseCaseDir(useCase), "graphConfiguration.json");

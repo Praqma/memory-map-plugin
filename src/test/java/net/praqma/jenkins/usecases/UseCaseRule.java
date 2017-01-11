@@ -1,6 +1,8 @@
 package net.praqma.jenkins.usecases;
 
 import java.io.File;
+import java.io.IOException;
+
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jgit.api.Git;
 import org.junit.rules.ExternalResource;
@@ -32,18 +34,22 @@ public class UseCaseRule extends ExternalResource {
     public Statement apply(Statement base, Description description) {
         try {
             File dir = new File(FileUtils.getTempDirectory(), "/rule" + System.currentTimeMillis());
-            if (workDir != null && workDir.exists()) {
-                Git.open(workDir).fetch().call();
-                System.out.println("Repo for tests already exists. Reusing: " + workDir.getAbsolutePath());
-            } else {
-                dir.mkdir();
-                workDir = dir;
-                Git.cloneRepository().setURI(url).setCloneAllBranches(true).setDirectory(workDir).call().close();
-                System.out.println("Repo for test doesn't exist. Creating: " + workDir.getAbsolutePath());
-            }
+            dir.mkdir();
+            workDir = dir;
+            Git.cloneRepository().setURI(url).setCloneAllBranches(true).setDirectory(dir).call().close();
+            System.out.println("Repo for test doesn't exist. Creating: " + dir.getAbsolutePath());
             return super.apply(base, description);
         } catch (Exception ex) {
             throw new RuntimeException("Failed to create test repo", ex);
+        }
+    }
+
+    public void after() {
+        try {
+            FileUtils.deleteDirectory(workDir);
+        } catch (IOException e) {
+            //Ignore
+            e.printStackTrace();
         }
     }
 }
