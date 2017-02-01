@@ -1,3 +1,9 @@
+---
+Maintainer: 
+- Codemines
+- MadsNielsen
+---
+
 Memory Map plugin
 =================
 This readme file mostly contains developer oriented documentation. 
