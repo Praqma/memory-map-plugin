@@ -1,6 +1,5 @@
 ---
 Maintainer: 
-- Codemines
 - MadsNielsen
 ---
 
