@@ -18,7 +18,7 @@ The linker command file is to some extend common for all compilers.
 * some compilers have their own names and special sections (.cinit for TI)
 * there is a user defined section and layout as well
 
-Typically the memory map file have _memory_ sections and another section called  _sections_ 
+Typically the memory map file have _memory_ sections and another section called  _sections_
 
 
 ## Typical memory sections
@@ -105,4 +105,3 @@ If declaring inside functions and memory usage isn’t change it might be on the
 * **Ensure drill-down-data structure?:** We would like to support drill-down into data - how can we design toward that approach. *Mads could show current data flow and structures.*
 
 * **Map files are not versioned!** I could find any descriptions or writing about if GCC describe their different memory map output file formats and that they are actually versioned. Researched mostly GCC.
-

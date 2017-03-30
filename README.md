@@ -40,3 +40,9 @@ We happily accept pull requests on [Praqma's Memory Map GitHub repository](https
 * Please reference a JIRA issue in your pull request.
 * Please either include tests for your code changes or make sure your changes are covered by existing tests.
 * Unless you are contributing a simple bug fix or feature implementation, please consult the  [Memory Map plugin's Trello board](https://trello.com/b/eOsTMooO/memory-map-plugin-for-jenkins-ci) to discuss implementation ideas.
+
+### Developer details
+
+See some of our initial research on compiler and linkers, and their memory map output, and get a grasp about the idea behind it all. Read the [research notes in the docs folder](docs/ResearchNotes.md).
+
+See also the brief architecture illustration in [docs/architecture.md](docs/architecture.md).
