@@ -24,14 +24,15 @@ It allows for displaying memory map values throughout builds in a graph, making 
 * [Maven project Memory Map Plugin](https://jenkins.ci.cloudbees.com/job/plugins/job/memory-map-plugin/)
 
 ### Roadmap
-* [Memory Map plugin's Trello board](https://trello.com/b/eOsTMooO/memory-map-plugin-for-jenkins-ci)
+
+See [docs/roadmap.md](docs/roadmap.md)-file.
 
 ### Wiki and issue tracker
+
 User oriented documentation can be found on the wiki:
 * [Memory Map plugin's Jenkins wiki page](https://wiki.jenkins-ci.org/display/JENKINS/Memory+Map+Plugin)
 
-Issues are tracked using the Jenkins JIRA issue tracker:
-* [Memory Map on JIRA](https://issues.jenkins-ci.org/browse/JENKINS-29122?jql=project%20%3D%20JENKINS%20AND%20status%20in%20%28Open%2C%20%22In%20Progress%22%2C%20Reopened%29%20AND%20component%20%3D%20%27memory-map-plugin%27)
+We are not using the Jenkins CI community issue tracker any more. All issues are tracked using github issues.
 
 ## Contributing
 
