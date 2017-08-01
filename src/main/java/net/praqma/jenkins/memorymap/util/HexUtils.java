@@ -52,7 +52,7 @@ public class HexUtils {
     }
 
     public static double wordCount(String hexString, int wordSize, String scale) {
-        return HexUtils.getRadix(hexString, wordSize) / (double) HexUtils.scale.get(scale.toLowerCase());
+        return HexUtils.getRadix(hexString, 16) / (double) HexUtils.scale.get(scale.toLowerCase());
     }
 
     public static double byteCount(String hexString, int wordSize, String scale) {
