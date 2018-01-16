@@ -33,6 +33,7 @@ import org.apache.commons.lang.StringUtils;
  */
 public class HexUtils {
 
+    private static final int HEXA_RADIX = 16;
     private static final int BITS_PER_BYTE = 8;
 
     private static final long DEFAULT = 1;
@@ -51,12 +52,12 @@ public class HexUtils {
         scale.put("giga", GIGA);
     }
 
-    public static double wordCount(String hexString, int wordSize, String scale) {
-        return HexUtils.getRadix(hexString, 16) / (double) HexUtils.scale.get(scale.toLowerCase());
+    public static double wordCount(String hexString, String scale) {
+        return HexUtils.getRadix(hexString, HEXA_RADIX) / (double) HexUtils.scale.get(scale.toLowerCase());
     }
 
     public static double byteCount(String hexString, int wordSize, String scale) {
-        return HexUtils.wordCount(hexString, wordSize, scale) * (wordSize / (double) BITS_PER_BYTE);
+        return HexUtils.wordCount(hexString, scale) * (wordSize / (double) BITS_PER_BYTE);
     }
 
     private static double getRadix(String hexString, int radix) {

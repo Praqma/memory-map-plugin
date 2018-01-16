@@ -47,17 +47,17 @@ public class HexUtilsTest {
      */
     @Test
     public void wordCountTestKilo() {
-        assertEquals(1023d / 1024, HexUtils.wordCount("3FF", 8, "kilo"), 0);
-        assertEquals(1024d / 1024, HexUtils.wordCount("400", 8, "kilo"), 0);
-        assertEquals(1025d / 1024, HexUtils.wordCount("401", 8, "kilo"), 0);
+        assertEquals(1023d / 1024, HexUtils.wordCount("3FF", "kilo"), 0);
+        assertEquals(1024d / 1024, HexUtils.wordCount("400", "kilo"), 0);
+        assertEquals(1025d / 1024, HexUtils.wordCount("401", "kilo"), 0);
 
-        assertEquals(1023d / 1024, HexUtils.wordCount("3FF", 16, "kilo"), 0);
-        assertEquals(1024d / 1024, HexUtils.wordCount("400", 16, "kilo"), 0);
-        assertEquals(1025d / 1024, HexUtils.wordCount("401", 16, "kilo"), 0);
+        assertEquals(1023d / 1024, HexUtils.wordCount("3FF", "kilo"), 0);
+        assertEquals(1024d / 1024, HexUtils.wordCount("400", "kilo"), 0);
+        assertEquals(1025d / 1024, HexUtils.wordCount("401", "kilo"), 0);
 
-        assertEquals(1023d / 1024, HexUtils.wordCount("3FF", 32, "kilo"), 0);
-        assertEquals(1024d / 1024, HexUtils.wordCount("400", 32, "kilo"), 0);
-        assertEquals(1025d / 1024, HexUtils.wordCount("401", 32, "kilo"), 0);
+        assertEquals(1023d / 1024, HexUtils.wordCount("3FF", "kilo"), 0);
+        assertEquals(1024d / 1024, HexUtils.wordCount("400", "kilo"), 0);
+        assertEquals(1025d / 1024, HexUtils.wordCount("401", "kilo"), 0);
 
     }
 
@@ -66,9 +66,9 @@ public class HexUtilsTest {
      */
     @Test
     public void wordCountTestMega() {
-        assertEquals(1023d / 1024 / 1024, HexUtils.wordCount("3FF", 16, "Mega"), 0);
-        assertEquals(1024d / 1024 / 1024, HexUtils.wordCount("400", 16, "Mega"), 0);
-        assertEquals(1025d / 1024 / 1024, HexUtils.wordCount("401", 16, "Mega"), 0);
+        assertEquals(1023d / 1024 / 1024, HexUtils.wordCount("3FF", "Mega"), 0);
+        assertEquals(1024d / 1024 / 1024, HexUtils.wordCount("400", "Mega"), 0);
+        assertEquals(1025d / 1024 / 1024, HexUtils.wordCount("401", "Mega"), 0);
 
     }
 
@@ -77,9 +77,9 @@ public class HexUtilsTest {
      */
     @Test
     public void wordCountTestGiga() {
-        assertEquals(1023d / 1024 / 1024 / 1024, HexUtils.wordCount("3FF", 16, "Giga"), 0);
-        assertEquals(1024d / 1024 / 1024 / 1024, HexUtils.wordCount("400", 16, "Giga"), 0);
-        assertEquals(1025d / 1024 / 1024 / 1024, HexUtils.wordCount("401", 16, "Giga"), 0);
+        assertEquals(1023d / 1024 / 1024 / 1024, HexUtils.wordCount("3FF", "Giga"), 0);
+        assertEquals(1024d / 1024 / 1024 / 1024, HexUtils.wordCount("400", "Giga"), 0);
+        assertEquals(1025d / 1024 / 1024 / 1024, HexUtils.wordCount("401", "Giga"), 0);
 
     }
 
