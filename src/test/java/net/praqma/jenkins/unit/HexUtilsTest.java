@@ -43,18 +43,10 @@ public class HexUtilsTest {
     public ExpectedException thrown = ExpectedException.none();
 
     /**
-     * Test the conversion of the number 1024 to kWords with a few different word sizes
+     * Test the conversion of the number 1024 to kWords
      */
     @Test
     public void wordCountTestKilo() {
-        assertEquals(1023d / 1024, HexUtils.wordCount("3FF", "kilo"), 0);
-        assertEquals(1024d / 1024, HexUtils.wordCount("400", "kilo"), 0);
-        assertEquals(1025d / 1024, HexUtils.wordCount("401", "kilo"), 0);
-
-        assertEquals(1023d / 1024, HexUtils.wordCount("3FF", "kilo"), 0);
-        assertEquals(1024d / 1024, HexUtils.wordCount("400", "kilo"), 0);
-        assertEquals(1025d / 1024, HexUtils.wordCount("401", "kilo"), 0);
-
         assertEquals(1023d / 1024, HexUtils.wordCount("3FF", "kilo"), 0);
         assertEquals(1024d / 1024, HexUtils.wordCount("400", "kilo"), 0);
         assertEquals(1025d / 1024, HexUtils.wordCount("401", "kilo"), 0);
