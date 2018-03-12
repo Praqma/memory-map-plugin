@@ -208,16 +208,10 @@ public class MemoryMapBuildAction implements SimpleBuildStep.LastBuildAction {
         rangeAxis.setUpperBound(max);
         rangeAxis.setLowerBound(min);
         BarRenderer renderer = new BarRenderer();
-        renderer.setBaseItemLabelsVisible(true);
 
         CategoryPlot plot = new CategoryPlot(dataSet, domainAxis, rangeAxis, renderer);
         plot.setDomainAxis(domainAxis);
         domainAxis.setCategoryLabelPositions(CategoryLabelPositions.UP_90);
-
-        domainAxis.setLowerMargin(0.1);
-        domainAxis.setUpperMargin(0.1);
-        domainAxis.setTickLabelsVisible(true);
-        domainAxis.setCategoryMargin(0.1);
 
         plot.setOrientation(PlotOrientation.VERTICAL);
         plot.setBackgroundPaint(Color.WHITE);
