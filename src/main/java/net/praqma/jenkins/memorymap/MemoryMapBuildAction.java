@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.logging.Level;
+import hudson.util.ShiftedCategoryAxis;
 import jenkins.tasks.SimpleBuildStep;
 import net.praqma.jenkins.memorymap.parser.AbstractMemoryMapParser;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
@@ -41,7 +42,6 @@ import net.praqma.jenkins.memorymap.util.HexUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.CategoryAxis;
-import org.jfree.chart.axis.CategoryAxis3D;
 import org.jfree.chart.axis.CategoryLabelPositions;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.CategoryPlot;
@@ -202,7 +202,7 @@ public class MemoryMapBuildAction implements SimpleBuildStep.LastBuildAction {
     }
 
     protected JFreeChart createPairedBarCharts(String title, String yAxis, double max, double min, CategoryDataset dataSet, Collection<ValueMarker> markers) {
-        final CategoryAxis domainAxis = new CategoryAxis3D();
+        final CategoryAxis domainAxis = new ShiftedCategoryAxis(null);
         final NumberAxis rangeAxis = new NumberAxis(yAxis);
         rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
         rangeAxis.setUpperBound(max);
