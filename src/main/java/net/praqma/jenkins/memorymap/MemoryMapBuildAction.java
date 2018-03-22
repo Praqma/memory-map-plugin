@@ -317,7 +317,7 @@ public class MemoryMapBuildAction implements SimpleBuildStep.LastBuildAction {
                 if (getRecorder().getShowBytesOnGraph()) {
                     value = value + HexUtils.byteCount(item.getUsed(), getRecorder().getWordSize(), scale);
                 } else {
-                    value = value + HexUtils.wordCount(item.getUsed(), getRecorder().getWordSize(), scale);
+                    value = value + HexUtils.wordCount(item.getUsed(), scale);
                 }
             }
         }
@@ -338,7 +338,7 @@ public class MemoryMapBuildAction implements SimpleBuildStep.LastBuildAction {
                 }
             } else {
                 if (it.getTopLevelMemoryMax() != null) {
-                    value = value + HexUtils.wordCount(it.getTopLevelMemoryMax(), getRecorder().getWordSize(), scale);
+                    value = value + HexUtils.wordCount(it.getTopLevelMemoryMax(), scale);
                     if (value > 0d) {
                         return value;
                     }
@@ -359,7 +359,7 @@ public class MemoryMapBuildAction implements SimpleBuildStep.LastBuildAction {
                 }
             } else {
                 if (it.getTopLevelMemoryMax() != null) {
-                    value = value + HexUtils.wordCount(it.getTopLevelMemoryMax(), getRecorder().getWordSize(), scale);
+                    value = value + HexUtils.wordCount(it.getTopLevelMemoryMax(), scale);
                 }
             }
         }
