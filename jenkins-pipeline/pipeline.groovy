@@ -1,4 +1,9 @@
 multibranchPipelineJob("Memory Map Jenkins Plugin") {
+    factory {
+        workflowBranchProjectFactory {
+            scriptPath('jenkins-pipeline/Jenkinsfile')
+        }
+    }
     branchSources {
         git {
             credentialsId("github")
@@ -11,7 +16,8 @@ multibranchPipelineJob("Memory Map Jenkins Plugin") {
     }
 
     configure {
-        it / 'sources' / 'data' / 'jenkins.branch.BranchSource' / 'source' / 'traits' << 'jenkins.plugins.git.traits.CloneOptionTrait' {
+        def traitBlock = it / 'sources' / 'data' / 'jenkins.branch.BranchSource' / 'source' / 'traits'
+        traitBlock << 'jenkins.plugins.git.traits.CloneOptionTrait' {
             extension(class: 'hudson.plugins.git.extensions.impl.CloneOption') {
                 shallow(false)
                 noTag(false)
@@ -20,5 +26,8 @@ multibranchPipelineJob("Memory Map Jenkins Plugin") {
                 honorRefspec(false)
             }
         }
+
+        traitBlock << 'jenkins.plugins.git.traits.BranchDiscoveryTrait' { }
     }
+
 }
