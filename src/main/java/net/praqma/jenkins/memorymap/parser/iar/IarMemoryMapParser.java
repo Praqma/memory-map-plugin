@@ -139,6 +139,10 @@ public class IarMemoryMapParser extends AbstractMemoryMapParser {
         return config;
     }
 
+    @Override
+    public int getDefaultWordSize() {
+        return 16;
+    }
 
     @Symbol("IARParser")
     @Extension
