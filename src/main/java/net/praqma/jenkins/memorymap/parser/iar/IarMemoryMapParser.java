@@ -59,13 +59,13 @@ public class IarMemoryMapParser extends AbstractMemoryMapParser {
     private static final Pattern AVR_CODE = Pattern.compile("CODE\\s\\w+\\s\\-\\s\\w+\\s\\((\\S+)\\sbytes\\)", Pattern.MULTILINE);
     private static final Pattern EWARM_CONST = Pattern.compile("\\.rodata\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
     private static final Pattern EWARM_NOINIT = Pattern.compile("\\.noinit\\s+\\S+\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
-    private static final Pattern STM8_NOINIT = Pattern.compile("\.near\.noinit\s+uninit\s+\S+\s+(\S+)", Pattern.MULTILINE);
+    private static final Pattern STM8_NOINIT = Pattern.compile("\\.near\\.noinit\\s+uninit\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
     // the onces here below are the same over all IAR compiler version (EWARM, STM8 and AVR).
     private static final Pattern IAR_INIT_TABLE = Pattern.compile("\\.iar\\.init_table\\s+const\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
     private static final Pattern IAR_INTERRUPT_VECTOR_TABLE = Pattern.compile("\\.intvec\\s+(const|ro\\scode)\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
     private static final Pattern IAR_INIT_BYTES = Pattern.compile("Initializer\\sbytes\\s+ro\\sdata\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
     private static final Pattern STM8_IAR_VREGS = Pattern.compile("\\.vregs\\s+uninit\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
-    private static final Pattern IAR_CHECKSUM = Pattern.compile("\.checksum\s+const\s+\S+\s+(\S+)", Pattern.MULTILINE);
+    private static final Pattern IAR_CHECKSUM = Pattern.compile("\\.checksum\\s+const\\s+\\S+\\s+(\\S+)", Pattern.MULTILINE);
     /*
      * Ram
      */
