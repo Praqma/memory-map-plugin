@@ -1,6 +1,6 @@
 ---
 Maintainer:
-- buep
+- MadsNielsen
 ---
 
 # Memory Map plugin
