@@ -48,7 +48,7 @@ import org.jenkinsci.Symbol;
  * @author Kay van der Zander
  * IAR map files used from ARM, STM8 and AVR.
  */
-public class IARMemoryMapParser extends AbstractMemoryMapParser {
+public class IarMemoryMapParser extends AbstractMemoryMapParser {
 
 
     /*
@@ -83,12 +83,12 @@ public class IARMemoryMapParser extends AbstractMemoryMapParser {
     private static final Pattern AVR_EEPROM = Pattern.compile("XDATA\\s\\w+\\s\\-\\s\\w+\\s\\((\\S+)\\sbytes\\)", Pattern.MULTILINE);
 
     @DataBoundConstructor
-    public IARMemoryMapParser(String parserUniqueName, String mapFile, String configurationFile, Integer wordSize, List<MemoryMapGraphConfiguration> graphConfiguration, Boolean bytesOnGraph) {
+    public IarMemoryMapParser(String parserUniqueName, String mapFile, String configurationFile, Integer wordSize, List<MemoryMapGraphConfiguration> graphConfiguration, Boolean bytesOnGraph) {
         super(parserUniqueName, mapFile, configurationFile, wordSize, bytesOnGraph, graphConfiguration,
         EWARM_TEXT, EWARM_CONST, EWARM_NOINIT, EWARM_BSS, EWARM_DATA,);
     }
 
-    public IARMemoryMapParser() {
+    public IarMemoryMapParser() {
         super();
     }
 
@@ -142,7 +142,7 @@ public class IARMemoryMapParser extends AbstractMemoryMapParser {
 
     @Symbol("IARParser")
     @Extension
-    public static final class DescriptorImpl extends MemoryMapParserDescriptor<TexasInstrumentsMemoryMapParser> {
+    public static final class DescriptorImpl extends MemoryMapParserDescriptor<IarMemoryMapParser> {
 
         @Override
         public String getDisplayName() {
@@ -151,7 +151,7 @@ public class IARMemoryMapParser extends AbstractMemoryMapParser {
 
         @Override
         public AbstractMemoryMapParser newInstance(StaplerRequest req, JSONObject formData, AbstractMemoryMapParser instance) throws FormException {
-            IARMemoryMapParser parser = (IARMemoryMapParser) instance;
+            IarMemoryMapParser parser = (IarMemoryMapParser) instance;
             save();
             return parser;
         }
