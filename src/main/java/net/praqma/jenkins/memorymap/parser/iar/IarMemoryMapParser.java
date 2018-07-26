@@ -85,7 +85,7 @@ public class IarMemoryMapParser extends AbstractMemoryMapParser {
     @DataBoundConstructor
     public IarMemoryMapParser(String parserUniqueName, String mapFile, String configurationFile, Integer wordSize, List<MemoryMapGraphConfiguration> graphConfiguration, Boolean bytesOnGraph) {
         super(parserUniqueName, mapFile, configurationFile, wordSize, bytesOnGraph, graphConfiguration,
-        EWARM_TEXT, EWARM_CONST, EWARM_NOINIT, EWARM_BSS, EWARM_DATA,);
+        EWARM_TEXT, EWARM_CONST, EWARM_NOINIT, EWARM_BSS, EWARM_DATA);
     }
 
     public IarMemoryMapParser() {
