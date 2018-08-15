@@ -9,10 +9,6 @@ multibranchPipelineJob("Memory Map Jenkins Plugin") {
             credentialsId("github")
             remote("https://github.com/Praqma/memory-map-plugin.git")
         }
-
-        triggers {
-            periodic(20)
-        }
     }
 
     configure {
