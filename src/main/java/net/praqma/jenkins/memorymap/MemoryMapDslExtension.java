@@ -26,7 +26,7 @@ job {
 }
 ```
 
-Valid values for `parserType` are `GCC` and `TI`. Valid values for `scale` are `DEFAULT`, `KILO`, `MEGA` and `GIGA`.
+Valid values for `parserType` are `GCC`, 'PowerPCEabiGcc' and `TI`. Valid values for `scale` are `DEFAULT`, `KILO`, `MEGA` and `GIGA`.
 
 ```
 job ('mmap_GEN'){
