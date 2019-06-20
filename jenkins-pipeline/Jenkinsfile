@@ -7,7 +7,7 @@ node("dockerhost1") {
     } 
        
     stage("build") {
-        buildMaven()
+        buildMaven buildCommand: "mvn clean package test integration-test"
     }
 
     stage("changelog") {
