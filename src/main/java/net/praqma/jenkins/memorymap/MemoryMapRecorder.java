@@ -44,17 +44,15 @@ import jenkins.model.Jenkins;
 import net.praqma.jenkins.memorymap.parser.*;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
 import net.praqma.jenkins.memorymap.util.MemoryMapError;
-import net.sf.json.JSONObject;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
-import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.QueryParameter;
 /**
  *
  * @author Praqma
  */
-public class MemoryMapRecorder extends Recorder implements SimpleBuildStep {
+public class MemoryMapRecorder extends Recorder implements Describable<Publisher>, SimpleBuildStep {
 
     private int wordSize = 8;
     private boolean showBytesOnGraph = false;
@@ -66,9 +64,6 @@ public class MemoryMapRecorder extends Recorder implements SimpleBuildStep {
     @Override
     public BuildStepMonitor getRequiredMonitorService() {
         return BuildStepMonitor.BUILD;
-    }
-
-    public MemoryMapRecorder(){
     }
 
     @DataBoundConstructor
