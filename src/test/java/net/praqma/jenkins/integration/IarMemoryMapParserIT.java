@@ -36,13 +36,13 @@ public class IarMemoryMapParserIT {
 
     @Test
     public void testUsageValues() throws Exception {
-        MemoryMapGraphConfiguration graphConfiguration = new MemoryMapGraphConfiguration(".text+.near", "FLASH");
+        MemoryMapGraphConfiguration graphConfiguration = new MemoryMapGraphConfiguration(".bss", "RAM");
         IarMemoryMapParser parser = createParser(graphConfiguration);
         parser.setMapFile("EWARM_7.60.1_linker_stm32f091xC.map");
         parser.setConfigurationFile("EWARM_7.60.1_linker_stm32f091xC.icf");
 
         HashMap<String, String> expectedValues = new HashMap<>();
-        expectedValues.put("someSection", "0xFF");
+        expectedValues.put(".bss", "0xc4");
 
         TestUtils.testUsageValues(jenkins, parser, "iar-ewarm-7.60.1.zip", expectedValues);
     }
