@@ -115,8 +115,6 @@ public class IarMemoryMapParser extends AbstractMemoryMapParser {
 
                     MemoryMapConfigMemoryItem item = null;
                     while (matcher.find()) {
-                        // Need to build a MemoryMapConfigMemoryItem with as much data as we can squeeze out of the map file:
-                        // MemoryMapConfigMemoryItem(String name, String origin, String length, String used, String unused)
                         item = new MemoryMapConfigMemoryItem(section, "N/A", "N/A", matcher.group(1), "N/A");
                         config.add(item);
                     }

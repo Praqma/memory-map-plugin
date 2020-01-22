@@ -76,13 +76,4 @@ public class MemoryMapConfigMemory extends LinkedList<MemoryMapConfigMemoryItem>
         }
         return items;
     }
-
-    @Override
-    public boolean add(MemoryMapConfigMemoryItem e) {
-        if (this.contains(e)) {
-            return false;
-        }
-        return super.add(e);
-    }
-
 }
