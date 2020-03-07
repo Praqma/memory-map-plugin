@@ -23,7 +23,6 @@
  */
 package net.praqma.jenkins.memorymap.util;
 
-import java.io.File;
 import java.io.IOException;
 
 /**
