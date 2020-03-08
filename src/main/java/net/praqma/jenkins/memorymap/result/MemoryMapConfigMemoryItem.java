@@ -229,9 +229,7 @@ public class MemoryMapConfigMemoryItem implements Serializable, Comparable<Memor
     public boolean equals(Object obj) {
         if (obj instanceof MemoryMapConfigMemoryItem) {
             MemoryMapConfigMemoryItem item = (MemoryMapConfigMemoryItem) obj;
-            if (item.name.equals(this.name)) {
-                return true;
-            }
+            return item.name.equals(this.name);
         }
         return false;
     }
