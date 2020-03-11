@@ -32,7 +32,7 @@ See [docs/roadmap.md](docs/roadmap.md)-file.
 User oriented documentation can be found on the wiki:
 * [Memory Map plugin's Jenkins wiki page](https://wiki.jenkins-ci.org/display/JENKINS/Memory+Map+Plugin)
 
-We are not using the Jenkins CI community issue tracker any more. All issues are tracked using github issues.
+We are not using the Jenkins CI community issue tracker any more. All issues are tracked using [Github issues](https://github.com/Praqma/memory-map-plugin/issues).
 
 ## Contributing
 
