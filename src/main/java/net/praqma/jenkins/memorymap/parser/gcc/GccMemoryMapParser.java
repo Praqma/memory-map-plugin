@@ -141,7 +141,7 @@ public class GccMemoryMapParser extends AbstractMemoryMapParser implements Seria
      * @return a more complete configuration, where i have better values
      */
     public MemoryMapConfigMemory guessLengthOfSections(MemoryMapConfigMemory memory) {
-        Collections.sort(memory, new MemoryMapMemItemComparator());
+        memory.sort(new MemoryMapMemItemComparator());
 
         for (MemoryMapConfigMemoryItem item : memory) {
             if (item.getLength() == null) {

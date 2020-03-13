@@ -129,13 +129,7 @@ public class HexUtils {
             long current = getLongValue();
             long other = t.getLongValue();
 
-            if (other > current) {
-                return 1;
-            } else if (other < current) {
-                return -1;
-            } else {
-                return 0;
-            }
+            return Long.compare(other, current);
         }
 
         @Override
