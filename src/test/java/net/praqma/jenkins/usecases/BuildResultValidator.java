@@ -17,7 +17,6 @@ public class BuildResultValidator {
 
     private Run<?, ?> build;
     private ResultContainer expectedResults;
-    private boolean validateGraphs = true;
     private boolean validateValues = true;
 
     public BuildResultValidator expect(String json) {
@@ -31,7 +30,6 @@ public class BuildResultValidator {
     }
 
     public BuildResultValidator validateGraphs(boolean validateGraphs) {
-        this.validateGraphs = validateGraphs;
         return this;
     }
 
@@ -70,9 +68,6 @@ public class BuildResultValidator {
             }
         }
 
-        if (validateGraphs) {
-            //TODO: Implement me
-        }
     }
 
     public void printExpected(HashMap<String, HashMap<String, String>> expectedValues) {

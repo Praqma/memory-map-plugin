@@ -75,7 +75,7 @@ public class MemoryMapRecorder extends Recorder implements SimpleBuildStep {
     }
 
     @Override
-    public void perform(@Nonnull Run<?, ?> build, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull TaskListener listener) throws InterruptedException, IOException {        
+    public void perform(@Nonnull Run<?, ?> build, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull TaskListener listener) throws InterruptedException, IOException {
         PrintStream out = listener.getLogger();
         HashMap<String, MemoryMapConfigMemory> config;
 
@@ -141,14 +141,14 @@ public class MemoryMapRecorder extends Recorder implements SimpleBuildStep {
     public void setWordSize(int wordSize) {
         this.wordSize = wordSize;
     }
-    
+
     /**
      * @return the scale
      */
     public String getScale() {
         return scale;
     }
-    
+
      /**
      * @param scale the scale to set
      */
