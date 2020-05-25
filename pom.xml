@@ -306,11 +306,6 @@
             In the reporting section javadoc plugin is mentioned as well to enable javadoc as part of the 'mvn site'
             lifecycle
             -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.10.4</version>
-            </plugin>
             <!--
             Run pmd:pmd and pmd:cpd goals directly without being part of 'mvn site' lifecycle
             PMD and CPD scans java code for possible problems and copy-pasted code
