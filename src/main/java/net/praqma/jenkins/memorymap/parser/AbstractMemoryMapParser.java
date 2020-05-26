@@ -51,6 +51,7 @@ import jenkins.model.Jenkins;
 import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfiguration;
 import net.praqma.jenkins.memorymap.graph.MemoryMapGraphConfigurationDescriptor;
 import net.praqma.jenkins.memorymap.parser.gcc.GccMemoryMapParser;
+import net.praqma.jenkins.memorymap.parser.powerpceabigcc.PowerPCEabiGccMemoryMapParser;
 import net.praqma.jenkins.memorymap.parser.ti.TexasInstrumentsMemoryMapParser;
 import net.praqma.jenkins.memorymap.result.MemoryMapConfigMemory;
 import org.apache.commons.collections.ListUtils;
@@ -62,6 +63,8 @@ import org.kohsuke.stapler.DataBoundSetter;
         property = "type")
 @JsonSubTypes({
     @Type(value = TexasInstrumentsMemoryMapParser.class, name = "TexasInstrumentsMemoryMapParser")
+    ,
+    @Type(value = PowerPCEabiGccMemoryMapParser.class, name = "PowerPCEabiGccMemoryMapParser")
     ,
     @Type(value = GccMemoryMapParser.class, name = "GccMemoryMapParser")})
 

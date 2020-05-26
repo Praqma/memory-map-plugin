@@ -10,6 +10,7 @@ import static javaposse.jobdsl.dsl.Preconditions.checkArgument;
 import static javaposse.jobdsl.plugin.ContextExtensionPoint.executeInContext;
 import net.praqma.jenkins.memorymap.parser.AbstractMemoryMapParser;
 import net.praqma.jenkins.memorymap.parser.gcc.GccMemoryMapParser;
+import net.praqma.jenkins.memorymap.parser.powerpceabigcc.PowerPCEabiGccMemoryMapParser;
 import net.praqma.jenkins.memorymap.parser.ti.TexasInstrumentsMemoryMapParser;
 
 public class MemoryMapJobDslContext implements Context {
@@ -46,7 +47,7 @@ public class MemoryMapJobDslContext implements Context {
     }
 
     List<AbstractMemoryMapParser> parsers = new ArrayList<>();
-    List<String> parserTypes = Arrays.asList("GCC", "TI");
+    List<String> parserTypes = Arrays.asList("GCC", "PowerPCEabiGcc", "TI");
 
     public void parser(String parserType, String parserUniqueName, String commandFile, String mapFile, Runnable closure) {
         checkArgument(parserTypes.contains(parserType), "Parser type must be one of " + parserTypes);
@@ -57,6 +58,9 @@ public class MemoryMapJobDslContext implements Context {
         switch (parserType) {
             case "GCC":
                 parser = new GccMemoryMapParser(parserUniqueName, mapFile, commandFile, wordSize, showBytesOnGraphs, context.graphConfigurations);
+                break;
+            case "PowerPCEabiGcc":
+                parser = new PowerPCEabiGccMemoryMapParser(parserUniqueName, mapFile, commandFile, wordSize, showBytesOnGraphs, context.graphConfigurations);
                 break;
             case "TI":
                 parser = new TexasInstrumentsMemoryMapParser(parserUniqueName, mapFile, commandFile, wordSize, context.graphConfigurations, showBytesOnGraphs);
