@@ -27,8 +27,8 @@
             <id>MadsNielsen</id>
             <email>man@praqma.net</email>
             <name>Mads Nielsen</name>
-            <organization>Prama</organization>
-            <organizationUrl>http://www.praqma.com</organizationUrl>
+            <organization>Praqma</organization>
+            <organizationUrl>https://www.praqma.com</organizationUrl>
             <roles>
                 <role>developer</role>
             </roles>
@@ -39,7 +39,7 @@
             <email>jes@praqma.net</email>
             <name>Jes Struck</name>
             <organization>Praqma</organization>
-            <organizationUrl>http://www.praqma.com</organizationUrl>
+            <organizationUrl>https://www.praqma.com</organizationUrl>
             <roles>
                 <role>developer</role>
             </roles>
@@ -50,7 +50,7 @@
             <name>Bue Petersen</name>
             <email>bue@praqma.net</email>
             <organization>Praqma</organization>
-            <organizationUrl>http://www.praqma.com</organizationUrl>
+            <organizationUrl>https://www.praqma.com</organizationUrl>
             <roles>
                 <role>developer</role>
             </roles>
@@ -61,7 +61,7 @@
             <name>Hugo Leote</name>
             <email>hleote@praqma.net</email>
             <organization>Praqma</organization>
-            <organizationUrl>http://www.praqma.com</organizationUrl>
+            <organizationUrl>https://www.praqma.com</organizationUrl>
             <roles>
                 <role>intern/developer</role>
             </roles>
@@ -72,7 +72,7 @@
             <name>Martin Georgiev</name>
             <email>mvgeorgiev@praqma.net</email>
             <organization>Praqma</organization>
-            <organizationUrl>http://www.praqma.com</organizationUrl>
+            <organizationUrl>https://www.praqma.com</organizationUrl>
             <roles>
                 <role>intern/developer</role>
             </roles>
@@ -502,11 +502,11 @@
     <licenses>
         <license>
             <name>MIT</name>
-            <url>http://www.opensource.org/licenses/mit-license.php</url>
+            <url>https://www.opensource.org/licenses/mit-license.php</url>
         </license>
     </licenses>
     <scm>
-        <connection>scm:git:http://github.com/Praqma/memory-map-plugin.git</connection>
+        <connection>scm:git:https://github.com/Praqma/memory-map-plugin.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/Praqma/memory-map-plugin.git</developerConnection>
         <url>https://github.com/Praqma/memory-map-plugin.git</url>
       <tag>HEAD</tag>
