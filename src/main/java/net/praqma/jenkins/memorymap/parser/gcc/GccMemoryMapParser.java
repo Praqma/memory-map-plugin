@@ -94,7 +94,7 @@ public class GccMemoryMapParser extends AbstractMemoryMapParser implements Seria
      }
      *
      */
-    public List<MemoryMapConfigMemoryItem> getSections(CharSequence m) {
+    public List<MemoryMapConfigMemoryItem> getSections(CharSequence m) throws AbortException {
         List<MemoryMapConfigMemoryItem> items = new ArrayList<>();
 
         Pattern section = Pattern.compile("SECTIONS\\s?\\r?\\n?\\{([\\s\\S]*)\\n\\}", Pattern.MULTILINE);
@@ -104,6 +104,11 @@ public class GccMemoryMapParser extends AbstractMemoryMapParser implements Seria
 
         while (sectionMatched.find()) {
             sectionString = sectionMatched.group(1);
+        }
+
+        if (sectionString == null) {
+            logger.log(Level.SEVERE, "Unable to locate SECTIONS block in config file.");
+            throw new AbortException("Unable to locate SECTIONS block in config file.");
         }
 
         //Find the good stuff (SECTION): *SECTIONS\n\{(.*)\n\}
