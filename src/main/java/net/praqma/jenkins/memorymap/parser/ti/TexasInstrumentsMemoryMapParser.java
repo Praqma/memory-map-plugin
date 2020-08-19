@@ -44,6 +44,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.jenkinsci.Symbol;
 
+import javax.annotation.Nonnull;
+
 /**
  *
  * @author Praqma
@@ -139,7 +141,7 @@ public class TexasInstrumentsMemoryMapParser extends AbstractMemoryMapParser {
     @Extension
     public static final class DescriptorImpl extends MemoryMapParserDescriptor<TexasInstrumentsMemoryMapParser> {
 
-        @Override
+        @Override @Nonnull
         public String getDisplayName() {
             return "Texas Instruments";
         }

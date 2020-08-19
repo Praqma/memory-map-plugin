@@ -225,7 +225,7 @@ public class TestUtils {
     }
 
     public static void copyFilesToProjectWorkspace(FreeStyleProject project, String... files) throws Exception {
-        FilePath workspace = project.getWorkspace();
+        FilePath workspace = project.getSomeWorkspace();
         for (String file : Arrays.asList(files)) {
             workspace.copyFrom(TestUtils.class.getResource(file));
         }
